@@ -1,0 +1,7 @@
+Django>=5.0,<6.0
+google-genai
+python-dotenv
+whitenoise
+gunicorn
+dj-database-url
+psycopg2-binary

@@ -1,0 +1,410 @@
+{% extends 'base.html' %}
+{% load recipe_filters %}
+{% block content %}
+
+<style>
+  .planner-slot {
+    min-height: 90px;
+    border-radius: 16px;
+    border: 2px dashed #e5e7eb;
+    background: #ffffff;
+    transition: all 0.25s;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+  .planner-slot:hover {
+    border-color: #374151;
+    background: #f9fafb;
+    transform: translateY(-2px);
+  }
+  .planner-slot.filled {
+    background: #ffffff;
+    border: 2px solid #374151;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+  .meal-emoji { font-size: 1.4rem; }
+  .day-header {
+    background: #374151;
+    color: white;
+    border-radius: 14px;
+    padding: 10px 8px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+  .meal-label {
+    writing-mode: horizontal-tb;
+    font-weight: 700;
+    color: #374151;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .add-icon {
+    width: 32px; height: 32px;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; color: #064E3B; font-weight: 900;
+    margin-bottom: 4px;
+  }
+  .delete-meal-btn {
+    position: absolute; top: 6px; right: 6px;
+    background: rgba(6, 78, 59,0.1);
+    border: none; border-radius: 50%;
+    width: 22px; height: 22px;
+    font-size: 0.65rem; color: #374151;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .delete-meal-btn:hover { background: #e5e7eb; transform: scale(1.1); }
+  .summary-badge {
+    background: #ecfdf5;
+    color: #064E3B; border-radius: 20px;
+    padding: 4px 14px; font-size: 0.78rem; font-weight: 700;
+    display: inline-block; margin: 3px;
+  }
+  .meal-icon-map { display: none; }
+</style>
+
+<!-- Header -->
+<div class="text-center mb-5">
+  <span class="badge-pill">📅 Smart Planner</span>
+  <h2 class="fw-bold" style="color:#064E3B;">Weekly Meal Planner</h2>
+  <p class="text-muted">Plan your meals for the whole week — click any slot to add a recipe 🍽️</p>
+</div>
+
+<!-- Stats Bar -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card p-3 text-center">
+      <div style="font-size:1.8rem;">📅</div>
+      <div class="fw-bold" style="color:#064E3B; font-size:1.4rem;">7</div>
+      <div style="font-size:0.78rem; color:#6b7280;">Days Planned</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card p-3 text-center">
+      <div style="font-size:1.8rem;">🍽️</div>
+      <div class="fw-bold" style="color:#064E3B; font-size:1.4rem;" id="filledSlots">0</div>
+      <div style="font-size:0.78rem; color:#6b7280;">Meals Scheduled</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card p-3 text-center">
+      <div style="font-size:1.8rem;">📋</div>
+      <div class="fw-bold" style="color:#064E3B; font-size:1.4rem;">{{ saved_recipe_names|length }}</div>
+      <div style="font-size:0.78rem; color:#6b7280;">Saved Recipes</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card p-3 text-center" style="cursor:pointer; border:2px solid #064E3B;" onclick="generateShoppingList()">
+      <div style="font-size:1.8rem;">🛒</div>
+      <div class="fw-bold" style="color:#064E3B; font-size:1rem; margin-top:4px;">Generate</div>
+      <div style="font-size:0.78rem; color:#6b7280;">Shopping List</div>
+    </div>
+  </div>
+</div>
+
+<!-- Meal emoji legend -->
+<div class="d-flex gap-3 flex-wrap mb-3" style="font-size:0.82rem; color:#6b7280;">
+  <span>☀️ Breakfast</span>
+  <span>🌤️ Lunch</span>
+  <span>🍎 Snack</span>
+  <span>🌙 Dinner</span>
+</div>
+
+<!-- Planner Grid -->
+<div class="card p-4 mb-5">
+  <div class="table-responsive">
+    <table style="width:100%; border-collapse:separate; border-spacing:8px;">
+      <thead>
+        <tr>
+          <th style="width:80px;"></th>
+          {% for day in days %}
+          <th><div class="day-header">{{ day|slice:":3" }}</div></th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for meal in meals %}
+        <tr>
+          <td style="text-align:center; vertical-align:middle; padding:4px 0;">
+            <div class="meal-label">
+              {% if meal == 'Breakfast' %}☀️
+              {% elif meal == 'Lunch' %}🌤️
+              {% elif meal == 'Snack' %}🍎
+              {% else %}🌙{% endif %}
+              <br>{{ meal }}
+            </div>
+          </td>
+          {% for day in days %}
+          {% with slot=grid|get_item:day %}
+          {% with plan=slot|get_item:meal %}
+          <td style="vertical-align:top; padding:0;">
+            {% if plan %}
+            <div class="planner-slot filled" onclick="openEditSlot('{{ day }}','{{ meal }}','{{ plan.recipe_name|escapejs }}','{{ plan.notes|escapejs }}',{{ plan.id }})">
+              <button class="delete-meal-btn" onclick="event.stopPropagation(); deleteMeal({{ plan.id }}, this)">✕</button>
+              <div style="font-size:0.7rem; font-weight:700; color:#064E3B; margin-bottom:3px;">
+                {% if meal == 'Breakfast' %}☀️{% elif meal == 'Lunch' %}🌤️{% elif meal == 'Snack' %}🍎{% else %}🌙{% endif %}
+              </div>
+              <p style="font-size:0.75rem; font-weight:700; color:#064E3B; margin:0; line-height:1.3; word-break:break-word;">{{ plan.recipe_name|truncatechars:30 }}</p>
+              {% if plan.notes %}<p style="font-size:0.65rem; color:#6b7280; margin:3px 0 0; line-height:1.2;">{{ plan.notes|truncatechars:30 }}</p>{% endif %}
+            </div>
+            {% else %}
+            <div class="planner-slot" onclick="openAddSlot('{{ day }}','{{ meal }}')">
+              <div class="add-icon">+</div>
+              <div style="font-size:0.65rem; color:#9ca3af; font-weight:600;">Add meal</div>
+            </div>
+            {% endif %}
+          </td>
+          {% endwith %}
+          {% endwith %}
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- Weekly Summary -->
+<div class="card p-4 mb-5" style="border:2px solid #ecfdf5;">
+  <h5 class="fw-bold mb-3" style="color:#064E3B;">📊 Weekly Summary</h5>
+  <div id="weeklySummary">
+    {% for day in days %}
+    {% with day_has_meal=False %}
+    <div class="mb-3">
+      <div style="font-weight:700; color:#064E3B; font-size:0.88rem; margin-bottom:6px;">{{ day }}</div>
+      <div class="d-flex flex-wrap">
+        {% for meal in meals %}
+        {% with slot=grid|get_item:day %}
+        {% with plan=slot|get_item:meal %}
+        {% if plan %}
+        <span class="summary-badge">
+          {% if meal == 'Breakfast' %}☀️{% elif meal == 'Lunch' %}🌤️{% elif meal == 'Snack' %}🍎{% else %}🌙{% endif %}
+          {{ plan.recipe_name }}
+        </span>
+        {% endif %}
+        {% endwith %}
+        {% endwith %}
+        {% endfor %}
+        {% comment %}If nothing planned:{% endcomment %}
+      </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Add/Edit Meal Modal -->
+<div id="mealModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:9999; backdrop-filter:blur(4px);">
+  <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:92%; max-width:480px; background:white; border-radius:24px; padding:32px; box-shadow:0 25px 60px rgba(0,0,0,0.15);">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h5 class="fw-bold mb-0" style="color:#064E3B;" id="modalTitle">Add Meal</h5>
+        <p class="text-muted mb-0" style="font-size:0.82rem;" id="modalSubtitle"></p>
+      </div>
+      <button onclick="closeMealModal()" style="background:#f9fafb; border:none; border-radius:50%; width:34px; height:34px; font-size:1rem; cursor:pointer;">✕</button>
+    </div>
+
+    <input type="hidden" id="slotDay" value="">
+    <input type="hidden" id="slotMeal" value="">
+    <input type="hidden" id="slotPlanId" value="">
+
+    <div class="mb-3">
+      <label class="fw-bold mb-1" style="color:#064E3B; font-size:0.88rem;">🍽️ Recipe Name</label>
+      <input type="text" id="recipeNameInput" class="form-control" placeholder="e.g. Dal Tadka, Upma, Poha..."
+        style="border-radius:12px; border:2px solid #d1fae5; padding:12px 14px;"
+        oninput="filterSuggestions(this.value)">
+      <!-- Suggestions -->
+      <div id="recipeSuggestions" style="background:white; border:2px solid #d1fae5; border-radius:12px; margin-top:4px; max-height:160px; overflow-y:auto; display:none; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label class="fw-bold mb-1" style="color:#064E3B; font-size:0.88rem;">📝 Notes (optional)</label>
+      <input type="text" id="mealNotesInput" class="form-control" placeholder="e.g. low-oil version, add extra coriander..."
+        style="border-radius:12px; border:2px solid #d1fae5; padding:12px 14px;">
+    </div>
+
+    <button onclick="saveMeal()" class="btn w-100" style="background:#064E3B; color:white; border-radius:14px; padding:14px;">
+      Save Meal
+    </button>
+  </div>
+</div>
+
+<!-- Shopping List Modal -->
+<div id="shoppingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:9999; backdrop-filter:blur(4px);">
+  <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:92%; max-width:520px; background:white; border-radius:24px; padding:32px; box-shadow:0 25px 60px rgba(0,0,0,0.15); max-height:85vh; overflow-y:auto;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h5 class="fw-bold mb-0" style="color:#064E3B;">🛒 Weekly Shopping List</h5>
+      <button onclick="closeShoppingModal()" style="background:#f9fafb; border:none; border-radius:50%; width:34px; height:34px; font-size:1rem; cursor:pointer;">✕</button>
+    </div>
+    <p class="text-muted mb-3" style="font-size:0.85rem;">Based on your meal plan this week:</p>
+    <div id="shoppingListContent" style="font-size:0.88rem; line-height:2;"></div>
+    <div class="mt-4 d-flex gap-3 flex-wrap">
+      <button onclick="shareOnWhatsApp()" class="btn btn-sm" style="background:#10B981; color:white; border:none; border-radius:12px; padding:9px 20px; font-weight:700;">
+        <i class="fab fa-whatsapp me-1"></i> Share on WhatsApp
+      </button>
+      <button onclick="closeShoppingModal()" class="btn btn-outline-secondary btn-sm">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const savedRecipes = {{ saved_recipe_names|safe }};
+const csrfToken = '{{ csrf_token }}';
+let currentShoppingText = '';
+
+// Count filled slots on load
+document.addEventListener('DOMContentLoaded', function() {
+  const filled = document.querySelectorAll('.planner-slot.filled').length;
+  document.getElementById('filledSlots').textContent = filled;
+});
+
+function openAddSlot(day, meal) {
+  document.getElementById('modalTitle').textContent = 'Add Meal';
+  document.getElementById('modalSubtitle').textContent = day + ' — ' + meal;
+  document.getElementById('slotDay').value = day;
+  document.getElementById('slotMeal').value = meal;
+  document.getElementById('slotPlanId').value = '';
+  document.getElementById('recipeNameInput').value = '';
+  document.getElementById('mealNotesInput').value = '';
+  document.getElementById('recipeSuggestions').style.display = 'none';
+  document.getElementById('mealModal').style.display = 'block';
+  setTimeout(() => document.getElementById('recipeNameInput').focus(), 100);
+}
+
+function openEditSlot(day, meal, recipeName, notes, planId) {
+  document.getElementById('modalTitle').textContent = 'Edit Meal';
+  document.getElementById('modalSubtitle').textContent = day + ' — ' + meal;
+  document.getElementById('slotDay').value = day;
+  document.getElementById('slotMeal').value = meal;
+  document.getElementById('slotPlanId').value = planId;
+  document.getElementById('recipeNameInput').value = recipeName;
+  document.getElementById('mealNotesInput').value = notes;
+  document.getElementById('recipeSuggestions').style.display = 'none';
+  document.getElementById('mealModal').style.display = 'block';
+}
+
+function closeMealModal() {
+  document.getElementById('mealModal').style.display = 'none';
+}
+
+function filterSuggestions(val) {
+  const box = document.getElementById('recipeSuggestions');
+  if (!val || val.length < 1) { box.style.display = 'none'; return; }
+  const matches = savedRecipes.filter(r => r.toLowerCase().includes(val.toLowerCase()));
+  const custom = val.trim();
+  let html = '';
+  if (custom && !matches.includes(custom)) {
+    html += `<div onclick="selectSuggestion('${custom.replace(/'/g, "\\'")}')" style="padding:10px 14px; cursor:pointer; font-size:0.82rem; color:#374151; font-weight:600; border-bottom:1px solid #f3f4f6;">
+      ✏️ Use "<strong>${custom}</strong>"</div>`;
+  }
+  matches.slice(0, 6).forEach(r => {
+    html += `<div onclick="selectSuggestion('${r.replace(/'/g, "\\'")}')" style="padding:10px 14px; cursor:pointer; font-size:0.82rem; color:#111827;" 
+      onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background=''"">
+      ❤️ ${r}</div>`;
+  });
+  box.innerHTML = html || '<div style="padding:10px 14px; color:#9ca3af; font-size:0.82rem;">No saved recipes match</div>';
+  box.style.display = 'block';
+}
+
+function selectSuggestion(name) {
+  document.getElementById('recipeNameInput').value = name;
+  document.getElementById('recipeSuggestions').style.display = 'none';
+}
+
+function saveMeal() {
+  const day = document.getElementById('slotDay').value;
+  const meal = document.getElementById('slotMeal').value;
+  const recipe = document.getElementById('recipeNameInput').value.trim();
+  const notes = document.getElementById('mealNotesInput').value.trim();
+  if (!recipe) { alert('Please enter a recipe name!'); return; }
+
+  const fd = new FormData();
+  fd.append('day', day); fd.append('meal_type', meal);
+  fd.append('recipe_name', recipe); fd.append('notes', notes);
+  fd.append('csrfmiddlewaretoken', csrfToken);
+
+  fetch('/meal-planner/save/', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'saved') {
+        closeMealModal();
+        location.reload();
+      }
+    });
+}
+
+function deleteMeal(planId, btn) {
+  if (!confirm('Remove this meal?')) return;
+  const fd = new FormData();
+  fd.append('meal_id', planId);
+  fd.append('csrfmiddlewaretoken', csrfToken);
+  fetch('/meal-planner/delete/', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'deleted') location.reload();
+    });
+}
+
+function generateShoppingList() {
+  const slots = document.querySelectorAll('.planner-slot.filled');
+  if (slots.length === 0) {
+    alert('Your meal plan is empty! Add some meals first 😊');
+    return;
+  }
+  const recipes = [];
+  slots.forEach(s => {
+    const name = s.querySelector('p')?.textContent?.trim();
+    if (name) recipes.push(name);
+  });
+  const unique = [...new Set(recipes)];
+  const listHtml = unique.map(r => `
+    <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #f3f4f6;">
+      <span style="font-size:1rem;">🛒</span>
+      <span style="color:#111827; font-weight:600;">${r}</span>
+      <span style="color:#6b7280; font-size:0.75rem;">— ingredients needed</span>
+    </div>`).join('');
+  document.getElementById('shoppingListContent').innerHTML = `
+    <div style="background:#f9fafb; border-radius:12px; padding:16px; margin-bottom:16px;">
+      <p style="color:#374151; font-weight:700; font-size:0.88rem; margin:0;">📋 ${unique.length} recipes planned this week:</p>
+    </div>
+    ${listHtml}
+    <div style="margin-top:16px; padding:14px; background:#f0fdf4; border-radius:12px;">
+      <p style="color:#065f46; font-size:0.82rem; margin:0; font-weight:600;">
+        💡 Tip: Buy ingredients for similar dishes together to save money!
+      </p>
+    </div>`;
+  currentShoppingText = '🛒 My Weekly Meal Plan Shopping List:\n\n' + unique.map(r => `• ${r}`).join('\n') + '\n\nPlan created with SmartRecipe 🍽️';
+  document.getElementById('shoppingModal').style.display = 'block';
+}
+
+function closeShoppingModal() {
+  document.getElementById('shoppingModal').style.display = 'none';
+}
+
+function shareOnWhatsApp() {
+  const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(currentShoppingText);
+  window.open(url, '_blank');
+}
+
+// Close modals on backdrop click
+document.getElementById('mealModal').addEventListener('click', function(e) {
+  if (e.target === this) closeMealModal();
+});
+document.getElementById('shoppingModal').addEventListener('click', function(e) {
+  if (e.target === this) closeShoppingModal();
+});
+</script>
+
+{% endblock %}

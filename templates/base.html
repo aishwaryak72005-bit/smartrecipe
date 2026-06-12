@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartRecipe 🍽️</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        font-family: "Poppins", sans-serif;
+        box-sizing: border-box;
+      }
+      body {
+        background: #FFFFFF;
+        min-height: 100vh;
+        padding-top: 76px;
+      }
+
+      .navbar {
+        background: #064E3B !important;
+        box-shadow: 0 4px 20px rgba(6, 78, 59, 0.3);
+        padding: 14px 0;
+      }
+      .navbar-brand {
+        color: white !important;
+        font-size: 1.6rem;
+        font-weight: 900;
+      }
+      .brand-highlight {
+        color: #10B981;
+      }
+      .nav-link {
+        color: rgba(255, 255, 255, 0.88) !important;
+        font-weight: 500;
+        padding: 8px 18px !important;
+        border-radius: 30px;
+        transition: all 0.3s;
+      }
+      .nav-link:hover {
+        background: rgba(255, 255, 255, 0.18);
+        color: white !important;
+      }
+      .nav-btn-white {
+        background: #10B981 !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        padding: 8px 22px !important;
+        border-radius: 30px !important;
+        margin-left: 8px;
+        transition: all 0.3s !important;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      }
+      .nav-btn-white:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(16, 185, 129, 0.5);
+      }
+      .nav-user-badge {
+        background: rgba(248, 249, 250, 0.15);
+        color: #FFFFFF !important;
+        border-radius: 30px;
+        padding: 8px 18px !important;
+        font-weight: 600 !important;
+        border: 1px solid rgba(248, 249, 250, 0.2);
+      }
+
+      /* ── BUTTONS ── */
+      .btn-purple {
+        background: linear-gradient(135deg, #10B981, #059669);
+        color: #FFFFFF;
+        border: none;
+        border-radius: 14px;
+        padding: 13px 32px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s;
+        box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
+      }
+      .btn-purple:hover {
+        transform: translateY(-3px);
+        color: #FFFFFF;
+        box-shadow: 0 8px 28px rgba(16, 185, 129, 0.5);
+      }
+      .btn-pink {
+        background: linear-gradient(135deg, #064E3B, #065F46);
+        color: #FFFFFF;
+        border: none;
+        border-radius: 14px;
+        padding: 13px 32px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s;
+        box-shadow: 0 4px 18px rgba(6, 78, 59, 0.3);
+      }
+      .btn-pink:hover {
+        transform: translateY(-3px);
+        color: #FFFFFF;
+        box-shadow: 0 8px 28px rgba(6, 78, 59, 0.45);
+      }
+      .btn-outline-purple {
+        background: transparent;
+        color: #064E3B;
+        border: 2px solid #064E3B;
+        border-radius: 14px;
+        padding: 11px 30px;
+        font-weight: 700;
+        transition: all 0.3s;
+      }
+      .btn-outline-purple:hover {
+        background: #064E3B;
+        color: #FFFFFF;
+        transform: translateY(-3px);
+      }
+
+      /* ── CARD ── */
+      .card {
+        border: none;
+        border-radius: 22px;
+        background: #FFFFFF;
+        box-shadow: 0 4px 24px rgba(6, 78, 59, 0.07);
+      }
+
+      /* ── ALERTS ── */
+      .alert {
+        border: none;
+        border-radius: 14px;
+        font-weight: 500;
+      }
+      .alert-success {
+        background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
+        color: #064E3B;
+        border-left: 4px solid #10B981;
+      }
+
+      /* ── FORMS ── */
+      .form-control:focus,
+      .form-select:focus {
+        border-color: #10B981 !important;
+        box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.2) !important;
+      }
+      .form-check-input:checked {
+        background-color: #10B981 !important;
+        border-color: #10B981 !important;
+      }
+      .custom-switch {
+        transition: background-color 0.2s, border-color 0.2s;
+      }
+
+      /* ── FOOD CARDS ── */
+      .food-card {
+        background: #FFFFFF;
+        border-radius: 20px;
+        text-align: center;
+        transition: all 0.35s;
+        box-shadow: 0 4px 20px rgba(6, 78, 59, 0.07);
+        cursor: pointer;
+        overflow: hidden;
+        border: 1px solid rgba(6, 78, 59, 0.08);
+      }
+      .food-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 14px 36px rgba(6, 78, 59, 0.13);
+      }
+      .food-icon-circle {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 14px;
+      }
+
+      /* ── BADGE PILL ── */
+      .badge-pill {
+        background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
+        color: #064E3B;
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        display: inline-block;
+        margin-bottom: 12px;
+        letter-spacing: 0.3px;
+      }
+
+      /* ── STEP CARDS ── */
+      .step-card {
+        background: #FFFFFF;
+        border-radius: 18px;
+        padding: 28px 20px;
+        text-align: center;
+        border: 2px solid rgba(6, 78, 59, 0.1);
+        transition: all 0.3s;
+      }
+      .step-card:hover {
+        border-color: #10B981;
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15);
+      }
+      .step-number {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #10B981, #059669);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.2rem;
+        margin: 0 auto 14px;
+      }
+
+      /* ── FOOTER ── */
+      .footer {
+        background: #064E3B;
+        color: rgba(248, 249, 250, 0.8);
+        padding: 40px 0;
+        margin-top: 70px;
+        text-align: center;
+        border-top: 3px solid rgba(16, 185, 129, 0.4);
+      }
+      .footer-emoji-row {
+        font-size: 1.6rem;
+        letter-spacing: 6px;
+        margin-bottom: 10px;
+      }
+      .btn-sm.btn-purple {
+        padding: 6px 16px;
+        font-size: 0.82rem;
+      }
+      .btn-sm.btn-pink {
+        padding: 6px 16px;
+        font-size: 0.82rem;
+      }
+
+      /* ── MOBILE BOTTOM NAV ── */
+      .mobile-bottom-nav {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid rgba(6, 78, 59, 0.1);
+        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.06);
+        z-index: 1000;
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      .mobile-nav-item {
+        flex: 1;
+        text-align: center;
+        padding: 12px 0;
+        color: #9ca3af;
+        text-decoration: none;
+        font-size: 0.75rem;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
+      .mobile-nav-item i {
+        display: block;
+        font-size: 1.3rem;
+        margin-bottom: 4px;
+      }
+      .mobile-nav-item.active {
+        color: #10B981;
+      }
+      .mobile-nav-item:hover {
+        color: #064E3B;
+      }
+
+      @media (max-width: 991px) {
+        .mobile-bottom-nav {
+          display: flex;
+        }
+        body {
+          padding-bottom: 80px;
+        }
+        .navbar-collapse {
+          background: #065F46;
+          padding: 15px;
+          border-radius: 12px;
+          margin-top: 10px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        }
+        .navbar-collapse .nav-link {
+          color: rgba(248, 249, 250, 0.88) !important;
+          padding: 12px 16px !important;
+          margin-bottom: 8px;
+          border-radius: 12px;
+          background: rgba(248, 249, 250, 0.08);
+          font-weight: 600;
+        }
+        .navbar-collapse .nav-user-badge {
+          background: rgba(16, 185, 129, 0.2) !important;
+          color: #FFFFFF !important;
+          margin-top: 8px;
+          margin-bottom: 8px;
+        }
+      }
+
+      /* ── CHATBOT FAB ── */
+      .chatbot-fab {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #10B981, #059669);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
+        cursor: pointer;
+        z-index: 999;
+        transition: transform 0.3s;
+      }
+      .chatbot-fab:hover {
+        transform: scale(1.1);
+      }
+      @media (min-width: 992px) {
+        .chatbot-fab {
+          bottom: 30px;
+        }
+      }
+
+      /* ── CHATBOT WINDOW ── */
+      .chatbot-window {
+        display: none;
+        position: fixed;
+        bottom: 150px;
+        right: 20px;
+        width: 350px;
+        height: 450px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+        z-index: 1000;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid rgba(6, 78, 59, 0.1);
+      }
+      @media (max-width: 500px) {
+        .chatbot-window {
+          bottom: 80px;
+          right: 10px;
+          left: 10px;
+          width: auto;
+        }
+      }
+      .chatbot-header {
+        background: linear-gradient(135deg, #064E3B, #065F46);
+        color: #FFFFFF;
+        padding: 15px 20px;
+        font-weight: 700;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .chatbot-body {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background: #FFFFFF;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .chat-msg {
+        max-width: 80%;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 0.85rem;
+        line-height: 1.4;
+      }
+      .chat-msg.bot {
+        background: white;
+        color: #065F46;
+        align-self: flex-start;
+        border: 1px solid rgba(6, 78, 59, 0.15);
+        border-bottom-left-radius: 4px;
+      }
+      .chat-msg.user {
+        background: #10B981;
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+      }
+      .chatbot-footer {
+        padding: 12px;
+        background: white;
+        border-top: 1px solid rgba(6, 78, 59, 0.1);
+        display: flex;
+        gap: 8px;
+      }
+      .chat-input {
+        flex: 1;
+        border: 1px solid rgba(6, 78, 59, 0.2);
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        outline: none;
+        background: #FFFFFF;
+      }
+      .chat-send-btn {
+        background: #10B981;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      /* ── PROGRESS / MISC ── */
+      .progress-bar {
+        background: linear-gradient(135deg, #10B981, #064E3B) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg fixed-top" style="z-index: 1030;">
+      <div class="container">
+        <a class="navbar-brand" href="/"
+          >🍽️ Smart<span class="brand-highlight">Recipe</span></a
+        >
+        <button
+          class="navbar-toggler border-0"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          style="background: rgba(255,255,255,0.25); border-radius: 12px; padding: 10px 14px;"
+        >
+          <span style="color: white; font-size: 1.4rem"
+            ><i class="fas fa-bars"></i
+          ></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <div class="navbar-nav ms-auto align-items-center">
+            {% if user.is_authenticated %}
+            <a class="nav-link" href="{% url 'suggest' %}">
+              <i class="fas fa-lightbulb me-1"></i> Suggest
+            </a>
+            <a class="nav-link" href="{% url 'generate' %}">
+              <i class="fas fa-magic me-1"></i> Generate
+            </a>
+            <a class="nav-link" href="{% url 'saved_recipes' %}">
+              <i class="fas fa-heart me-1"></i> Saved
+            </a>
+            <a class="nav-link" href="{% url 'meal_planner' %}">
+              <i class="fas fa-calendar-week me-1"></i> Meal Plan
+            </a>
+
+            <div
+              class="nav-link nav-user-badge ms-2"
+              style="
+                cursor: pointer;
+                background: linear-gradient(135deg, #10B981, #059669);
+                border: none;
+              "
+              onclick="showXPModal()"
+            >
+              <i class="fas fa-star text-white"></i>
+              <span id="userXPDisplay">0 XP</span>
+            </div>
+
+            <a class="nav-link nav-user-badge ms-2" href="#">
+              <i class="fas fa-user-circle me-1"></i> {{ user.username }}
+            </a>
+            <a class="nav-link nav-btn-white ms-2" href="{% url 'logout' %}">
+              <i class="fas fa-sign-out-alt me-1"></i> Logout
+            </a>
+            {% else %}
+            <a class="nav-link" href="{% url 'login' %}">
+              <i class="fas fa-sign-in-alt me-1"></i> Login
+            </a>
+            <a class="nav-link nav-btn-white" href="{% url 'register' %}">
+              <i class="fas fa-rocket me-1"></i> Get Started
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-3">
+      {% for message in messages %}
+      <div
+        class="alert alert-success alert-dismissible fade show d-flex align-items-center"
+      >
+        <i class="fas fa-check-circle me-2" style="color: #10B981"></i>
+        <span>{{ message }}</span>
+        <button
+          type="button"
+          class="btn-close ms-auto"
+          data-bs-dismiss="alert"
+        ></button>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="container mt-4">{% block content %}{% endblock %}</div>
+
+    <div class="footer pb-5 pb-lg-0">
+      <div class="footer-emoji-row">🍛 🥗 🍜 🥘 🍱</div>
+      <p class="mb-1 fw-bold" style="font-size: 1.1rem">🍽️ SmartRecipe</p>
+      <p class="mb-0" style="font-size: 0.85rem; opacity: 0.7">
+        Cook Smart · Spend Less · Eat Better · Made with ❤️ in Bangalore
+      </p>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    {% if user.is_authenticated %}
+    <div class="mobile-bottom-nav">
+      <a
+        href="{% url 'suggest' %}"
+        class="mobile-nav-item {% if request.resolver_match.url_name == 'suggest' %}active{% endif %}"
+      >
+        <i class="fas fa-lightbulb"></i>
+        Suggest
+      </a>
+      <a
+        href="{% url 'generate' %}"
+        class="mobile-nav-item {% if request.resolver_match.url_name == 'generate' %}active{% endif %}"
+      >
+        <i class="fas fa-magic"></i>
+        Generate
+      </a>
+      <a
+        href="{% url 'saved_recipes' %}"
+        class="mobile-nav-item {% if request.resolver_match.url_name == 'saved_recipes' %}active{% endif %}"
+      >
+        <i class="fas fa-heart"></i>
+        Saved
+      </a>
+      <a
+        href="{% url 'meal_planner' %}"
+        class="mobile-nav-item {% if request.resolver_match.url_name == 'meal_planner' %}active{% endif %}"
+      >
+        <i class="fas fa-calendar-week"></i>
+        Plan
+      </a>
+    </div>
+    {% endif %}
+
+
+    <!-- ═══════════════════════════════════════════════════════
+         AI FRIDGE SCANNER MODAL
+         Opens camera → captures image → sends to Groq Vision AI
+         → detected ingredients are appended to the textarea
+    ═══════════════════════════════════════════════════════ -->
+    {% if user.is_authenticated %}
+    <div id="fridgeScannerModal" style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(6, 78, 59, 0.75);
+        backdrop-filter: blur(6px);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    ">
+      <div style="
+          background: #FFFFFF;
+          border-radius: 24px;
+          width: 100%;
+          max-width: 480px;
+          overflow: hidden;
+          box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      ">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #064E3B, #065F46); padding: 18px 24px; display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <h5 style="color:#FFFFFF; margin:0; font-weight:800; font-size:1.1rem;">🧊 AI Ingredients Scanner</h5>
+            <p style="color:rgba(250,248,245,0.7); margin:0; font-size:0.78rem;">Point camera at ingredients — AI detects them!</p>
+          </div>
+          <button onclick="closeScanner()" style="background:rgba(255,255,255,0.15); border:none; border-radius:50%; width:36px; height:36px; color:white; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Camera View -->
+        <div style="background:#0F0F10; position:relative; min-height:260px; display:flex; align-items:center; justify-content:center;">
+          <video id="fridgeCamera" autoplay playsinline style="width:100%; max-height:300px; object-fit:cover; display:none;"></video>
+          <canvas id="fridgeCanvas" style="display:none;"></canvas>
+
+          <!-- Placeholder when camera not started -->
+          <div id="cameraPlaceholder" style="text-align:center; padding:40px 20px;">
+            <div style="font-size:3.5rem; margin-bottom:12px;">📷</div>
+            <p style="color:rgba(255,255,255,0.6); margin:0; font-size:0.9rem;">Camera will appear here</p>
+            <p style="color:rgba(255,255,255,0.4); margin:4px 0 0; font-size:0.78rem;">Allow camera access when prompted</p>
+          </div>
+
+          <!-- Captured image preview -->
+          <img id="capturedPreview" style="display:none; width:100%; max-height:300px; object-fit:cover;" alt="Captured" />
+
+          <!-- Scanning overlay animation -->
+          <div id="scanningOverlay" style="display:none; position:absolute; inset:0; background:rgba(27,67,50,0.65); display:none; align-items:center; justify-content:center; flex-direction:column;">
+            <div style="width:56px; height:56px; border:4px solid #10B981; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+            <p style="color:white; margin-top:14px; font-weight:700; font-size:0.95rem;">🤖 AI is detecting ingredients...</p>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div style="padding:20px 24px; background:#FFFFFF;">
+
+          <!-- Step 1: Start camera -->
+          <div id="scanStep1">
+            <button onclick="startFridgeCamera()" style="
+                width:100%; background:linear-gradient(135deg,#064E3B,#065F46);
+                color:white; border:none; border-radius:14px; padding:13px;
+                font-size:1rem; font-weight:700; cursor:pointer;
+                box-shadow:0 4px 16px rgba(27,67,50,0.3); transition:all 0.3s;
+            " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+              <i class="fas fa-camera me-2"></i> Open Camera
+            </button>
+            <p style="text-align:center; color:#9ca3af; font-size:0.78rem; margin-top:10px; margin-bottom:0;">
+              Or upload a photo of your fridge / ingredients
+            </p>
+            <input type="file" id="fridgeFileInput" accept="image/*" capture="environment"
+              onchange="handleFridgeFile(event)"
+              style="display:none;" />
+            <button onclick="document.getElementById('fridgeFileInput').click()" style="
+                width:100%; background:#FFFFFF; color:#064E3B;
+                border:2px solid rgba(27,67,50,0.2); border-radius:14px;
+                padding:10px; font-size:0.88rem; font-weight:700;
+                cursor:pointer; margin-top:8px; transition:all 0.3s;
+            ">
+              <i class="fas fa-upload me-2"></i> Upload Photo
+            </button>
+          </div>
+
+          <!-- Step 2: Capture & scan (shown after camera starts) -->
+          <div id="scanStep2" style="display:none;">
+            <button onclick="captureAndScan()" style="
+                width:100%; background:linear-gradient(135deg,#10B981,#059669);
+                color:white; border:none; border-radius:14px; padding:13px;
+                font-size:1rem; font-weight:700; cursor:pointer;
+                box-shadow:0 4px 16px rgba(224,122,95,0.4); transition:all 0.3s;
+            " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+              <i class="fas fa-bolt me-2"></i> Capture & Scan with AI
+            </button>
+            <button onclick="retakePhoto()" style="
+                width:100%; background:transparent; color:#064E3B;
+                border:2px solid rgba(27,67,50,0.2); border-radius:14px;
+                padding:9px; font-size:0.85rem; font-weight:600;
+                cursor:pointer; margin-top:8px;
+            ">
+              <i class="fas fa-redo me-2"></i> Retake
+            </button>
+          </div>
+
+          <!-- Step 3: Results (shown after scan) -->
+          <div id="scanStep3" style="display:none;">
+            <div style="background:#DCFCE7; border-radius:14px; padding:14px; margin-bottom:14px; border:1px solid rgba(27,67,50,0.15);">
+              <p style="color:#064E3B; font-size:0.85rem; font-weight:700; margin-bottom:8px;">
+                ✅ <span id="detectedCount">0</span> ingredients detected:
+              </p>
+              <div id="detectedIngredientChips" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+            </div>
+            <button onclick="addAllDetected()" style="
+                width:100%; background:linear-gradient(135deg,#064E3B,#065F46);
+                color:white; border:none; border-radius:14px; padding:13px;
+                font-size:1rem; font-weight:700; cursor:pointer;
+                box-shadow:0 4px 16px rgba(27,67,50,0.3);
+            ">
+              <i class="fas fa-plus-circle me-2"></i> Add All to My Ingredients
+            </button>
+            <button onclick="resetScanner()" style="
+                width:100%; background:transparent; color:#9ca3af;
+                border:none; padding:8px; font-size:0.82rem;
+                cursor:pointer; margin-top:6px;
+            ">
+              Scan Again
+            </button>
+          </div>
+
+          <!-- Error state -->
+          <div id="scanError" style="display:none; text-align:center; padding:8px;">
+            <p id="scanErrorMsg" style="color:#059669; font-weight:600; font-size:0.88rem; margin:0;"></p>
+            <button onclick="resetScanner()" style="background:transparent; border:none; color:#064E3B; font-weight:600; cursor:pointer; margin-top:6px; font-size:0.85rem;">Try Again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+
+    <script>
+      let fridgeStream = null;
+      let detectedIngredients = [];
+
+      function openScanner() {
+        document.getElementById('fridgeScannerModal').style.display = 'flex';
+        resetScanner();
+      }
+
+      function closeScanner() {
+        document.getElementById('fridgeScannerModal').style.display = 'none';
+        stopFridgeCamera();
+      }
+
+      function stopFridgeCamera() {
+        if (fridgeStream) {
+          fridgeStream.getTracks().forEach(t => t.stop());
+          fridgeStream = null;
+        }
+      }
+
+      function resetScanner() {
+        stopFridgeCamera();
+        document.getElementById('fridgeCamera').style.display = 'none';
+        document.getElementById('capturedPreview').style.display = 'none';
+        document.getElementById('cameraPlaceholder').style.display = 'block';
+        document.getElementById('scanningOverlay').style.display = 'none';
+        document.getElementById('scanStep1').style.display = 'block';
+        document.getElementById('scanStep2').style.display = 'none';
+        document.getElementById('scanStep3').style.display = 'none';
+        document.getElementById('scanError').style.display = 'none';
+        detectedIngredients = [];
+      }
+
+      async function startFridgeCamera() {
+        try {
+          fridgeStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+          });
+          const video = document.getElementById('fridgeCamera');
+          video.srcObject = fridgeStream;
+          video.style.display = 'block';
+          document.getElementById('cameraPlaceholder').style.display = 'none';
+          document.getElementById('scanStep1').style.display = 'none';
+          document.getElementById('scanStep2').style.display = 'block';
+        } catch (err) {
+          showScanError('Camera access denied. Please allow camera permission or upload a photo instead.');
+        }
+      }
+
+      function captureAndScan() {
+        const video = document.getElementById('fridgeCamera');
+        const canvas = document.getElementById('fridgeCanvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        const imageData = canvas.toDataURL('image/jpeg', 0.85);
+        stopFridgeCamera();
+
+        // Show preview of captured photo
+        const preview = document.getElementById('capturedPreview');
+        preview.src = imageData;
+        preview.style.display = 'block';
+        video.style.display = 'none';
+
+        // Show scanning animation
+        const overlay = document.getElementById('scanningOverlay');
+        overlay.style.display = 'flex';
+        document.getElementById('scanStep2').style.display = 'none';
+
+        runAIScan(imageData);
+      }
+
+      function handleFridgeFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imageData = e.target.result;
+          document.getElementById('cameraPlaceholder').style.display = 'none';
+          const preview = document.getElementById('capturedPreview');
+          preview.src = imageData;
+          preview.style.display = 'block';
+          document.getElementById('scanStep1').style.display = 'none';
+          const overlay = document.getElementById('scanningOverlay');
+          overlay.style.display = 'flex';
+          runAIScan(imageData);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function retakePhoto() {
+        document.getElementById('capturedPreview').style.display = 'none';
+        startFridgeCamera();
+      }
+
+      async function runAIScan(imageData) {
+        try {
+          const response = await fetch('/api/scan-fridge/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ image: imageData }),
+          });
+          const result = await response.json();
+
+          document.getElementById('scanningOverlay').style.display = 'none';
+
+          if (result.status === 'success' && result.ingredients && result.ingredients.length > 0) {
+            detectedIngredients = result.ingredients;
+            showDetectedIngredients(result.ingredients);
+          } else if (result.status === 'success' && (!result.ingredients || result.ingredients.length === 0)) {
+            showScanError('No food ingredients detected. Try a clearer photo closer to the items.');
+          } else {
+            showScanError(result.message || 'Scan failed. Please try again.');
+          }
+        } catch (err) {
+          document.getElementById('scanningOverlay').style.display = 'none';
+          showScanError('Network error. Please check your connection.');
+        }
+      }
+
+      function showDetectedIngredients(ingredients) {
+        document.getElementById('detectedCount').textContent = ingredients.length;
+        const container = document.getElementById('detectedIngredientChips');
+        container.innerHTML = '';
+        ingredients.forEach(ing => {
+          const chip = document.createElement('span');
+          chip.textContent = ing;
+          chip.style.cssText = 'background:#064E3B; color:#FFFFFF; padding:5px 13px; border-radius:20px; font-size:0.78rem; font-weight:600; cursor:pointer;';
+          chip.title = 'Click to remove';
+          chip.onclick = function() {
+            detectedIngredients = detectedIngredients.filter(i => i !== ing);
+            chip.remove();
+            document.getElementById('detectedCount').textContent = detectedIngredients.length;
+          };
+          container.appendChild(chip);
+        });
+        document.getElementById('scanStep3').style.display = 'block';
+        // XP reward
+        if (typeof addXP === 'function') addXP(15, 'Fridge Scanned!');
+      }
+
+      function addAllDetected() {
+        // Find the ingredients textarea on this page
+        const textarea = document.querySelector('textarea[name="ingredients"]');
+        if (textarea && detectedIngredients.length > 0) {
+          const existing = textarea.value.trim();
+          const newItems = detectedIngredients.join(', ');
+          textarea.value = existing ? existing + ', ' + newItems : newItems;
+          textarea.focus();
+          closeScanner();
+        } else {
+          closeScanner();
+        }
+      }
+
+      function showScanError(msg) {
+        document.getElementById('scanErrorMsg').textContent = msg;
+        document.getElementById('scanError').style.display = 'block';
+        document.getElementById('scanStep1').style.display = 'none';
+        document.getElementById('scanStep2').style.display = 'none';
+        document.getElementById('scanStep3').style.display = 'none';
+      }
+
+      // Close on backdrop click
+      document.getElementById('fridgeScannerModal').addEventListener('click', function(e) {
+        if (e.target === this) closeScanner();
+      });
+    </script>
+    {% endif %}
+
+    <!-- Chatbot UI -->
+
+    {% if user.is_authenticated %}
+    <div class="chatbot-fab" onclick="toggleChatbot()">
+      <i class="fas fa-robot"></i>
+    </div>
+
+    <div class="chatbot-window" id="chatbotWindow">
+      <div class="chatbot-header">
+        <span>👨‍🍳 Chef AI</span>
+        <i
+          class="fas fa-times"
+          style="cursor: pointer"
+          onclick="toggleChatbot()"
+        ></i>
+      </div>
+      <div class="chatbot-body" id="chatBody">
+        <div class="chat-msg bot">
+          Hi there! I'm Chef AI. Need any cooking advice or substitute
+          suggestions?
+        </div>
+      </div>
+      <div class="chatbot-footer">
+        <input
+          type="text"
+          id="chatInput"
+          class="chat-input"
+          placeholder="Type a message..."
+          onkeypress="if (event.key === 'Enter') sendChatMessage();"
+        />
+        <button class="chat-send-btn" onclick="sendChatMessage()">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      function toggleChatbot() {
+        const win = document.getElementById("chatbotWindow");
+        win.style.display = win.style.display === "flex" ? "none" : "flex";
+      }
+
+      function sendChatMessage() {
+        const input = document.getElementById("chatInput");
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = "";
+
+        const chatBody = document.getElementById("chatBody");
+        chatBody.innerHTML += `<div class="chat-msg user">${text}</div>`;
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        const loaderId = "loader_" + Date.now();
+        chatBody.innerHTML += `<div class="chat-msg bot" id="${loaderId}"><i class="fas fa-ellipsis-h fa-fade"></i></div>`;
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        fetch("/api/chatbot/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+          body: JSON.stringify({
+            message: text,
+            context: window.location.pathname,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            document.getElementById(loaderId).remove();
+            if (data.reply) {
+              chatBody.innerHTML += `<div class="chat-msg bot">${data.reply.replace(/\\n/g, "<br>")}</div>`;
+            } else {
+              chatBody.innerHTML += `<div class="chat-msg bot">Oops, something went wrong.</div>`;
+            }
+            chatBody.scrollTop = chatBody.scrollHeight;
+          })
+          .catch((err) => {
+            document.getElementById(loaderId).remove();
+            chatBody.innerHTML += `<div class="chat-msg bot">Network error.</div>`;
+          });
+      }
+    </script>
+    {% endif %}
+
+    <!-- Gamification XP Modal -->
+    <div class="modal fade" id="xpModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div
+          class="modal-content"
+          style="border-radius: 20px; overflow: hidden; border: none"
+        >
+          <div
+            class="modal-header"
+            style="
+              background: linear-gradient(135deg, #064E3B, #2C1E18);
+              color: white;
+              border: none;
+            "
+          >
+            <h5 class="modal-title fw-bold">
+              <i class="fas fa-trophy"></i> Your Cooking Journey
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body text-center p-4">
+            <h1 style="font-size: 3rem; margin-bottom: 0">👨‍🍳</h1>
+            <h4 class="fw-bold mt-2" style="color: #E07A5F">
+              Level <span id="userLevelDisplay">1</span> Chef
+            </h4>
+            <p class="text-muted mb-4">
+              Keep cooking and saving recipes to earn more XP!
+            </p>
+
+            <div
+              class="progress"
+              style="height: 12px; border-radius: 10px; background: rgba(224, 122, 95, 0.1)"
+            >
+              <div
+                id="xpProgressBar"
+                class="progress-bar progress-bar-striped progress-bar-animated"
+                role="progressbar"
+                style="width: 0%; background: linear-gradient(135deg, #E07A5F, #064E3B);"
+              ></div>
+            </div>
+            <p class="mt-2 fw-bold" style="font-size: 0.9rem; color: #E07A5F">
+              <span id="xpProgressText">0</span> /
+              <span id="xpNextLevel">100</span> XP to next level
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Gamification Logic
+      let userXP = parseInt(localStorage.getItem("smartrecipe_xp") || "0");
+
+      function updateXPDisplay() {
+        document.getElementById("userXPDisplay").innerText = userXP + " XP";
+        const level = Math.floor(userXP / 100) + 1;
+        const currentLevelXP = userXP % 100;
+
+        const xpLevelDisplays = document.querySelectorAll("#userLevelDisplay");
+        xpLevelDisplays.forEach((el) => (el.innerText = level));
+
+        const pb = document.getElementById("xpProgressBar");
+        if (pb) pb.style.width = currentLevelXP + "%";
+
+        const pt = document.getElementById("xpProgressText");
+        if (pt) pt.innerText = currentLevelXP;
+      }
+
+      function addXP(amount, message) {
+        userXP += amount;
+        localStorage.setItem("smartrecipe_xp", userXP);
+        updateXPDisplay();
+
+        // Show floating toast
+        const toast = document.createElement("div");
+        toast.innerHTML = `<i class="fas fa-star text-warning"></i> +${amount} XP: ${message}`;
+        toast.style.cssText =
+          "position:fixed; top:20px; right:20px; background:white; padding:12px 20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.2); z-index:9999; font-weight:700; color:#E07A5F; animation: slideIn 0.3s ease-out;";
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          toast.style.animation = "slideOut 0.3s ease-in forwards";
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      function showXPModal() {
+        updateXPDisplay();
+        new bootstrap.Modal(document.getElementById("xpModal")).show();
+      }
+
+      // Init
+      document.addEventListener("DOMContentLoaded", updateXPDisplay);
+
+      // Add global styles for animations
+      const style = document.createElement("style");
+      style.innerHTML = `
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+      `;
+      document.head.appendChild(style);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,545 @@
+{% extends 'base.html' %} {% block content %}
+<div class="row justify-content-center mt-2">
+  <div class="col-lg-11">
+    <!-- HERO -->
+    <div class="card mb-5 overflow-hidden">
+      <div
+        style="
+          background: linear-gradient(
+            135deg,
+            #059669 0%,
+            #065F46 100%
+          );
+          padding: 55px 45px;
+          position: relative;
+        "
+      >
+        <div
+          style="
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 220px;
+            height: 220px;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 50%;
+          "
+        ></div>
+        <div
+          style="
+            position: absolute;
+            bottom: -60px;
+            right: 100px;
+            width: 180px;
+            height: 180px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+          "
+        ></div>
+
+        <div class="row align-items-center">
+          <!-- Left Text -->
+          <div class="col-md-6" style="position: relative; z-index: 2">
+            {% if user.is_authenticated %}
+            <div
+              class="badge-pill"
+              style="background: rgba(255, 255, 255, 0.2); color: white"
+            >
+              👋 Welcome back!
+            </div>
+            <h1
+              style="
+                color: white;
+                font-weight: 900;
+                font-size: 2.8rem;
+                line-height: 1.15;
+              "
+            >
+              Hello,<br />{{ user.username }}! 🎉
+            </h1>
+            <p
+              style="
+                color: rgba(255, 255, 255, 0.88);
+                font-size: 1.05rem;
+                margin-top: 12px;
+                line-height: 1.6;
+              "
+            >
+              Ready to discover amazing recipes within your budget?
+            </p>
+            <div class="mt-4 d-flex gap-3 flex-wrap">
+              <a
+                href="#"
+                class="btn"
+                style="
+                  background: white;
+                  color: #10B981;
+                  font-weight: 800;
+                  border-radius: 14px;
+                  padding: 13px 28px;
+                  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+                "
+              >
+                <i class="fas fa-magic me-2"></i> Generate Recipes
+              </a>
+              <a
+                href="{% url 'generate' %}"
+                class="btn"
+                style="
+                  background: rgba(255, 255, 255, 0.15);
+                  color: white;
+                  font-weight: 600;
+                  border-radius: 14px;
+                  padding: 13px 24px;
+                  border: 2px solid rgba(255, 255, 255, 0.4);
+                "
+              >
+                <i class="fas fa-history me-2"></i> My Recipes
+              </a>
+            </div>
+            {% else %}
+            <div
+              class="badge-pill"
+              style="background: rgba(255, 255, 255, 0.2); color: white"
+            >
+              🇮🇳 Made for Indian Kitchens
+            </div>
+            <h1
+              style="
+                color: #FFFFFF;
+                font-weight: 900;
+                font-size: 2.8rem;
+                line-height: 1.15;
+              "
+            >
+              Cook Smart.<br /><span style="color: #10B981">Spend Less.</span>
+            </h1>
+            <p
+              style="
+                color: rgba(248, 249, 250, 0.88);
+                font-size: 1.05rem;
+                margin-top: 14px;
+                line-height: 1.7;
+              "
+            >
+              Enter your ingredients + budget → AI generates perfect Indian
+              recipes → Buy missing items from Blinkit or JioMart!
+            </p>
+            <div class="mt-4 d-flex gap-3 flex-wrap">
+              <a
+                href="{% url 'register' %}"
+                class="btn"
+                style="
+                  background: white;
+                  color: #10B981;
+                  font-weight: 800;
+                  border-radius: 14px;
+                  padding: 13px 28px;
+                  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+                "
+              >
+                <i class="fas fa-rocket me-2"></i> Start Cooking Free
+              </a>
+              <a
+                href="{% url 'login' %}"
+                class="btn"
+                style="
+                  background: rgba(255, 255, 255, 0.15);
+                  color: white;
+                  font-weight: 600;
+                  border-radius: 14px;
+                  padding: 13px 24px;
+                  border: 2px solid rgba(255, 255, 255, 0.4);
+                "
+              >
+                <i class="fas fa-sign-in-alt me-2"></i> Login
+              </a>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Right Real Food Images -->
+          <div
+            class="col-md-6 mt-4 mt-md-0"
+            style="position: relative; z-index: 2"
+          >
+            <div class="row g-3">
+              <div class="col-6">
+                <div
+                  style="
+                    border-radius: 18px;
+                    overflow: hidden;
+                    border: 2px solid rgba(255, 255, 255, 0.25);
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+                  "
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=300&h=160&fit=crop"
+                    alt="Dal Tadka"
+                    style="width: 100%; height: 110px; object-fit: cover"
+                  />
+                  <div
+                    style="
+                      background: rgba(255, 255, 255, 0.12);
+                      backdrop-filter: blur(10px);
+                      padding: 10px 12px;
+                    "
+                  >
+                    <p
+                      style="
+                        color: white;
+                        font-size: 0.82rem;
+                        font-weight: 700;
+                        margin: 0;
+                      "
+                    >
+                      🍛 Dal Tadka
+                    </p>
+                    <p
+                      style="
+                        color: rgba(255, 255, 255, 0.75);
+                        font-size: 0.72rem;
+                        margin: 0;
+                      "
+                    >
+                      ₹80 budget
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div
+                  style="
+                    border-radius: 18px;
+                    overflow: hidden;
+                    border: 2px solid rgba(255, 255, 255, 0.25);
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+                  "
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=300&h=160&fit=crop"
+                    alt="Veg Curry"
+                    style="width: 100%; height: 110px; object-fit: cover"
+                  />
+                  <div
+                    style="
+                      background: rgba(255, 255, 255, 0.12);
+                      backdrop-filter: blur(10px);
+                      padding: 10px 12px;
+                    "
+                  >
+                    <p
+                      style="
+                        color: white;
+                        font-size: 0.82rem;
+                        font-weight: 700;
+                        margin: 0;
+                      "
+                    >
+                      🥘 Veg Curry
+                    </p>
+                    <p
+                      style="
+                        color: rgba(255, 255, 255, 0.75);
+                        font-size: 0.72rem;
+                        margin: 0;
+                      "
+                    >
+                      ₹120 budget
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div
+                  style="
+                    border-radius: 18px;
+                    overflow: hidden;
+                    border: 2px solid rgba(255, 255, 255, 0.25);
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+                  "
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=300&h=160&fit=crop"
+                    alt="Noodles"
+                    style="width: 100%; height: 110px; object-fit: cover"
+                  />
+                  <div
+                    style="
+                      background: rgba(255, 255, 255, 0.12);
+                      backdrop-filter: blur(10px);
+                      padding: 10px 12px;
+                    "
+                  >
+                    <p
+                      style="
+                        color: white;
+                        font-size: 0.82rem;
+                        font-weight: 700;
+                        margin: 0;
+                      "
+                    >
+                      🍜 Masala Noodles
+                    </p>
+                    <p
+                      style="
+                        color: rgba(255, 255, 255, 0.75);
+                        font-size: 0.72rem;
+                        margin: 0;
+                      "
+                    >
+                      ₹60 budget
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div
+                  style="
+                    border-radius: 18px;
+                    overflow: hidden;
+                    border: 2px solid rgba(255, 255, 255, 0.25);
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+                  "
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=300&h=160&fit=crop"
+                    alt="Paratha"
+                    style="width: 100%; height: 110px; object-fit: cover"
+                  />
+                  <div
+                    style="
+                      background: rgba(255, 255, 255, 0.12);
+                      backdrop-filter: blur(10px);
+                      padding: 10px 12px;
+                    "
+                  >
+                    <p
+                      style="
+                        color: white;
+                        font-size: 0.82rem;
+                        font-weight: 700;
+                        margin: 0;
+                      "
+                    >
+                      🫓 Aloo Paratha
+                    </p>
+                    <p
+                      style="
+                        color: rgba(255, 255, 255, 0.75);
+                        font-size: 0.72rem;
+                        margin: 0;
+                      "
+                    >
+                      ₹50 budget
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHY SMARTRECIPE -->
+    <div class="text-center mb-4">
+      <span class="badge-pill">✨ Everything You Need</span>
+      <h3 class="fw-bold" style="color: #1B4332">Why SmartRecipe?</h3>
+    </div>
+    <div class="row g-4 mb-5">
+      <div class="col-md-3 col-6">
+        <div class="food-card p-4">
+          <div
+            class="food-icon-circle"
+            style="background: linear-gradient(135deg, #F0FDF4, #DCFCE7)"
+          >
+            🤖
+          </div>
+          <h6 style="font-weight: 700; color: #1B4332">AI Powered</h6>
+          <p class="text-muted mb-0" style="font-size: 0.82rem">
+            Smart recipes from your ingredients
+          </p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="food-card p-4">
+          <div
+            class="food-icon-circle"
+            style="background: linear-gradient(135deg, #DCFCE7, #BBF7D0)"
+          >
+            💰
+          </div>
+          <h6 style="font-weight: 700; color: #1B4332">Budget Friendly</h6>
+          <p class="text-muted mb-0" style="font-size: 0.82rem">
+            Always within your ₹ budget
+          </p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="food-card p-4">
+          <div
+            class="food-icon-circle"
+            style="background: linear-gradient(135deg, #F0FDF4, #DCFCE7)"
+          >
+            🛒
+          </div>
+          <h6 style="font-weight: 700; color: #1B4332">Shop Instantly</h6>
+          <p class="text-muted mb-0" style="font-size: 0.82rem">
+            Blinkit & JioMart in one click
+          </p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="food-card p-4">
+          <div
+            class="food-icon-circle"
+            style="background: linear-gradient(135deg, #E6CCB2, #DDB892)"
+          >
+            ▶️
+          </div>
+          <h6 style="font-weight: 700; color: #1B4332">Watch & Cook</h6>
+          <p class="text-muted mb-0" style="font-size: 0.82rem">
+            YouTube videos for each recipe
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS — only for guests -->
+    {% if not user.is_authenticated %}
+    <div class="card p-5 mb-5">
+      <div class="text-center mb-4">
+        <span class="badge-pill">🚀 Super Simple</span>
+        <h3 class="fw-bold" style="color: #1A1A1A">How It Works</h3>
+        <p class="text-muted">Ready in just 3 easy steps</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div style="font-size: 2.5rem; margin-bottom: 12px">🥬</div>
+            <h6 style="font-weight: 700; color: #1A1A1A">Enter Ingredients</h6>
+            <p class="text-muted mb-0" style="font-size: 0.88rem">
+              Type what's in your kitchen — onion, tomato, rice, dal, anything!
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div style="font-size: 2.5rem; margin-bottom: 12px">💸</div>
+            <h6 style="font-weight: 700; color: #1A1A1A">Set Your Budget</h6>
+            <p class="text-muted mb-0" style="font-size: 0.88rem">
+              Tell us your budget in ₹ — even ₹50 works!
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div style="font-size: 2.5rem; margin-bottom: 12px">🍽️</div>
+            <h6 style="font-weight: 700; color: #1A1A1A">Cook & Enjoy!</h6>
+            <p class="text-muted mb-0" style="font-size: 0.88rem">
+              Get AI recipes, watch YouTube videos, buy missing items!
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-5">
+        <a href="{% url 'register' %}" class="btn btn-purple btn-lg">
+          <i class="fas fa-rocket me-2"></i> Start Cooking for Free
+        </a>
+      </div>
+    </div>
+
+    <!-- POPULAR DISHES -->
+    <div class="text-center mb-4">
+      <span class="badge-pill">🍱 Trending Today</span>
+      <h3 class="fw-bold" style="color: #1A1A1A">Popular Budget Recipes</h3>
+      <p class="text-muted">Dishes people are loving right now</p>
+    </div>
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="food-card">
+          <img
+            src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=220&fit=crop"
+            alt="Dal Chawal"
+            style="width: 100%; height: 190px; object-fit: cover"
+          />
+          <div style="padding: 18px">
+            <h6 style="font-weight: 700; color: #1A1A1A">Dal Chawal</h6>
+            <p class="text-muted mb-2" style="font-size: 0.82rem">
+              Classic comfort food with protein-rich dal
+            </p>
+            <span
+              style="
+                background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+                color: #1B4332;
+                padding: 4px 14px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 700;
+              "
+              >₹60 approx</span
+            >
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="food-card">
+          <img
+            src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&h=220&fit=crop"
+            alt="Aloo Sabzi"
+            style="width: 100%; height: 190px; object-fit: cover"
+          />
+          <div style="padding: 18px">
+            <h6 style="font-weight: 700; color: #1A1A1A">Aloo Sabzi</h6>
+            <p class="text-muted mb-2" style="font-size: 0.82rem">
+              Simple potato curry with Indian spices
+            </p>
+            <span
+              style="
+                background: linear-gradient(135deg, #E5E7EB, #DBEAFE);
+                color: #1B4332;
+                padding: 4px 14px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 700;
+              "
+              >₹40 approx</span
+            >
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="food-card">
+          <img
+            src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=220&fit=crop"
+            alt="Roti Sabzi"
+            style="width: 100%; height: 190px; object-fit: cover"
+          />
+          <div style="padding: 18px">
+            <h6 style="font-weight: 700; color: #1A1A1A">Roti Sabzi</h6>
+            <p class="text-muted mb-2" style="font-size: 0.82rem">
+              Wholesome roti with mixed vegetables
+            </p>
+            <span
+              style="
+                background: linear-gradient(135deg, #E5E7EB, #DBEAFE);
+                color: #1B4332;
+                padding: 4px 14px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 700;
+              "
+              >₹50 approx</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

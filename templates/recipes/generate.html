@@ -1,0 +1,2115 @@
+{% extends 'base.html' %} {% block content %}
+<div class="row justify-content-center mt-2">
+  <div class="col-lg-10">
+    <div class="text-center mb-4">
+      <span class="badge-pill">🤖 AI Powered</span>
+      <h2 class="fw-bold" style="color: #064E3B">Generate Your Recipe</h2>
+      <p class="text-muted">Tell us what you have — AI does the rest!</p>
+    </div>
+
+    <div class="card p-4 p-md-5">
+      <form method="POST" action="{% url 'generate' %}" id="recipeForm">
+        {% csrf_token %}
+
+        <div class="mb-4">
+          <label
+            class="form-label fw-bold"
+            style="color: #064E3B; font-size: 1.05rem"
+          >
+            🥬 What ingredients do you have?
+          </label>
+          <textarea
+            name="ingredients"
+            class="form-control"
+            rows="3"
+            placeholder="Example: onion, tomato, rice, dal, potato..."
+            style="
+              border-radius: 14px;
+              border: 2px solid #E9ECEF;
+              padding: 14px 18px;
+              font-size: 0.95rem;
+              resize: none;
+            "
+            required
+          >
+{% if ingredients %}{{ ingredients }}{% endif %}</textarea>
+          <div class="d-flex align-items-center justify-content-between mt-2">
+            <div style="font-size: 0.82rem; color: #a0aec0">
+              <i class="fas fa-info-circle me-1"></i> Separate with commas
+            </div>
+            <div class="d-flex gap-2">
+              <!-- 📸 Fridge Scanner Button -->
+              <button type="button" id="scannerBtn" onclick="openScanner()"
+                style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7); color:#064E3B; border:none; border-radius:20px; padding:6px 16px; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px;"
+                title="Scan your ingredients!">
+                <i class="fas fa-camera"></i> <span>Scan Ingredients</span>
+              </button>
+              <!-- 🎤 Voice Input Button -->
+              <button type="button" id="voiceBtn" onclick="startVoiceInput()"
+                style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7); color:#064E3B; border:none; border-radius:20px; padding:6px 16px; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px;"
+                title="Speak your ingredients!">
+                <i class="fas fa-microphone"></i> <span id="voiceBtnText">Speak Ingredients</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Quick Add Ingredients — Categorized -->
+        <div class="mb-4">
+          <p style="font-size:0.9rem; font-weight:700; color:#064E3B; margin-bottom:12px;">
+            ⚡ Quick Add Ingredients
+          </p>
+
+          <!-- Category tabs -->
+          <div class="d-flex flex-wrap gap-2 mb-3" id="ingredientCategoryTabsG">
+            {% for category, items in quick_ingredients.items %}
+            <button type="button"
+              onclick="showCategoryG('catg_{{ forloop.counter }}')"
+              id="tabg_{{ forloop.counter }}"
+              style="background:{% if forloop.first %}#064E3B{% else %}#F0FDF4{% endif %}; color:{% if forloop.first %}#FFFFFF{% else %}#065F46{% endif %}; border:none; border-radius:20px; padding:6px 14px; font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.2s;">
+              {{ category }}
+            </button>
+            {% endfor %}
+          </div>
+
+          <!-- Category ingredient chips -->
+          {% for category, items in quick_ingredients.items %}
+          <div id="catg_{{ forloop.counter }}" class="ingredient-cat-g" style="display:{% if forloop.first %}flex{% else %}none{% endif %}; flex-wrap:wrap; gap:8px;">
+            {% for item in items %}
+            <span
+              onclick="addIngredient('{{ item }}')"
+              style="
+                background: #FFFFFF;
+                color: #064E3B;
+                padding: 7px 16px;
+                border-radius: 20px;
+                font-size: 0.82rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+                border: 1.5px solid rgba(27,67,50,0.15);
+                box-shadow: 0 2px 8px rgba(27,67,50,0.06);
+              "
+              onmouseover="this.style.background='#10B981'; this.style.color='white'; this.style.borderColor='#10B981'; this.style.transform='translateY(-2px)';"
+              onmouseout="this.style.background='#FFFFFF'; this.style.color='#064E3B'; this.style.borderColor='rgba(27,67,50,0.15)'; this.style.transform='translateY(0)';"
+            >
+              + {{ item }}
+            </span>
+            {% endfor %}
+          </div>
+          {% endfor %}
+
+          <script>
+            function showCategoryG(id) {
+              document.querySelectorAll('.ingredient-cat-g').forEach(el => el.style.display = 'none');
+              document.getElementById(id).style.display = 'flex';
+              const tabNum = id.replace('catg_', '');
+              document.querySelectorAll('#ingredientCategoryTabsG button').forEach((btn, i) => {
+                if ((i + 1) == tabNum) {
+                  btn.style.background = '#064E3B';
+                  btn.style.color = '#FFFFFF';
+                } else {
+                  btn.style.background = '#F0FDF4';
+                  btn.style.color = '#065F46';
+                }
+              });
+            }
+          </script>
+        </div>
+
+
+        <div class="row g-4 mb-4">
+          <div class="col-md-4">
+            <label class="form-label fw-bold" style="color: #064E3B"
+              >💰 Budget</label
+            >
+            <div class="input-group">
+              <span
+                class="input-group-text fw-bold"
+                style="
+                  background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+                  border: 2px solid #F0FDF4;
+                  border-right: none;
+                  color: #064E3B;
+                  border-radius: 14px 0 0 14px;
+                "
+                >₹</span
+              >
+              <input
+                type="number"
+                name="budget"
+                class="form-control form-control-lg"
+                placeholder="Amount"
+                min="10"
+                max="10000"
+                value="{% if budget %}{{ budget }}{% endif %}"
+                style="
+                  border-radius: 0 14px 14px 0;
+                  border: 2px solid #E9ECEF;
+                  border-left: none;
+                  padding: 13px 18px;
+                "
+                required
+              />
+            </div>
+            <div class="d-flex gap-2 mt-2 flex-wrap">
+              {% for amt in quick_budgets %}
+              <span
+                onclick="setBudget('{{ amt }}')"
+                style="
+                  background: #FFFFFF;
+                  color: #064E3B;
+                  padding: 4px 12px;
+                  border-radius: 15px;
+                  font-size: 0.78rem;
+                  font-weight: 600;
+                  cursor: pointer;
+                  border: 1px solid #F0FDF4;
+                "
+              >
+                ₹{{ amt }}
+              </span>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold" style="color: #064E3B"
+              >👥 Serving Size</label
+            >
+            <select
+              name="serving_size"
+              class="form-select form-select-lg"
+              style="
+                border-radius: 14px;
+                border: 2px solid #E9ECEF;
+                padding: 13px 18px;
+              "
+            >
+              <option value="1">1 Person</option>
+              <option value="2" selected>2 People</option>
+              <option value="4">Family (4)</option>
+              <option value="6">Large Family (6)</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold" style="color: #064E3B">🍽️ Cuisine & Festival</label>
+            <select name="cuisine" class="form-select form-select-lg" style="border-radius: 14px; border: 2px solid #E9ECEF; padding: 13px 18px;">
+              <optgroup label="🌍 General">
+                <option value="any">🍽️ Any Cuisine</option>
+                <option value="healthy">🥗 Healthy / Low-Cal</option>
+                <option value="quick">⚡ Quick (under 20 min)</option>
+                <option value="jain">🌿 Jain (No Root Veg)</option>
+                <option value="vegan">🌱 Vegan</option>
+                <option value="diabetic">💊 Diabetic-Friendly</option>
+              </optgroup>
+              <optgroup label="🗺️ North India">
+                <option value="north_indian">🫓 North Indian</option>
+                <option value="punjabi">🧄 Punjabi</option>
+                <option value="rajasthani">🏜️ Rajasthani</option>
+                <option value="kashmiri">❄️ Kashmiri</option>
+                <option value="bihari">🌾 Bihari</option>
+              </optgroup>
+              <optgroup label="🗺️ South India">
+                <option value="south_indian">🥥 South Indian</option>
+                <option value="kerala">🌴 Kerala</option>
+                <option value="chettinad">🌶️ Chettinad (Tamil Nadu)</option>
+                <option value="andhra">🔥 Andhra (Spicy)</option>
+                <option value="karnataka">🫘 Karnataka</option>
+              </optgroup>
+              <optgroup label="🗺️ East & West India">
+                <option value="bengali">🐟 Bengali</option>
+                <option value="odia">🍚 Odia</option>
+                <option value="gujarati">🥟 Gujarati</option>
+                <option value="maharashtrian">🌶️ Maharashtrian</option>
+                <option value="goan">🌊 Goan</option>
+              </optgroup>
+              <optgroup label="🌮 Street & Fusion">
+                <option value="street_food">🌮 Indian Street Food</option>
+                <option value="hyderabadi">👑 Hyderabadi</option>
+                <option value="mughlai">🍖 Mughlai</option>
+              </optgroup>
+              <optgroup label="🎉 Festival Mode">
+                <option value="diwali">🪔 Diwali Special</option>
+                <option value="holi">🎨 Holi Special</option>
+                <option value="eid">🌙 Eid Special</option>
+                <option value="navratri">🕉️ Navratri Vrat</option>
+                <option value="pongal">🌾 Pongal / Sankranti</option>
+                <option value="onam">🌸 Onam Sadya</option>
+                <option value="ganesh">🐘 Ganesh Chaturthi</option>
+                <option value="christmas">🎄 Christmas Special</option>
+                <option value="baisakhi">💃 Baisakhi / Harvest</option>
+                <option value="raksha">🎀 Raksha Bandhan (Sweets)</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <!-- Extra Inputs Row -->
+        <div class="row g-4 mb-4">
+          <!-- Meal Type -->
+          <div class="col-md-4">
+            <label class="form-label fw-bold" style="color: #064E3B">🍳 Meal Type</label>
+            <select name="meal_type" class="form-select form-select-lg" style="border-radius:14px; border:2px solid #E9ECEF; padding:13px 18px;">
+              <option value="any">🍽️ Any Meal</option>
+              <option value="breakfast">🌅 Breakfast</option>
+              <option value="lunch">☀️ Lunch</option>
+              <option value="dinner">🌙 Dinner</option>
+              <option value="snack">🍿 Snack / Tea-Time</option>
+              <option value="dessert">🍮 Dessert / Sweet</option>
+              <option value="drink">🥤 Drink / Beverage</option>
+            </select>
+          </div>
+          <!-- Spice Level -->
+          <div class="col-md-4">
+            <label class="form-label fw-bold" style="color: #064E3B">🌶️ Spice Level</label>
+            <select name="spice_level" class="form-select form-select-lg" style="border-radius:14px; border:2px solid #E9ECEF; padding:13px 18px;">
+              <option value="any">🤷 Any Spice</option>
+              <option value="mild">😊 Mild (No Spice)</option>
+              <option value="medium">🌡️ Medium</option>
+              <option value="spicy">🌶️ Spicy</option>
+              <option value="extra_spicy">🔥 Extra Spicy</option>
+            </select>
+          </div>
+          <!-- Diet Preference -->
+          <div class="col-md-4">
+            <label class="form-label fw-bold" style="color: #064E3B">🥦 Diet Preference</label>
+            <select name="diet_pref" class="form-select form-select-lg" style="border-radius:14px; border:2px solid #E9ECEF; padding:13px 18px;">
+              <option value="any">🍽️ No Preference</option>
+              <option value="vegetarian">🌿 Vegetarian</option>
+              <option value="vegan">🌱 Vegan</option>
+              <option value="non_veg">🍗 Non-Vegetarian</option>
+              <option value="eggetarian">🥚 Eggetarian</option>
+              <option value="jain">🪷 Jain</option>
+              <option value="diabetic">💊 Diabetic-Friendly</option>
+              <option value="high_protein">💪 High Protein</option>
+            </select>
+          </div>
+        </div>
+
+        </div>
+
+        <input type="hidden" name="user_xp" id="hidden_user_xp" value="0">
+        <button
+          type="submit"
+          class="btn btn-purple w-100 btn-lg"
+          style="font-size: 1.1rem; padding: 16px; background: linear-gradient(135deg, #10B981, #059669); border: none;"
+          onclick="document.getElementById('hidden_user_xp').value = parseInt(localStorage.getItem('smartrecipe_xp') || '0'); showLoading();"
+        >
+          <i class="fas fa-magic me-2"></i> Generate My Recipes with AI ✨
+        </button>
+      </form>
+    </div>
+
+    <div
+      class="card p-4 mt-4"
+      style="
+        background: linear-gradient(135deg, #FFFFFF, #FFFFFF);
+        border: 2px solid #F0FDF4;
+      "
+    >
+      <h6 class="fw-bold mb-3" style="color: #064E3B">
+        💡 Tips for Better Recipes
+      </h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-2">
+            <span style="font-size: 1.3rem">✅</span>
+            <p class="mb-0" style="font-size: 0.85rem; color: #555">
+              Add more ingredients for more recipe options
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-2">
+            <span style="font-size: 1.3rem">✅</span>
+            <p class="mb-0" style="font-size: 0.85rem; color: #555">
+              Higher budget unlocks more recipe varieties
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-2">
+            <span style="font-size: 1.3rem">✅</span>
+            <p class="mb-0" style="font-size: 0.85rem; color: #555">
+              Select cuisine for more relevant recipes
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loadingSection" style="display: none" class="text-center mt-5">
+      <div class="card p-5">
+        <div
+          style="
+            font-size: 4rem;
+            animation: spin 2s linear infinite;
+            display: inline-block;
+          "
+        >
+          🍳
+        </div>
+        <h4 class="fw-bold mt-3" style="color: #064E3B">
+          AI is cooking your recipes...
+        </h4>
+        <p class="text-muted">Please wait 5-10 seconds</p>
+        <div class="progress mt-3" style="height: 8px; border-radius: 10px">
+          <div
+            class="progress-bar"
+            id="progressBar"
+            style="
+              background: linear-gradient(135deg, #10B981, #059669);
+              border-radius: 10px;
+              width: 0%;
+            "
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    {% if recipes %}
+    <div class="mt-5" id="results">
+      <div class="text-center mb-4">
+        <span class="badge-pill">🤖 AI Generated</span>
+        <h3 class="fw-bold" style="color: #064E3B">
+          Your Recipes Are Ready! 🎉
+        </h3>
+        <p class="text-muted">
+          {{ recipes|length }} recipes found within ₹{{ budget }} budget
+        </p>
+      </div>
+
+      <!-- Recipe Cards -->
+      <div class="row g-4 mb-4">
+        {% for recipe in recipes %}
+        <div class="col-12">
+          <div class="card overflow-hidden">
+
+            <!-- ═══ RECIPE HEADER ═══════════════════════════════════════ -->
+            <div class="recipe-header" style="position:relative; overflow:hidden; background: {{ recipe.dish_gradient }};">
+              
+              <div class="d-flex align-items-center gap-4" style="position:relative; z-index:2; padding: 32px 24px;">
+                <!-- Big emoji -->
+                <div style="font-size: 4.5rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25)); flex-shrink: 0;">
+                  {{ recipe.dish_emoji }}
+                </div>
+                
+                <div style="flex:1; min-width:0;">
+                  <span style="
+                    display:inline-block;
+                    background: rgba(255,255,255,0.2);
+                    backdrop-filter: blur(8px);
+                    color: white;
+                    padding: 4px 14px;
+                    border-radius: 20px;
+                    font-size: 0.72rem;
+                    font-weight: 800;
+                    letter-spacing: 1.5px;
+                    text-transform: uppercase;
+                    margin-bottom: 8px;
+                    border: 1px solid rgba(255,255,255,0.3);
+                  ">🍽️ Recipe {{ recipe.number }}</span>
+                  <h3 style="
+                    color: white;
+                    font-weight: 900;
+                    margin: 0 0 6px;
+                    font-size: clamp(1.4rem, 4vw, 2rem);
+                    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                    line-height: 1.2;
+                  ">{{ recipe.name }}</h3>
+                  <p style="
+                    color: rgba(255,255,255,0.9);
+                    font-size: 0.95rem;
+                    margin: 0;
+                    text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+                    line-height: 1.4;
+                  ">{{ recipe.description }}</p>
+                </div>
+
+                <!-- Cost + Time + Rating pills (Desktop view, wrapped on mobile) -->
+                <div class="d-none d-md-flex flex-column gap-2 align-items-end" style="flex-shrink:0;">
+                  {% if recipe.rating %}
+                  <span style="background: linear-gradient(135deg, #fef08a, #fde047); color:#854d0e; padding:6px 16px; border-radius:20px; font-size:0.85rem; font-weight:900; box-shadow: 0 4px 12px rgba(253, 224, 71, 0.4); text-transform:uppercase; letter-spacing:0.5px;">⭐ {{ recipe.rating }}/10 Taste</span>
+                  {% endif %}
+                  {% if recipe.cost %}
+                  <span style="background:rgba(255,255,255,0.9); color:#059669; padding:6px 16px; border-radius:20px; font-size:0.85rem; font-weight:800; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">💰 {{ recipe.cost }}</span>
+                  {% endif %}
+                  {% if recipe.time %}
+                  <span style="background:rgba(255,255,255,0.9); color:#10B981; padding:6px 16px; border-radius:20px; font-size:0.85rem; font-weight:800; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">⏱️ {{ recipe.time }}</span>
+                  {% endif %}
+                </div>
+              </div>
+              
+              <!-- Cost + Time + Rating pills (Mobile view) -->
+              <div class="d-flex d-md-none gap-2 flex-wrap px-4 pb-2" style="position:relative; z-index:2;">
+                {% if recipe.rating %}
+                <span style="background: linear-gradient(135deg, #fef08a, #fde047); color:#854d0e; padding:5px 14px; border-radius:20px; font-size:0.8rem; font-weight:900; box-shadow: 0 4px 8px rgba(253, 224, 71, 0.4);">⭐ {{ recipe.rating }}/10 Taste</span>
+                {% endif %}
+                {% if recipe.cost %}
+                <span style="background:rgba(255,255,255,0.9); color:#059669; padding:5px 14px; border-radius:20px; font-size:0.8rem; font-weight:800; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">💰 {{ recipe.cost }}</span>
+                {% endif %}
+                {% if recipe.time %}
+                <span style="background:rgba(255,255,255,0.9); color:#10B981; padding:5px 14px; border-radius:20px; font-size:0.8rem; font-weight:800; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">⏱️ {{ recipe.time }}</span>
+                {% endif %}
+              </div>
+
+              <!-- ── Action buttons ── -->
+              <div class="d-flex flex-wrap gap-2 px-4 pb-4" style="position:relative; z-index:4;">
+                <button
+                  onclick="startCookingMode(this.closest('.card'), '{{ recipe.name|escapejs }}')"
+                  style="
+                    background: #10B981;
+                    color: white;
+                    border: none;
+                    padding: 8px 18px;
+                    border-radius: 24px;
+                    font-size: 0.82rem;
+                    font-weight: 800;
+                    cursor: pointer;
+                    display: flex; align-items: center; gap: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    transition: transform 0.2s, box-shadow 0.2s;
+                  "
+                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.25)';"
+                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
+                >
+                  <i class="fas fa-play"></i> Start Cooking
+                </button>
+                <button
+                  onclick="shareRecipeLink('{{ recipe.name|escapejs }}', '{{ recipe.description|escapejs }}', this)"
+                  style="
+                    background: #25D366;
+                    color: white;
+                    border: none;
+                    padding: 8px 18px;
+                    border-radius: 24px;
+                    font-size: 0.82rem;
+                    font-weight: 800;
+                    cursor: pointer;
+                    display: flex; align-items: center; gap: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    transition: transform 0.2s, box-shadow 0.2s;
+                  "
+                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.25)';"
+                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
+                >
+                  <i class="fab fa-whatsapp"></i> Share
+                </button>
+                <a href="https://www.youtube.com/results?search_query={{ recipe.name|urlencode }}+recipe" target="_blank"
+                  style="
+                    background: #ef4444;
+                    color: white;
+                    text-decoration: none;
+                    padding: 8px 18px;
+                    border-radius: 24px;
+                    font-size: 0.82rem;
+                    font-weight: 800;
+                    display: flex; align-items: center; gap: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    transition: transform 0.2s, box-shadow 0.2s;
+                  "
+                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.25)';"
+                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
+                >
+                  <i class="fab fa-youtube"></i> Video
+                </a>
+
+                <!-- Social Divider -->
+                <div style="width:100%; height:0; margin: 2px 0;"></div>
+
+                <!-- Pinterest -->
+                <a href="https://www.pinterest.com/search/pins/?q={{ recipe.name|urlencode }}+recipe" target="_blank"
+                  style="
+                    background: linear-gradient(135deg, #E60023, #ad081b);
+                    color: white;
+                    text-decoration: none;
+                    padding: 7px 16px;
+                    border-radius: 24px;
+                    font-size: 0.78rem;
+                    font-weight: 800;
+                    display: flex; align-items: center; gap: 7px;
+                    box-shadow: 0 4px 12px rgba(230,0,35,0.35);
+                    transition: transform 0.2s, box-shadow 0.2s;
+                  "
+                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 18px rgba(230,0,35,0.5)';"
+                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(230,0,35,0.35)';"
+                  title="Find {{ recipe.name }} ideas on Pinterest"
+                >
+                  <i class="fab fa-pinterest"></i> Pinterest
+                </a>
+
+              </div>
+            </div>
+            <!-- ═══ END RECIPE HEADER ═════════════════════════════════════ -->
+
+            <div class="card-body p-4" id="recipe-content-{{ forloop.counter }}">
+              <div class="row g-4">
+                <div class="col-md-5">
+                  <h6 class="fw-bold mb-3" style="color: #064E3B">
+                    🥬 Ingredients
+                  </h6>
+                  {% for ing in recipe.ingredients %}
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    {% if ing.have %}
+                    <span
+                      style="
+                        background: #DCFCE7;
+                        color: #10B981;
+                        padding: 3px 10px;
+                        border-radius: 12px;
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                        flex-shrink: 0;
+                      "
+                      >✅ Have</span
+                    >
+                    {% else %}
+                    <span
+                      style="
+                        background: #FFFFFF;
+                        color: #6C757D;
+                        padding: 3px 10px;
+                        border-radius: 12px;
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                        flex-shrink: 0;
+                      "
+                      >❌ Buy</span
+                    >
+                    {% endif %}
+                    <span style="font-size: 0.88rem; color: #444"
+                      >{{ ing.text }}</span
+                    >
+                  </div>
+                  {% endfor %}
+                </div>
+                <div class="col-md-7">
+                  <h6 class="fw-bold mb-3" style="color: #064E3B">
+                    📋 Instructions
+                  </h6>
+                  {% for step in recipe.instructions %}
+                  <div class="d-flex gap-3 mb-3">
+                    <div
+                      style="
+                        background: linear-gradient(135deg, #10B981, #059669);
+                        color: white;
+                        border-radius: 50%;
+                        width: 28px;
+                        height: 28px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 0.78rem;
+                        font-weight: 800;
+                        flex-shrink: 0;
+                        margin-top: 2px;
+                      "
+                    >
+                      {{ forloop.counter }}
+                    </div>
+                    <p
+                      class="instruction-text"
+                      style="
+                        font-size: 0.88rem;
+                        color: #444;
+                        margin: 0;
+                        line-height: 1.6;
+                      "
+                    >
+                      {{ step|slice:"2:" }}
+                    </p>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+
+            <!-- ⏱️ Cooking Timer -->
+            <div class="mt-4" style="background:linear-gradient(135deg,#064E3B,#10B981); border-radius:20px; padding:22px 24px;">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                  <div style="background:linear-gradient(135deg,#059669,#059669); border-radius:14px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0;">⏱️</div>
+                  <div>
+                    <p style="color:rgba(255,255,255,0.5); font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin:0;">Cooking Timer</p>
+                    <div id="timer-display-{{ recipe.number }}" style="color:white; font-size:2rem; font-weight:900; font-family:monospace; line-height:1;">00:00</div>
+                  </div>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                  <!-- Quick set buttons -->
+                  {% if recipe.time %}
+                  <button onclick="setTimer({{ recipe.number }}, '{{ recipe.time|escapejs }}')"
+                    style="background:rgba(16, 185, 129,0.1); color:#10B981; border:1px solid rgba(16, 185, 129,0.2); border-radius:10px; padding:6px 14px; font-size:0.75rem; font-weight:700; cursor:pointer;">
+                    Set {{ recipe.time }}
+                  </button>
+                  {% endif %}
+                  <button onclick="setTimerManual({{ recipe.number }}, 5)"  style="background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:6px 12px; font-size:0.75rem; font-weight:700; cursor:pointer;">5m</button>
+                  <button onclick="setTimerManual({{ recipe.number }}, 10)" style="background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:6px 12px; font-size:0.75rem; font-weight:700; cursor:pointer;">10m</button>
+                  <button onclick="setTimerManual({{ recipe.number }}, 20)" style="background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:6px 12px; font-size:0.75rem; font-weight:700; cursor:pointer;">20m</button>
+                  <button onclick="setTimerManual({{ recipe.number }}, 30)" style="background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:6px 12px; font-size:0.75rem; font-weight:700; cursor:pointer;">30m</button>
+                  <!-- Start/Pause/Reset -->
+                  <button id="timer-btn-{{ recipe.number }}" onclick="toggleTimer({{ recipe.number }})"
+                    style="background:linear-gradient(135deg,#059669,#059669); color:white; border:none; border-radius:10px; padding:6px 18px; font-size:0.8rem; font-weight:800; cursor:pointer;">
+                    ▶ Start
+                  </button>
+                  <button onclick="resetTimer({{ recipe.number }})"
+                    style="background:rgba(201, 97, 74,0.1); color:#059669; border:1px solid rgba(201, 97, 74,0.2); border-radius:10px; padding:6px 14px; font-size:0.75rem; font-weight:700; cursor:pointer;">
+                    ↺ Reset
+                  </button>
+                </div>
+              </div>
+              <!-- Progress bar -->
+              <div style="margin-top:14px; background:rgba(255,255,255,0.1); border-radius:10px; height:6px; overflow:hidden;">
+                <div id="timer-bar-{{ recipe.number }}" style="height:100%; width:0%; background:linear-gradient(90deg,#059669,#059669); border-radius:10px; transition:width 1s linear;"></div>
+              </div>
+            </div>
+
+
+
+              {% if recipe.missing %}
+              <div
+                class="mt-3 p-3"
+                style="
+                  background: linear-gradient(135deg, #FFFFFF, #F0FDF4);
+                  border-radius: 14px;
+                  border: 2px solid #10B981;
+                "
+              >
+                <h6 class="fw-bold mb-2" style="color: #064E3B">
+                  🛒 Missing Ingredients to Buy
+                </h6>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                  {% for item in recipe.missing %}
+                  <span
+                    style="
+                      background: white;
+                      color: #059669;
+                      padding: 5px 14px;
+                      border-radius: 20px;
+                      font-size: 0.82rem;
+                      font-weight: 600;
+                      border: 1px solid #BBF7D0;
+                    "
+                    >{{ item }}</span
+                  >
+                  {% endfor %}
+                </div>
+                <div class="mt-3">
+                  <button
+                    onclick="openShoppingModal('{{ recipe.missing|join:','|escapejs }}', '{{ recipe.name|escapejs }}')"
+                    class="btn btn-purple btn-sm"
+                    style="background: #10B981; border: none; color: white;"
+                  >
+                    <i class="fas fa-shopping-bag me-2"></i>Buy Ingredients 🛒
+                  </button>
+                </div>
+              </div>
+              {% else %}
+              <div
+                class="mt-3 p-3"
+                style="
+                  background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
+                  border-radius: 14px;
+                  border: 2px solid #064E3B;
+                "
+              >
+                <p
+                  class="mb-0 fw-bold"
+                  style="color: #064E3B; font-size: 0.88rem"
+                >
+                  ✅ You have all ingredients! Start cooking right away!
+                </p>
+              </div>
+              {% endif %}
+
+              <div class="mt-3 text-end">
+                <button
+                  onclick="saveRecipe('{{ recipe.name }}', '{{ recipe.description }}', this)"
+                  class="btn btn-sm"
+                  style="
+                    background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+                    color: #064E3B;
+                    border: none;
+                    border-radius: 14px;
+                    padding: 8px 20px;
+                    font-weight: 700;
+                    font-size: 0.85rem;
+                  "
+                >
+                  <i class="fas fa-heart me-1"></i> Save Recipe
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <!-- END Recipe Cards Loop -->
+
+      <!-- 🎥 YouTube Cooking Guides -->
+      {% if youtube_videos %}
+      <div class="mt-5 mb-5">
+        <h4 class="fw-bold mb-4" style="color: #064E3B; text-align: center;">
+          🎥 Recommended Cooking Videos
+        </h4>
+        <div class="row g-4 justify-content-center">
+          {% for video in youtube_videos %}
+          <div class="col-md-4">
+            <div class="card h-100 overflow-hidden shadow-sm hover-shadow" style="border: 2px solid #E9ECEF; border-radius: 20px; transition: all 0.3s ease;">
+              <div style="position: relative;">
+                <img src="{{ video.thumbnail }}" class="card-img-top" alt="{{ video.title }}" style="height: 180px; object-fit: cover;">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
+                  <button onclick="playVideo('{{ video.video_id }}', '{{ video.title|escapejs }}')" class="btn" style="background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-play" style="margin-left: 4px;"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-body p-4 d-flex flex-column justify-content-between">
+                <div>
+                  <h6 class="fw-bold mb-1" style="color: #064E3B; font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
+                    {{ video.title }}
+                  </h6>
+                  <p class="text-muted mb-3" style="font-size: 0.82rem;">
+                    <i class="fas fa-user-circle me-1"></i> {{ video.channel }}
+                  </p>
+                </div>
+                <div class="d-flex gap-2">
+                  <button onclick="playVideo('{{ video.video_id }}', '{{ video.title|escapejs }}')" class="btn btn-purple btn-sm w-100 fw-bold py-2" style="border-radius: 12px; background: #10B981; color: white;">
+                    <i class="fas fa-desktop me-1"></i> Watch Popup
+                  </button>
+                  <a href="https://www.youtube.com/watch?v={{ video.video_id }}" target="_blank" class="btn btn-outline-danger btn-sm w-100 fw-bold py-2" style="border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; color: #10B981; border-color: #10B981;">
+                    <i class="fab fa-youtube me-1"></i> YouTube
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+
+
+      <div class="text-center mt-2 mb-4">
+        <a href="{% url 'generate' %}" class="btn btn-outline-purple btn-lg" style="color: #10B981; border-color: #10B981;">
+          <i class="fas fa-redo me-2"></i> Generate New Recipes
+        </a>
+      </div>
+    </div>
+
+    {% elif ai_response %}
+    <div class="card p-4 mt-4">
+      <div class="text-center mb-3">
+        <span class="badge-pill">🤖 AI Generated</span>
+        <h3 class="fw-bold" style="color: #064E3B">
+          Your Recipes Are Ready! 🎉
+        </h3>
+      </div>
+      <pre
+        style="
+          white-space: pre-wrap;
+          font-family: &quot;Poppins&quot;, sans-serif;
+          font-size: 0.92rem;
+          color: #333;
+          line-height: 2;
+          margin: 0;
+        "
+      >
+{{ ai_response }}</pre
+      >
+    </div>
+    {% endif %} {% if error_message %}
+    <div class="card p-4 mt-4" style="border: 2px solid #DCFCE7">
+      <div class="text-center">
+        <div style="font-size: 3rem">😕</div>
+        <h5 class="fw-bold mt-2" style="color: #059669">
+          Something went wrong
+        </h5>
+        <p class="text-muted">{{ error_message }}</p>
+        <a href="{% url 'generate' %}" class="btn btn-pink" style="background: #10B981; color: white;">Try Again</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Shopping Modal -->
+<div
+  id="shoppingModal"
+  style="
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+  "
+>
+  <div
+    style="
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 550px;
+      background: white;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+      max-height: 90vh;
+      overflow-y: auto;
+    "
+  >
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="fw-bold mb-0" style="color: #064E3B">
+          🛒 Missing Ingredients
+        </h4>
+        <p class="text-muted mb-0" style="font-size: 0.88rem">
+          How would you like to shop?
+        </p>
+      </div>
+      <button
+        onclick="closeShoppingModal()"
+        style="
+          background: #f3f4f6;
+          border: none;
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+          font-size: 1.2rem;
+          cursor: pointer;
+        "
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- View 1: Choice -->
+    <div id="shoppingModalChoice">
+      <div class="mb-3 p-3" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px dashed #f59e0b; border-radius: 16px; text-align: center;">
+        <div style="font-size: 1.2rem; margin-bottom: 4px;">🎁</div>
+        <div style="font-weight: 700; color: #b45309; font-size: 0.95rem;">Complete your pantry to unlock 1 Bonus Premium Recipe!</div>
+      </div>
+      <div class="d-flex flex-column gap-3">
+        <button onclick="handleLocalStoreChoice()" class="btn" style="background: linear-gradient(135deg, #00C9A7, #008B74); color: white; padding: 20px; border-radius: 16px; text-align: left; border: none;">
+          <div class="fw-bold" style="font-size: 1.2rem;"><i class="fas fa-store me-2"></i> Local Store</div>
+          <div style="font-size: 0.85rem; opacity: 0.9;">Open an interactive checklist for your supermarket trip.</div>
+        </button>
+        <button onclick="handleOnlineChoice()" class="btn" style="background: linear-gradient(135deg, #10B981, #059669); color: white; padding: 20px; border-radius: 16px; text-align: left; border: none;">
+          <div class="fw-bold" style="font-size: 1.2rem;"><i class="fas fa-motorcycle me-2"></i> Order Online</div>
+          <div style="font-size: 0.85rem; opacity: 0.9;">Get missing ingredients delivered in 10-20 mins via Blinkit, Zepto, etc.</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- View 2: Online Stores -->
+    <div id="shoppingModalStores" style="display: none;">
+    <div
+      class="mb-4 p-3"
+      style="
+        background: linear-gradient(135deg, #FFFFFF, #FFFFFF);
+        border-radius: 14px;
+        border: 2px solid #E9ECEF;
+      "
+    >
+      <p class="fw-bold mb-1" style="color: #064E3B; font-size: 0.88rem">
+        🥬 Buying these ingredients:
+      </p>
+      <p
+        id="modalIngredients"
+        class="mb-0 text-muted"
+        style="font-size: 0.85rem"
+      ></p>
+    </div>
+    <div class="row g-3">
+      <div class="col-6">
+        <a
+          id="blinkitLink"
+          href="#"
+          target="_blank"
+          style="text-decoration: none"
+          onclick="closeShoppingModal()"
+        >
+          <div
+            style="
+              background: linear-gradient(135deg, #FFFFFF, #fae8ff);
+              border: 2px solid #059669;
+              border-radius: 18px;
+              padding: 18px;
+              text-align: center;
+              transition: all 0.3s;
+            "
+            onmouseover="this.style.transform = 'translateY(-4px)'"
+            onmouseout="this.style.transform = 'translateY(0)'"
+          >
+            <div style="font-size: 2.2rem; margin-bottom: 8px">⚡</div>
+            <div style="font-weight: 800; color: #10B981">Blinkit</div>
+            <div
+              style="
+                font-size: 0.75rem;
+                color: #10B981;
+                font-weight: 600;
+                margin-top: 4px;
+              "
+            >
+              10 min delivery
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6">
+        <a
+          id="zeptoLink"
+          href="#"
+          target="_blank"
+          style="text-decoration: none"
+          onclick="closeShoppingModal()"
+        >
+          <div
+            style="
+              background: linear-gradient(135deg, #FFFFFF, #fae8ff);
+              border: 2px solid #059669;
+              border-radius: 18px;
+              padding: 18px;
+              text-align: center;
+              transition: all 0.3s;
+            "
+            onmouseover="this.style.transform = 'translateY(-4px)'"
+            onmouseout="this.style.transform = 'translateY(0)'"
+          >
+            <div style="font-size: 2.2rem; margin-bottom: 8px">🟣</div>
+            <div style="font-weight: 800; color: #10B981">Zepto</div>
+            <div
+              style="
+                font-size: 0.75rem;
+                color: #10B981;
+                font-weight: 600;
+                margin-top: 4px;
+              "
+            >
+              10 min delivery
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6">
+        <a
+          id="jiomartLink"
+          href="#"
+          target="_blank"
+          style="text-decoration: none"
+          onclick="closeShoppingModal()"
+        >
+          <div
+            style="
+              background: linear-gradient(135deg, #eff6ff, #dbeafe);
+              border: 2px solid #60a5fa;
+              border-radius: 18px;
+              padding: 18px;
+              text-align: center;
+              transition: all 0.3s;
+            "
+            onmouseover="this.style.transform = 'translateY(-4px)'"
+            onmouseout="this.style.transform = 'translateY(0)'"
+          >
+            <div style="font-size: 2.2rem; margin-bottom: 8px">🔵</div>
+            <div style="font-weight: 800; color: #1d4ed8">JioMart</div>
+            <div
+              style="
+                font-size: 0.75rem;
+                color: #1e40af;
+                font-weight: 600;
+                margin-top: 4px;
+              "
+            >
+              Express delivery
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6">
+        <a
+          id="flipkartLink"
+          href="#"
+          target="_blank"
+          style="text-decoration: none"
+          onclick="closeShoppingModal()"
+        >
+          <div
+            style="
+              background: linear-gradient(135deg, #eff6ff, #dbeafe);
+              border: 2px solid #2563eb;
+              border-radius: 18px;
+              padding: 18px;
+              text-align: center;
+              transition: all 0.3s;
+            "
+            onmouseover="this.style.transform = 'translateY(-4px)'"
+            onmouseout="this.style.transform = 'translateY(0)'"
+          >
+            <div style="font-size: 2.2rem; margin-bottom: 8px">🛍️</div>
+            <div style="font-weight: 800; color: #1d4ed8">Flipkart Fresh</div>
+            <div
+              style="
+                font-size: 0.75rem;
+                color: #1e40af;
+                font-weight: 600;
+                margin-top: 4px;
+              "
+            >
+              Same day delivery
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6">
+        <a
+          id="bigbasketLink"
+          href="#"
+          target="_blank"
+          style="text-decoration: none"
+          onclick="closeShoppingModal()"
+        >
+          <div
+            style="
+              background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+              border: 2px solid #4ade80;
+              border-radius: 18px;
+              padding: 18px;
+              text-align: center;
+              transition: all 0.3s;
+            "
+            onmouseover="this.style.transform = 'translateY(-4px)'"
+            onmouseout="this.style.transform = 'translateY(0)'"
+          >
+            <div style="font-size: 2.2rem; margin-bottom: 8px">🧺</div>
+            <div style="font-weight: 800; color: #166534">BigBasket</div>
+            <div
+              style="
+                font-size: 0.75rem;
+                color: #14532d;
+                font-weight: 600;
+                margin-top: 4px;
+              "
+            >
+              Scheduled delivery
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6">
+        <a
+          id="swiggyLink"
+          href="#"
+          target="_blank"
+          style="text-decoration: none"
+          onclick="closeShoppingModal()"
+        >
+          <div
+            style="
+              background: linear-gradient(135deg, #fff7ed, #ffedd5);
+              border: 2px solid #fb923c;
+              border-radius: 18px;
+              padding: 18px;
+              text-align: center;
+              transition: all 0.3s;
+            "
+            onmouseover="this.style.transform = 'translateY(-4px)'"
+            onmouseout="this.style.transform = 'translateY(0)'"
+          >
+            <div style="font-size: 2.2rem; margin-bottom: 8px">🟠</div>
+            <div style="font-weight: 800; color: #c2410c">Instamart</div>
+            <div
+              style="
+                font-size: 0.75rem;
+                color: #9a3412;
+                font-weight: 600;
+                margin-top: 4px;
+              "
+            >
+              15 min delivery
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+    </div> <!-- End View 2 -->
+
+    <!-- View 3: In-App Checklist -->
+    <div id="shoppingModalChecklist" style="display: none;">
+      <div id="checklistView">
+        <h5 class="fw-bold mb-3 text-center" style="color: #00C9A7;">🛒 Supermarket Checklist</h5>
+        <p class="text-center text-muted small">Tap items as you put them in your cart!</p>
+        <div id="checklistItems" class="d-flex flex-column gap-2 mb-4">
+          <!-- JS will populate checkboxes here -->
+        </div>
+      </div>
+      <div id="checklistSuccess" style="display: none;" class="text-center py-4">
+        <div style="font-size: 4rem; animation: bounce 1s infinite;">🎉</div>
+        <h4 class="fw-bold mt-3" style="color: #10B981;">Pantry Complete!</h4>
+        <p class="text-muted">You now have everything needed to cook!</p>
+        <button onclick="unlockBonusRecipe()" class="btn btn-warning btn-lg rounded-pill fw-bold px-4 mt-3 shadow" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; border: none; font-size: 1.1rem;">
+          <i class="fas fa-gift me-2"></i> Unlock 1 Bonus Premium Recipe
+        </button>
+      </div>
+    </div> <!-- End View 3 -->
+    
+    <button
+      onclick="closeShoppingModal()"
+      class="btn btn-outline-purple w-100 mt-4"
+    >
+      Cancel
+    </button>
+  </div>
+</div>
+
+<style>
+  @keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  @keyframes shimmerAnim {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+</style>
+
+<script>
+  function addIngredient(item) {
+      const textarea = document.querySelector('textarea[name="ingredients"]');
+      const current = textarea.value.trim();
+      if (current === '') {
+          textarea.value = item;
+      } else {
+          if (!current.toLowerCase().includes(item.toLowerCase())) {
+              textarea.value = current + ', ' + item;
+          }
+      }
+  }
+
+  function setBudget(amount) {
+      document.querySelector('input[name="budget"]').value = amount;
+  }
+
+  function showLoading() {
+      setTimeout(() => {
+          document.getElementById('loadingSection').style.display = 'block';
+          let width = 0;
+          const bar = document.getElementById('progressBar');
+          const interval = setInterval(() => {
+              if (width >= 90) clearInterval(interval);
+              width += 2;
+              bar.style.width = width + '%';
+          }, 200);
+      }, 100);
+  }
+
+  function playVideo(videoId, title) {
+      // Opens YouTube in a small popup window — always works!
+      const width = 900;
+      const height = 600;
+      const left = (screen.width - width) / 2;
+      const top = (screen.height - height) / 2;
+      const url = 'https://www.youtube.com/watch?v=' + videoId;
+      window.open(
+          url,
+          'YouTubePlayer',
+          'width=' + width + ',height=' + height +
+          ',left=' + left + ',top=' + top +
+          ',resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,status=no'
+      );
+  }
+
+  let currentShoppingIngredients = '';
+  let currentShoppingRecipe = '';
+
+  function openShoppingModal(ingredientsRaw, recipeName) {
+      if(!ingredientsRaw) {
+          alert('You have all ingredients!');
+          return;
+      }
+      currentShoppingIngredients = ingredientsRaw;
+      currentShoppingRecipe = recipeName || 'Recipe';
+      
+      document.getElementById('shoppingModalChoice').style.display = 'block';
+      document.getElementById('shoppingModalStores').style.display = 'none';
+      document.getElementById('shoppingModalChecklist').style.display = 'none';
+      document.getElementById('shoppingModal').style.display = 'block';
+  }
+
+  function checkAllBought() {
+      const checkboxes = document.querySelectorAll('#checklistItems input[type="checkbox"]');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      if(allChecked && checkboxes.length > 0) {
+          // Trigger Celebration
+          document.getElementById('checklistView').style.display = 'none';
+          document.getElementById('checklistSuccess').style.display = 'block';
+      }
+  }
+
+  function unlockBonusRecipe() {
+      const btn = event.currentTarget || document.querySelector('#shoppingModalChecklist button.btn-warning');
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Generating Dessert...';
+      btn.disabled = true;
+
+      fetch('/api/bonus-recipe/', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify({ base_recipe: currentShoppingRecipe })
+      })
+      .then(res => res.json())
+      .then(data => {
+          closeShoppingModal();
+          if (data.status === 'success') {
+              const r = data.recipe;
+              const newCard = document.createElement('div');
+              newCard.className = 'col-12 mt-4';
+              newCard.innerHTML = `
+                <div class="card overflow-hidden" style="border: 2px solid #fbbf24; box-shadow: 0 8px 32px rgba(245,158,11,0.2);">
+                  <div class="recipe-header" style="position:relative; overflow:hidden; background: ${r.dish_gradient}; padding: 32px 24px;">
+                    <div class="d-flex align-items-center gap-4" style="position:relative; z-index:2;">
+                      <div style="font-size: 4.5rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25)); flex-shrink: 0;">${r.dish_emoji}</div>
+                      <div style="flex:1; min-width:0;">
+                        <span style="display:inline-block; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); color: white; padding: 4px 14px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.3);">🎁 BONUS PREMIUM RECIPE</span>
+                        <h3 style="color: white; font-weight: 900; margin: 0 0 6px; font-size: clamp(1.4rem, 4vw, 2rem); text-shadow: 0 2px 8px rgba(0,0,0,0.3);">${r.name}</h3>
+                        <p style="color: rgba(255,255,255,0.9); font-size: 0.95rem; margin: 0; text-shadow: 0 1px 4px rgba(0,0,0,0.2);">${r.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3" style="color: #064E3B">📋 Instructions</h6>
+                    ${r.instructions.map((step, idx) => `
+                      <div class="d-flex gap-3 mb-3">
+                        <div style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; flex-shrink: 0; margin-top: 2px;">${idx + 1}</div>
+                        <p style="font-size: 0.88rem; color: #444; margin: 0; line-height: 1.6;">${step.substring(2)}</p>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+              const resultsDiv = document.getElementById('results');
+              if (resultsDiv) {
+                  const row = resultsDiv.querySelector('.row.g-4');
+                  if (row) {
+                      row.appendChild(newCard);
+                      newCard.scrollIntoView({ behavior: 'smooth' });
+                  }
+              }
+          } else {
+              alert('Failed to generate bonus recipe: ' + (data.message || 'Unknown error'));
+              btn.innerHTML = originalHtml;
+              btn.disabled = false;
+          }
+      })
+      .catch(err => {
+          console.error(err);
+          alert('Error calling AI API.');
+          btn.innerHTML = originalHtml;
+          btn.disabled = false;
+      });
+  }
+
+  function handleLocalStoreChoice() {
+      const items = currentShoppingIngredients.split(',').map(i => i.trim());
+      const container = document.getElementById('checklistItems');
+      container.innerHTML = items.map((item, i) => `
+        <label class="d-flex align-items-center p-3 rounded-3" style="background: #f8fafc; cursor: pointer; border: 1px solid #e2e8f0; transition: 0.2s;" onchange="this.style.opacity = this.querySelector('input').checked ? '0.5' : '1'; this.querySelector('span').style.textDecoration = this.querySelector('input').checked ? 'line-through' : 'none'; checkAllBought();">
+          <input type="checkbox" class="form-check-input me-3" style="width: 24px; height: 24px; cursor: pointer;">
+          <span style="font-size: 1.1rem; color: #334155;">${item}</span>
+        </label>
+      `).join('');
+      
+      document.getElementById('shoppingModalChoice').style.display = 'none';
+      document.getElementById('checklistView').style.display = 'block';
+      document.getElementById('checklistSuccess').style.display = 'none';
+      document.getElementById('shoppingModalChecklist').style.display = 'block';
+  }
+
+  function handleOnlineChoice() {
+      const ingredientsRaw = currentShoppingIngredients;
+      const searchQuery = encodeURIComponent(ingredientsRaw.replace(/,/g, ' '));
+      const firstItem = encodeURIComponent(ingredientsRaw.split(',')[0].trim());
+      document.getElementById('modalIngredients').textContent = ingredientsRaw.split(',').map(i => i.trim()).join(', ');
+      document.getElementById('blinkitLink').href = 'https://blinkit.com/s/?q=' + searchQuery;
+      document.getElementById('zeptoLink').href = 'https://www.zepto.now.com/search?query=' + firstItem;
+      document.getElementById('jiomartLink').href = 'https://www.jiomart.com/search/' + searchQuery;
+      document.getElementById('flipkartLink').href = 'https://www.flipkart.com/search?q=' + searchQuery;
+      document.getElementById('bigbasketLink').href = 'https://www.bigbasket.com/ps/?q=' + searchQuery;
+      document.getElementById('swiggyLink').href = 'https://www.swiggy.com/instamart/search?query=' + firstItem;
+      
+      document.getElementById('shoppingModalChoice').style.display = 'none';
+      document.getElementById('shoppingModalStores').style.display = 'block';
+  }
+
+  function closeShoppingModal() {
+      document.getElementById('shoppingModal').style.display = 'none';
+  }
+
+  document.getElementById('shoppingModal').addEventListener('click', function(e) {
+      if (e.target === this) closeShoppingModal();
+  });
+
+  function saveRecipe(name, description, btn) {
+      const formData = new FormData();
+      formData.append('recipe_name', name);
+      formData.append('recipe_description', description);
+      formData.append('ingredients', '{{ ingredients }}');
+      formData.append('budget', '{{ budget }}');
+      formData.append('cuisine', '{{ cuisine }}');
+      formData.append('ai_response', '{{ ai_response|escapejs }}');
+      formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+      fetch('/save-recipe/', { method: 'POST', body: formData })
+      .then(res => res.json())
+      .then(data => {
+          if (data.status === 'saved') {
+              btn.innerHTML = '❤️ Saved!';
+              btn.style.background = 'linear-gradient(135deg,#d1fae5,#a7f3d0)';
+              btn.style.color = '#065f46';
+              // Gamification
+              if(typeof addXP === 'function') addXP(50, "Saved a Recipe!");
+          } else {
+              btn.innerHTML = '✅ Already Saved';
+          }
+      });
+  }
+
+  {% if recipes or ai_response %}
+  window.onload = function() {
+      const results = document.getElementById('results');
+      if (results) results.scrollIntoView({ behavior: 'smooth' });
+  }
+  {% endif %}
+
+
+
+  // ── Cooking Timer ────────────────────────────────────────────────────
+  const timers = {};
+  function setTimer(n, timeStr) {
+    const match = timeStr.match(/(\d+)/);
+    if (match) setTimerManual(n, parseInt(match[1]));
+  }
+  function setTimerManual(n, minutes) {
+    resetTimer(n);
+    timers[n] = timers[n] || {};
+    timers[n].total = minutes * 60;
+    timers[n].remaining = minutes * 60;
+    timers[n].running = false;
+    updateTimerDisplay(n);
+  }
+  function toggleTimer(n) {
+    timers[n] = timers[n] || { total: 600, remaining: 600, running: false };
+    if (!timers[n].remaining) return;
+    if (timers[n].running) {
+      clearInterval(timers[n].interval);
+      timers[n].running = false;
+      document.getElementById('timer-btn-' + n).textContent = '▶ Resume';
+    } else {
+      timers[n].running = true;
+      document.getElementById('timer-btn-' + n).textContent = '⏸ Pause';
+      timers[n].interval = setInterval(() => {
+        timers[n].remaining--;
+        updateTimerDisplay(n);
+        if (timers[n].remaining <= 0) {
+          clearInterval(timers[n].interval);
+          timers[n].running = false;
+          document.getElementById('timer-btn-' + n).textContent = '✅ Done!';
+          document.getElementById('timer-display-' + n).style.color = '#008B74';
+          // Browser notification
+          if (Notification.permission === 'granted') {
+            new Notification('⏰ Timer Done!', { body: 'Your cooking time is up! Check your dish 🍽️', icon: '/static/icon.png' });
+          } else {
+            alert('⏰ Timer done! Your cooking time is up!');
+          }
+        }
+      }, 1000);
+    }
+  }
+  function resetTimer(n) {
+    if (timers[n] && timers[n].interval) clearInterval(timers[n].interval);
+    timers[n] = { total: 0, remaining: 0, running: false };
+    const disp = document.getElementById('timer-display-' + n);
+    const bar = document.getElementById('timer-bar-' + n);
+    const btn = document.getElementById('timer-btn-' + n);
+    if (disp) { disp.textContent = '00:00'; disp.style.color = 'white'; }
+    if (bar) bar.style.width = '0%';
+    if (btn) btn.textContent = '▶ Start';
+  }
+  function updateTimerDisplay(n) {
+    const t = timers[n];
+    const m = Math.floor(t.remaining / 60).toString().padStart(2, '0');
+    const s = (t.remaining % 60).toString().padStart(2, '0');
+    const disp = document.getElementById('timer-display-' + n);
+    const bar = document.getElementById('timer-bar-' + n);
+    if (disp) disp.textContent = m + ':' + s;
+    if (bar && t.total > 0) bar.style.width = ((t.total - t.remaining) / t.total * 100) + '%';
+  }
+  // Request notification permission
+  if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+
+  // ── Share Link ───────────────────────────────────────────────────
+  function shareRecipeLink(name, description, btn) {
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Link...';
+    
+    const formData = new FormData();
+    formData.append('recipe_name', name);
+    formData.append('recipe_description', description);
+    formData.append('ingredients', '{{ ingredients }}');
+    formData.append('budget', '{{ budget }}');
+    formData.append('cuisine', '{{ cuisine }}');
+    formData.append('ai_response', '{{ ai_response|escapejs }}');
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    fetch('/save-recipe/', { method: 'POST', body: formData })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'saved' || data.status === 'exists') {
+            const shareUrl = window.location.origin + '/share/' + data.share_id + '/';
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                btn.innerHTML = '📋 Link Copied!';
+                btn.style.background = '#0ea5e9'; // Change to blue
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '#25D366';
+                }, 3000);
+            });
+        } else {
+            alert('Could not generate share link.');
+            btn.innerHTML = originalText;
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Error generating share link.');
+        btn.innerHTML = originalText;
+    });
+  }
+
+  // ── Voice Input ──────────────────────────────────────────────────────
+  let voiceRecognition = null;
+  function startVoiceInput() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Voice input not supported in this browser. Please use Chrome or Edge.');
+      return;
+    }
+    if (voiceRecognition && voiceRecognition.running) {
+      voiceRecognition.stop(); return;
+    }
+    voiceRecognition = new SpeechRecognition();
+    voiceRecognition.lang = 'en-IN';
+    voiceRecognition.continuous = false;
+    voiceRecognition.interimResults = true;
+    const btn = document.getElementById('voiceBtn');
+    const label = document.getElementById('voiceBtnText');
+    btn.style.background = 'linear-gradient(135deg,#fca5a5,#fecaca)';
+    btn.style.color = '#dc2626';
+    label.textContent = '🔴 Listening...';
+    voiceRecognition.running = true;
+    voiceRecognition.onresult = function(e) {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) {
+          const words = e.results[i][0].transcript;
+          const ta = document.querySelector('textarea[name="ingredients"]');
+          const cur = ta.value.trim();
+          ta.value = cur ? cur + ', ' + words : words;
+        } else { interim = e.results[i][0].transcript; }
+      }
+      if (interim) label.textContent = '🎤 "' + interim + '"';
+    };
+    voiceRecognition.onend = function() {
+      voiceRecognition.running = false;
+      btn.style.background = 'linear-gradient(135deg,#E9ECEF,#DCFCE7)';
+      btn.style.color = '#10B981';
+      label.textContent = 'Speak Ingredients';
+    };
+    voiceRecognition.onerror = function(e) {
+      voiceRecognition.running = false;
+      btn.style.background = 'linear-gradient(135deg,#E9ECEF,#DCFCE7)';
+      btn.style.color = '#10B981';
+      label.textContent = 'Speak Ingredients';
+    };
+    voiceRecognition.start();
+  }
+
+
+  function downloadPDF(elementId, recipeName) {
+    const element = document.getElementById(elementId);
+    
+    // We clone the element to modify it for PDF without changing the UI
+    const clonedElement = element.cloneNode(true);
+    clonedElement.style.padding = '30px';
+    
+    // Add a nice header for the PDF
+    const header = document.createElement('div');
+    header.innerHTML = `
+      <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #10B981; padding-bottom: 15px;">
+        <h2 style="color: #064E3B; font-weight: 900; margin: 0;">SmartRecipe 🍽️</h2>
+        <h3 style="color: #6b7280; margin: 5px 0 0 0;">${recipeName}</h3>
+      </div>
+    `;
+    clonedElement.insertBefore(header, clonedElement.firstChild);
+
+    // Temporarily hide action buttons like "Save" inside the PDF
+    const saveBtns = clonedElement.querySelectorAll('.save-recipe-btn');
+    saveBtns.forEach(btn => btn.style.display = 'none');
+    
+    // Use native browser print to guarantee zero blank pages
+    const printWin = window.open('', '_blank');
+    if (!printWin) {
+        alert('Please allow popups to download the PDF.');
+        return;
+    }
+
+    // Extract all styles from the current document so the recipe looks perfect
+    let stylesHtml = '';
+    for (const styleSheet of document.styleSheets) {
+        try {
+            if (styleSheet.href) {
+                stylesHtml += `<link rel="stylesheet" type="text/css" href="${styleSheet.href}">`;
+            }
+        } catch (e) {}
+    }
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${recipeName} - Recipe</title>
+          ${stylesHtml}
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+          <style>
+            body { padding: 40px; background: white !important; }
+            @media print {
+              body { padding: 0; }
+              /* Force background colors to print */
+              * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            }
+          </style>
+        </head>
+        <body>
+          ${clonedElement.outerHTML}
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+                window.close();
+              }, 500);
+            }
+          <\/script>
+        </body>
+      </html>
+    `;
+
+    printWin.document.open();
+    printWin.document.write(printContent);
+    printWin.document.close();
+  }
+
+  // ── Animated Cooking Guide (Start Cooking Mode) ──────────────────────────
+  let cookingSteps = [];
+  let currentStepIndex = 0;
+  let synth = window.speechSynthesis;
+
+  function startCookingMode(cardElement, recipeName) {
+      // Get all instruction texts from the card
+      const stepElements = cardElement.querySelectorAll('.instruction-text');
+      cookingSteps = Array.from(stepElements).map(el => el.innerText.trim());
+      
+      if (cookingSteps.length === 0) {
+          alert("No instructions found!");
+          return;
+      }
+
+      currentStepIndex = 0;
+      document.getElementById('cooking-recipe-name').innerText = recipeName;
+      updateCookingOverlay();
+      
+      // Show overlay
+      document.getElementById('cooking-overlay').style.display = 'flex';
+      
+      // Read first step aloud
+      speakStep();
+  }
+
+  function closeCookingMode() {
+      document.getElementById('cooking-overlay').style.display = 'none';
+      if (synth) synth.cancel();
+      if (overlayTimerInterval) clearInterval(overlayTimerInterval);
+      if (handsFreeRec && handsFreeRec.running) handsFreeRec.stop();
+  }
+
+  function updateCookingOverlay() {
+      document.getElementById('cooking-step-number').innerText = 'Step ' + (currentStepIndex + 1) + ' of ' + cookingSteps.length;
+      document.getElementById('cooking-step-text').innerText = cookingSteps[currentStepIndex];
+      
+      // Check for Smart Timer
+      const text = cookingSteps[currentStepIndex];
+      const timeMatch = text.match(/\b(\d+)\s*(?:min|minute|minutes)\b/i);
+      const timerDiv = document.getElementById('cooking-smart-timer');
+      if (timeMatch) {
+          const mins = parseInt(timeMatch[1]);
+          document.getElementById('cooking-timer-btn').innerHTML = `<i class="fas fa-clock me-2"></i> Start ${mins} Min Timer`;
+          document.getElementById('cooking-timer-btn').onclick = function() { startOverlayTimer(mins, this); };
+          timerDiv.style.display = 'block';
+      } else {
+          timerDiv.style.display = 'none';
+      }
+      if (overlayTimerInterval) clearInterval(overlayTimerInterval);
+
+      // Update buttons
+      document.getElementById('cooking-prev-btn').disabled = (currentStepIndex === 0);
+      
+      const nextBtn = document.getElementById('cooking-next-btn');
+      if (currentStepIndex === cookingSteps.length - 1) {
+          nextBtn.innerHTML = '<i class="fas fa-check me-2"></i> Finish';
+          nextBtn.classList.replace('btn-light', 'btn-success');
+      } else {
+          nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right ms-2"></i>';
+          nextBtn.classList.replace('btn-success', 'btn-light');
+      }
+  }
+
+  function nextCookingStep() {
+      if (currentStepIndex < cookingSteps.length - 1) {
+          currentStepIndex++;
+          updateCookingOverlay();
+          speakStep();
+      } else {
+          // Finished
+          closeCookingMode();
+          // Maybe trigger confetti or a success message here!
+      }
+  }
+
+  function prevCookingStep() {
+      if (currentStepIndex > 0) {
+          currentStepIndex--;
+          updateCookingOverlay();
+          speakStep();
+      }
+  }
+
+  function speakStep() {
+      if (!synth) return;
+      synth.cancel(); // stop current speaking
+      
+      const textToSpeak = cookingSteps[currentStepIndex];
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = 'en-IN'; // Indian English accent
+      utterance.rate = 0.9;     // slightly slower for clarity
+      
+      synth.speak(utterance);
+  }
+
+  let overlayTimerInterval;
+  function startOverlayTimer(mins, btnElement) {
+      if(overlayTimerInterval) clearInterval(overlayTimerInterval);
+      let secs = mins * 60;
+      btnElement.style.background = 'linear-gradient(135deg, #ef4444, #f87171)';
+      
+      overlayTimerInterval = setInterval(() => {
+          secs--;
+          const m = Math.floor(secs / 60);
+          const s = secs % 60;
+          btnElement.innerHTML = `<i class="fas fa-stopwatch fa-spin me-2"></i> ${m}:${s.toString().padStart(2, '0')}`;
+          
+          if (secs <= 0) {
+              clearInterval(overlayTimerInterval);
+              btnElement.innerHTML = `<i class="fas fa-bell fa-shake me-2"></i> Time's Up!`;
+              btnElement.style.background = 'linear-gradient(135deg, #00C9A7, #008B74)';
+              const u = new SpeechSynthesisUtterance("Chef! Your timer is done!");
+              if(synth) synth.speak(u);
+          }
+      }, 1000);
+  }
+
+  let handsFreeRec = null;
+  function toggleHandsFree() {
+      const btn = document.getElementById('handsfree-btn');
+      if (handsFreeRec && handsFreeRec.running) {
+          handsFreeRec.stop();
+          return;
+      }
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return alert("Not supported in this browser");
+      
+      handsFreeRec = new SpeechRecognition();
+      handsFreeRec.continuous = true;
+      handsFreeRec.interimResults = false;
+      handsFreeRec.lang = 'en-US';
+      
+      handsFreeRec.onstart = () => {
+          handsFreeRec.running = true;
+          btn.style.background = '#ef4444';
+          btn.style.color = 'white';
+          btn.style.border = 'none';
+          btn.innerHTML = '<i class="fas fa-microphone fa-beat"></i>';
+      };
+      
+      handsFreeRec.onresult = (e) => {
+          const last = e.results.length - 1;
+          const cmd = e.results[last][0].transcript.toLowerCase().trim();
+          
+          if (cmd.includes('next')) {
+              nextCookingStep();
+          } else if (cmd.includes('back') || cmd.includes('previous')) {
+              prevCookingStep();
+          } else if (cmd.includes('repeat') || cmd.includes('read')) {
+              speakStep();
+          }
+      };
+      
+      handsFreeRec.onend = () => {
+          handsFreeRec.running = false;
+          btn.style.background = 'transparent';
+          btn.style.color = 'white';
+          btn.style.border = '1px solid white';
+          btn.innerHTML = '<i class="fas fa-microphone"></i>';
+      };
+      
+      handsFreeRec.start();
+  }
+
+  // ── Simulated AI Fridge Scanner ────────────────────────────────────────
+  let scannerStream = null;
+
+  async function openScanner() {
+      document.getElementById('scanner-overlay').style.display = 'flex';
+      switchScannerTab('camera');
+      const video = document.getElementById('scanner-video');
+      const canvas = document.getElementById('scanner-canvas');
+      const laser = document.getElementById('scanner-laser');
+      const captureBtn = document.getElementById('scanner-capture-btn');
+      video.style.display = 'block';
+      canvas.style.display = 'none';
+      laser.style.display = 'none';
+      document.getElementById('scanner-status').innerText = 'Aim at your fridge & ingredients';
+      captureBtn.style.display = 'block';
+      try {
+          scannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+          video.srcObject = scannerStream;
+      } catch (err) {
+          alert('Could not access camera. Please allow camera permissions.');
+          closeScanner();
+      }
+  }
+
+  function switchScannerTab(tab) {
+      const camView = document.getElementById('scanner-camera-view');
+      const upView = document.getElementById('scanner-upload-view');
+      const capBtn = document.getElementById('scanner-capture-btn');
+      const tabCam = document.getElementById('tab-camera');
+      const tabUp = document.getElementById('tab-upload');
+      if (tab === 'camera') {
+          camView.style.display = 'block'; upView.style.display = 'none';
+          capBtn.style.display = 'block';
+          tabCam.className = 'btn btn-light rounded-pill px-4'; tabCam.style.color='#064E3B';
+          tabUp.className = 'btn btn-outline-light rounded-pill px-4'; tabUp.style.color='';
+      } else {
+          camView.style.display = 'none'; upView.style.display = 'block';
+          capBtn.style.display = 'none';
+          tabUp.className = 'btn btn-light rounded-pill px-4'; tabUp.style.color='#064E3B';
+          tabCam.className = 'btn btn-outline-light rounded-pill px-4'; tabCam.style.color='';
+      }
+  }
+
+  function closeScanner() {
+      document.getElementById('scanner-overlay').style.display = 'none';
+      if (scannerStream) {
+          scannerStream.getTracks().forEach(track => track.stop());
+          scannerStream = null;
+      }
+  }
+
+  // ── COCO label → Ingredient name mapping ──
+  const COCO_TO_INGREDIENT = {
+    'banana': 'Banana', 'apple': 'Apple', 'sandwich': 'Bread', 'orange': 'Orange',
+    'broccoli': 'Broccoli', 'carrot': 'Carrot', 'hot dog': 'Sausage', 'pizza': 'Pizza base',
+    'donut': 'Donut', 'cake': 'Cake', 'bottle': 'Oil/Sauce bottle', 'cup': 'Cup',
+    'bowl': 'Bowl of food', 'fork': 'Utensil', 'knife': 'Utensil', 'spoon': 'Spoon',
+    'wine glass': 'Glass', 'refrigerator': 'Fridge', 'oven': 'Oven',
+    'microwave': 'Microwave', 'toaster': 'Toaster', 'blender': 'Blender',
+    'egg': 'Egg', 'lemon': 'Lemon', 'corn': 'Corn',
+  };
+
+  let cocoModel = null;
+  // Pre-load model in background as soon as page loads
+  async function preloadScannerModel() {
+    try {
+      if (!cocoModel) {
+        cocoModel = await cocoSsd.load();
+        console.log('COCO-SSD model ready');
+      }
+    } catch(e) { console.warn('Model preload failed:', e); }
+  }
+  // Start loading immediately
+  if (typeof cocoSsd !== 'undefined') preloadScannerModel();
+  else window.addEventListener('load', preloadScannerModel);
+
+  // Shared detection runner — works on any canvas
+  async function runDetectionOnCanvas(canvas, status, laser) {
+      laser.style.display = 'block';
+      status.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Loading AI Model...';
+      try {
+          if (!cocoModel) cocoModel = await cocoSsd.load();
+          status.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Scanning ingredients...';
+          const predictions = await cocoModel.detect(canvas);
+          laser.style.display = 'none';
+          const ctx = canvas.getContext('2d');
+          const found = [];
+          predictions.forEach(pred => {
+              if (pred.score < 0.35) return;
+              const label = COCO_TO_INGREDIENT[pred.class] || pred.class;
+              if (!found.includes(label)) found.push(label);
+              ctx.strokeStyle = '#00C9A7'; ctx.lineWidth = 3;
+              ctx.strokeRect(...pred.bbox);
+              ctx.fillStyle = 'rgba(16,185,129,0.85)';
+              ctx.fillRect(pred.bbox[0], pred.bbox[1]-26, pred.bbox[2], 26);
+              ctx.fillStyle = 'white'; ctx.font = 'bold 14px Arial';
+              ctx.fillText(`${label} ${Math.round(pred.score*100)}%`, pred.bbox[0]+5, pred.bbox[1]-6);
+          });
+          return found;
+      } catch(e) {
+          laser.style.display = 'none';
+          throw e;
+      }
+  }
+
+  async function captureAndScan() {
+      const video = document.getElementById('scanner-video');
+      const canvas = document.getElementById('scanner-canvas');
+      const laser = document.getElementById('scanner-laser');
+      const status = document.getElementById('scanner-status');
+      const captureBtn = document.getElementById('scanner-capture-btn');
+
+      // Freeze frame on canvas
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      video.style.display = 'none';
+      canvas.style.display = 'block';
+      captureBtn.style.display = 'none';
+
+      // Show laser
+      laser.style.display = 'block';
+      status.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Loading AI Model...';
+
+      try {
+          // Load model if not already loaded
+          if (!cocoModel) {
+              cocoModel = await cocoSsd.load();
+          }
+          status.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Scanning ingredients...';
+
+          // Run detection
+          const predictions = await cocoModel.detect(canvas);
+          laser.style.display = 'none';
+
+          // Clear old boxes
+          document.querySelectorAll('.tf-box').forEach(b => b.remove());
+
+          const containerEl = canvas.parentElement;
+          const scaleX = containerEl.offsetWidth / canvas.width;
+          const scaleY = containerEl.offsetHeight / canvas.height;
+
+          const found = await runDetectionOnCanvas(canvas, status, laser);
+          if (found.length === 0) {
+              status.innerHTML = '⚠️ No food items detected. Try better lighting or upload a photo!';
+              setTimeout(() => { captureBtn.style.display='block'; video.style.display='block'; canvas.style.display='none'; laser.style.display='none'; status.innerText='Aim at your fridge & ingredients'; }, 3000);
+              return;
+          }
+          status.innerHTML = `✅ Found: <b>${found.join(', ')}</b>`;
+          const ta = document.querySelector('textarea[name="ingredients"]');
+          const cur = ta.value.trim();
+          ta.value = cur ? cur + ', ' + found.join(', ') : found.join(', ');
+          setTimeout(() => closeScanner(), 2500);
+      } catch(err) {
+          laser.style.display = 'none';
+          status.innerHTML = '❌ Scan failed. Try again!';
+          console.error(err);
+          setTimeout(() => { captureBtn.style.display='block'; video.style.display='block'; canvas.style.display='none'; status.innerText='Aim at your fridge & ingredients'; }, 2000);
+      }
+  }
+
+  // Handle uploaded fridge image
+  async function handleImageUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const statusEl = document.getElementById('scanner-status-upload');
+      const laserEl = document.getElementById('scanner-laser-upload');
+      const canvas = document.getElementById('scanner-canvas-upload');
+      const placeholder = document.getElementById('upload-placeholder');
+
+      const img = new Image();
+      img.onload = async () => {
+          placeholder.style.display = 'none';
+          canvas.style.display = 'block';
+          statusEl.style.display = 'block';
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          try {
+              const found = await runDetectionOnCanvas(canvas, statusEl, laserEl);
+              if (found.length === 0) {
+                  statusEl.innerHTML = '⚠️ No food items detected. Try a clearer photo!';
+                  return;
+              }
+              statusEl.innerHTML = `✅ Found: <b>${found.join(', ')}</b>`;
+              const ta = document.querySelector('textarea[name="ingredients"]');
+              const cur = ta.value.trim();
+              ta.value = cur ? cur + ', ' + found.join(', ') : found.join(', ');
+              setTimeout(() => closeScanner(), 2500);
+          } catch(e) {
+              statusEl.innerHTML = '❌ Detection failed. Try again!';
+          }
+      };
+      img.src = URL.createObjectURL(file);
+  }
+
+</script>
+
+<!-- Full Screen Cooking Overlay HTML -->
+<div id="cooking-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #064E3B, #059669); z-index: 1050; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 20px;">
+    
+    <button onclick="closeCookingMode()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: none; color: white; width: 50px; height: 50px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; backdrop-filter: blur(10px);">
+        <i class="fas fa-times"></i>
+    </button>
+
+    <div style="text-align: center; max-width: 800px; width: 100%;">
+        <h4 id="cooking-recipe-name" style="color: #fde68a; font-weight: 800; margin-bottom: 30px; letter-spacing: 1px; text-transform: uppercase;">Recipe Name</h4>
+        
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); border-radius: 30px; padding: 50px 30px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+            <div id="cooking-step-number" style="background: rgba(255,255,255,0.2); display: inline-block; padding: 8px 20px; border-radius: 20px; font-weight: 700; margin-bottom: 20px; letter-spacing: 1px;">Step 1 of 5</div>
+            
+            <p id="cooking-step-text" style="font-size: clamp(1.5rem, 5vw, 2.5rem); font-weight: 800; line-height: 1.4; margin-bottom: 40px;">
+                Chop the onions and tomatoes finely.
+            </p>
+
+            <div id="cooking-smart-timer" style="display: none; margin-bottom: 30px;">
+                <button id="cooking-timer-btn" class="btn btn-warning btn-lg rounded-pill px-5 shadow-lg" style="font-weight: 800; font-size: 1.2rem; background: linear-gradient(135deg, #f59e0b, #fbbf24); border: none; color: white;">
+                    <i class="fas fa-clock me-2"></i> Start Timer
+                </button>
+            </div>
+
+            <div class="d-flex justify-content-center gap-3">
+                <button id="cooking-prev-btn" onclick="prevCookingStep()" class="btn btn-outline-light btn-lg rounded-pill px-4" style="font-weight: 700;">
+                    <i class="fas fa-arrow-left me-2"></i> Prev
+                </button>
+                <button onclick="speakStep()" class="btn btn-outline-light btn-lg rounded-pill px-4" style="font-weight: 700;" title="Read Aloud">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <button id="handsfree-btn" onclick="toggleHandsFree()" class="btn btn-outline-light btn-lg rounded-pill px-4" style="font-weight: 700;" title="Hands-Free Voice Control">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button id="cooking-next-btn" onclick="nextCookingStep()" class="btn btn-light btn-lg rounded-pill px-4" style="font-weight: 700; color: #064E3B;">
+                    Next <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fridge Scanner Overlay -->
+<style>
+  @keyframes laserScan {
+    0% { top: 0; box-shadow: 0 0 15px 5px rgba(16, 185, 129, 0.5); }
+    50% { top: 100%; box-shadow: 0 0 15px 5px rgba(16, 185, 129, 0.5); }
+    100% { top: 0; box-shadow: 0 0 15px 5px rgba(16, 185, 129, 0.5); }
+  }
+  .scanner-laser {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #00C9A7;
+    z-index: 1060;
+    display: none;
+    animation: laserScan 2s ease-in-out infinite;
+  }
+  .scanner-bounding-box {
+    position: absolute;
+    border: 2px dashed rgba(248, 249, 250, 0.5);
+    border-radius: 10px;
+    display: none;
+    background: rgba(16, 185, 129, 0.2);
+    z-index: 1055;
+    transition: all 0.3s;
+  }
+</style>
+
+<div id="scanner-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 1050; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+
+    <!-- Tab Switcher -->
+    <div class="d-flex gap-3 mb-4">
+        <button onclick="switchScannerTab('camera')" id="tab-camera" class="btn btn-light rounded-pill px-4" style="font-weight:700; color:#064E3B;">
+            <i class="fas fa-camera me-2"></i>Live Camera
+        </button>
+        <button onclick="switchScannerTab('upload')" id="tab-upload" class="btn btn-outline-light rounded-pill px-4" style="font-weight:700;">
+            <i class="fas fa-image me-2"></i>Upload Photo
+        </button>
+    </div>
+
+    <!-- Camera View -->
+    <div id="scanner-camera-view" style="position: relative; width: 100%; max-width: 600px; aspect-ratio: 3/4; background: #111; overflow: hidden; border-radius: 20px;">
+        <video id="scanner-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+        <canvas id="scanner-canvas" style="display: none; width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; background:#000;"></canvas>
+        <div id="scanner-laser" class="scanner-laser"></div>
+        <div id="scanner-status" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: white; padding: 10px 20px; border-radius: 30px; font-weight: 700; font-size: 0.9rem; z-index: 1065; backdrop-filter: blur(5px); white-space: nowrap; max-width: 90%;">
+            Aim at your fridge &amp; ingredients
+        </div>
+    </div>
+
+    <!-- Upload View -->
+    <div id="scanner-upload-view" style="display:none; width:100%; max-width:600px;">
+        <label for="fridge-image-input" style="display:block; width:100%; aspect-ratio:3/4; background:#111; border-radius:20px; border: 2px dashed #10b981; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white;">
+            <div id="upload-preview-wrap" style="width:100%;height:100%;position:relative;">
+                <canvas id="scanner-canvas-upload" style="display:none; width:100%; height:100%; object-fit:contain; border-radius:18px;"></canvas>
+                <div id="upload-placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+                    <i class="fas fa-cloud-upload-alt" style="font-size:4rem; color:#10b981; margin-bottom:16px;"></i>
+                    <p style="font-weight:700; font-size:1.1rem; margin:0;">Tap to upload fridge photo</p>
+                    <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-top:8px;">JPG, PNG supported</p>
+                </div>
+                <div id="scanner-laser-upload" class="scanner-laser" style="display:none;"></div>
+                <div id="scanner-status-upload" style="display:none; position:absolute; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.75); color:white; padding:10px 20px; border-radius:30px; font-weight:700; font-size:0.9rem; z-index:10; white-space:nowrap; max-width:90%;"></div>
+            </div>
+        </label>
+        <input type="file" id="fridge-image-input" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
+    </div>
+
+    <!-- Bottom Buttons -->
+    <div class="d-flex gap-4 mt-4">
+        <button onclick="closeScanner()" class="btn btn-outline-light rounded-circle" style="width: 60px; height: 60px; font-size: 1.5rem;">
+            <i class="fas fa-times"></i>
+        </button>
+        <button id="scanner-capture-btn" onclick="captureAndScan()" class="btn btn-light rounded-circle shadow" style="width: 60px; height: 60px; font-size: 1.5rem; color: #4c1d95;">
+            <i class="fas fa-camera"></i>
+        </button>
+    </div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+
+
+{% endblock %}

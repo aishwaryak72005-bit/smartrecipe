@@ -1,0 +1,646 @@
+{% extends 'base.html' %} {% block content %}
+<div class="row justify-content-center mt-2">
+  <div class="col-lg-9">
+    <!-- Page Header -->
+    <div class="text-center mb-4">
+      <span class="badge-pill">✨ Smart Suggestions</span>
+      <h2 class="fw-bold" style="color: #064E3B">What Should We Cook?</h2>
+      <p class="text-muted">
+        Enter your ingredients — AI suggests the best dishes for you!
+      </p>
+    </div>
+
+    <!-- Input Form -->
+    <div class="card p-4 p-md-5 mb-4">
+      <form method="POST" action="{% url 'suggest' %}" id="suggestForm">
+        {% csrf_token %}
+
+        <!-- Ingredients -->
+        <div class="mb-4">
+          <label
+            class="form-label fw-bold"
+            style="color: #064E3B; font-size: 1.05rem"
+          >
+            🥬 What ingredients do you have?
+          </label>
+          <textarea
+            name="ingredients"
+            class="form-control"
+            rows="3"
+            placeholder="Example: onion, tomato, rice, dal, potato..."
+            style="
+              border-radius: 14px;
+              border: 2px solid #E9ECEF;
+              padding: 14px 18px;
+              font-size: 0.95rem;
+              resize: none;
+            "
+            required
+          >
+{% if ingredients %}{{ ingredients }}{% endif %}</textarea
+          >
+        </div>
+
+        <!-- Fridge Scanner Button -->
+        <div class="mb-4">
+          <div class="d-flex align-items-center justify-content-between p-3" style="background: linear-gradient(135deg, #DCFCE7, #FFFFFF); border-radius: 14px; border: 1px solid #064E3B;">
+            <div>
+              <h6 class="fw-bold mb-1" style="color: #064E3B">🧊 AI Fridge Scanner</h6>
+              <p class="mb-0" style="font-size: 0.8rem; color: #064E3B">Point camera at your fridge — AI detects ingredients!</p>
+            </div>
+            <button type="button" class="btn btn-sm" style="background: #10B981; color: white; border-radius: 12px; font-weight: 700;" onclick="openScanner()">
+              <i class="fas fa-camera me-1"></i> Scan
+            </button>
+          </div>
+        </div>
+
+
+        <!-- Quick Add Ingredients — Categorized -->
+        <div class="mb-4">
+          <p style="font-size:0.9rem; font-weight:700; color:#064E3B; margin-bottom:12px;">
+            ⚡ Quick Add Ingredients
+          </p>
+
+          <!-- Category tabs -->
+          <div class="d-flex flex-wrap gap-2 mb-3" id="ingredientCategoryTabs">
+            {% for category, items in quick_ingredients.items %}
+            <button type="button"
+              onclick="showCategory('cat_{{ forloop.counter }}')"
+              id="tab_{{ forloop.counter }}"
+              style="background:{% if forloop.first %}#064E3B{% else %}#F0FDF4{% endif %}; color:{% if forloop.first %}#FFFFFF{% else %}#065F46{% endif %}; border:none; border-radius:20px; padding:6px 14px; font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.2s;">
+              {{ category }}
+            </button>
+            {% endfor %}
+          </div>
+
+          <!-- Category ingredient chips -->
+          {% for category, items in quick_ingredients.items %}
+          <div id="cat_{{ forloop.counter }}" class="ingredient-category" style="display:{% if forloop.first %}flex{% else %}none{% endif %}; flex-wrap:wrap; gap:8px;">
+            {% for item in items %}
+            <span
+              onclick="addIngredient('{{ item }}')"
+              style="
+                background: #FFFFFF;
+                color: #064E3B;
+                padding: 7px 16px;
+                border-radius: 20px;
+                font-size: 0.82rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+                border: 1.5px solid rgba(27,67,50,0.15);
+                box-shadow: 0 2px 8px rgba(27,67,50,0.06);
+              "
+              onmouseover="this.style.background='#10B981'; this.style.color='white'; this.style.borderColor='#10B981'; this.style.transform='translateY(-2px)';"
+              onmouseout="this.style.background='#FFFFFF'; this.style.color='#064E3B'; this.style.borderColor='rgba(27,67,50,0.15)'; this.style.transform='translateY(0)';"
+            >
+              + {{ item }}
+            </span>
+            {% endfor %}
+          </div>
+          {% endfor %}
+
+          <script>
+            function showCategory(id) {
+              document.querySelectorAll('.ingredient-category').forEach(el => el.style.display = 'none');
+              document.getElementById(id).style.display = 'flex';
+              // Update tab active styles
+              const tabNum = id.replace('cat_', '');
+              document.querySelectorAll('#ingredientCategoryTabs button').forEach((btn, i) => {
+                if ((i + 1) == tabNum) {
+                  btn.style.background = '#064E3B';
+                  btn.style.color = '#FFFFFF';
+                } else {
+                  btn.style.background = '#F0FDF4';
+                  btn.style.color = '#065F46';
+                }
+              });
+            }
+          </script>
+        </div>
+
+
+        <div class="row g-4 mb-4">
+          <!-- Budget -->
+          <div class="col-md-4">
+            <label class="form-label fw-bold" style="color: #064E3B"
+              >💰 Budget</label
+            >
+            <div class="input-group">
+              <span
+                class="input-group-text fw-bold"
+                style="
+                  background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+                  border: 2px solid #F0FDF4;
+                  border-right: none;
+                  color: #064E3B;
+                  border-radius: 14px 0 0 14px;
+                "
+                >₹</span
+              >
+              <input
+                type="number"
+                name="budget"
+                class="form-control form-control-lg"
+                placeholder="Amount"
+                min="10"
+                max="10000"
+                value="{% if budget %}{{ budget }}{% endif %}"
+                style="
+                  border-radius: 0 14px 14px 0;
+                  border: 2px solid #E9ECEF;
+                  border-left: none;
+                  padding: 13px 18px;
+                "
+                required
+              />
+            </div>
+            <div class="d-flex gap-2 mt-2 flex-wrap">
+              {% for amt in quick_budgets %}
+              <span
+                onclick="setBudget('{{ amt }}')"
+                style="
+                  background: #FFFFFF;
+                  color: #064E3B;
+                  padding: 4px 12px;
+                  border-radius: 15px;
+                  font-size: 0.78rem;
+                  font-weight: 600;
+                  cursor: pointer;
+                  border: 1px solid #F0FDF4;
+                "
+              >
+                ₹{{ amt }}
+              </span>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Serving -->
+          <div class="col-md-4">
+            <label class="form-label fw-bold" style="color: #064E3B"
+              >👥 Serving Size</label
+            >
+            <select
+              name="serving_size"
+              class="form-select form-select-lg"
+              style="
+                border-radius: 14px;
+                border: 2px solid #E9ECEF;
+                padding: 13px 18px;
+              "
+            >
+              <option value="1">1 Person</option>
+              <option value="2" selected>2 People</option>
+              <option value="4">Family (4)</option>
+              <option value="6">Large Family (6)</option>
+            </select>
+          </div>
+
+          <!-- Cuisine -->
+          <div class="col-md-4">
+            <label class="form-label fw-bold" style="color: #064E3B">🍽️ Cuisine & Festival</label>
+            <select name="cuisine" class="form-select form-select-lg" style="border-radius: 14px; border: 2px solid #E9ECEF; padding: 13px 18px;">
+              <optgroup label="🌍 General">
+                <option value="any">🍽️ Any Cuisine</option>
+                <option value="healthy">🥗 Healthy / Low-Cal</option>
+                <option value="quick">⚡ Quick (under 20 min)</option>
+                <option value="jain">🌿 Jain (No Root Veg)</option>
+                <option value="vegan">🌱 Vegan</option>
+                <option value="diabetic">💊 Diabetic-Friendly</option>
+              </optgroup>
+              <optgroup label="🗺️ North India">
+                <option value="north_indian">🫓 North Indian</option>
+                <option value="punjabi">🧄 Punjabi</option>
+                <option value="rajasthani">🏜️ Rajasthani</option>
+                <option value="kashmiri">❄️ Kashmiri</option>
+                <option value="bihari">🌾 Bihari</option>
+              </optgroup>
+              <optgroup label="🗺️ South India">
+                <option value="south_indian">🥥 South Indian</option>
+                <option value="kerala">🌴 Kerala</option>
+                <option value="chettinad">🌶️ Chettinad (Tamil Nadu)</option>
+                <option value="andhra">🔥 Andhra (Spicy)</option>
+                <option value="karnataka">🫘 Karnataka</option>
+              </optgroup>
+              <optgroup label="🗺️ East & West India">
+                <option value="bengali">🐟 Bengali</option>
+                <option value="odia">🍚 Odia</option>
+                <option value="gujarati">🥟 Gujarati</option>
+                <option value="maharashtrian">🌶️ Maharashtrian</option>
+                <option value="goan">🌊 Goan</option>
+              </optgroup>
+              <optgroup label="🌮 Street & Fusion">
+                <option value="street_food">🌮 Indian Street Food</option>
+                <option value="hyderabadi">👑 Hyderabadi</option>
+                <option value="mughlai">🍖 Mughlai</option>
+              </optgroup>
+              <optgroup label="🎉 Festival Mode">
+                <option value="diwali">🪔 Diwali Special</option>
+                <option value="holi">🎨 Holi Special</option>
+                <option value="eid">🌙 Eid Special</option>
+                <option value="navratri">🕉️ Navratri Vrat</option>
+                <option value="pongal">🌾 Pongal / Sankranti</option>
+                <option value="onam">🌸 Onam Sadya</option>
+                <option value="ganesh">🐘 Ganesh Chaturthi</option>
+                <option value="christmas">🎄 Christmas Special</option>
+                <option value="baisakhi">💃 Baisakhi / Harvest</option>
+                <option value="raksha">🎀 Raksha Bandhan (Sweets)</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+        <!-- Extra Inputs Row -->
+        <div class="row g-4 mb-4">
+          <!-- Meal Type -->
+          <div class="col-md-4">
+            <label class="form-label fw-bold" style="color: #064E3B">🍳 Meal Type</label>
+            <select name="meal_type" class="form-select form-select-lg" style="border-radius:14px; border:2px solid #E9ECEF; padding:13px 18px;">
+              <option value="any">🍽️ Any Meal</option>
+              <option value="breakfast">🌅 Breakfast</option>
+              <option value="lunch">☀️ Lunch</option>
+              <option value="dinner">🌙 Dinner</option>
+              <option value="snack">🍿 Snack / Tea-Time</option>
+              <option value="dessert">🍮 Dessert / Sweet</option>
+              <option value="drink">🥤 Drink / Beverage</option>
+            </select>
+          </div>
+          <!-- Spice Level -->
+          <div class="col-md-4">
+            <label class="form-label fw-bold" style="color: #064E3B">🌶️ Spice Level</label>
+            <select name="spice_level" class="form-select form-select-lg" style="border-radius:14px; border:2px solid #E9ECEF; padding:13px 18px;">
+              <option value="any">🤷 Any Spice</option>
+              <option value="mild">😊 Mild (No Spice)</option>
+              <option value="medium">🌡️ Medium</option>
+              <option value="spicy">🌶️ Spicy</option>
+              <option value="extra_spicy">🔥 Extra Spicy</option>
+            </select>
+          </div>
+          <!-- Diet Preference -->
+          <div class="col-md-4">
+            <label class="form-label fw-bold" style="color: #064E3B">🥦 Diet Preference</label>
+            <select name="diet_pref" class="form-select form-select-lg" style="border-radius:14px; border:2px solid #E9ECEF; padding:13px 18px;">
+              <option value="any">🍽️ No Preference</option>
+              <option value="vegetarian">🌿 Vegetarian</option>
+              <option value="vegan">🌱 Vegan</option>
+              <option value="non_veg">🍗 Non-Vegetarian</option>
+              <option value="eggetarian">🥚 Eggetarian</option>
+              <option value="jain">🪷 Jain</option>
+              <option value="diabetic">💊 Diabetic-Friendly</option>
+              <option value="high_protein">💪 High Protein</option>
+            </select>
+          </div>
+        </div>
+
+
+        <!-- assume_pantry always on (pantry items now in quick-add tabs) -->
+        <input type="hidden" name="assume_pantry" value="yes">
+
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-purple w-100 btn-lg" style="font-size: 1.1rem; padding: 16px" onclick="showLoading()">
+          <i class="fas fa-lightbulb me-2"></i> Suggest Dishes for Me ✨
+        </button>
+      </form>
+    </div>
+
+    <!-- Loading -->
+    <div
+      id="loadingSection"
+      style="display: none"
+      class="text-center mt-3 mb-4"
+    >
+      <div class="card p-4">
+        <div
+          style="
+            font-size: 3rem;
+            animation: spin 2s linear infinite;
+            display: inline-block;
+          "
+        >
+          🤔
+        </div>
+        <h5 class="fw-bold mt-3" style="color: #064E3B">
+          AI is thinking of dishes...
+        </h5>
+        <p class="text-muted">Just a moment!</p>
+      </div>
+    </div>
+
+    <!-- Dish Suggestions -->
+    {% if dishes %}
+    <div id="suggestions">
+      <div class="text-center mb-4">
+        <span class="badge-pill">🍽️ AI Suggestions</span>
+        <h3 class="fw-bold" style="color: #064E3B">Pick a Dish You Like!</h3>
+        <p class="text-muted">
+          Click any dish to get the full recipe instantly
+        </p>
+      </div>
+
+      <div class="row g-3 mb-4">
+        {% for dish in dishes %}
+        <div class="col-12">
+          <form method="POST" action="{% url 'generate' %}">
+            {% csrf_token %}
+            <input type="hidden" name="ingredients" value="{{ ingredients }}" />
+            <input type="hidden" name="budget" value="{{ budget }}" />
+            <input type="hidden" name="serving_size" value="{{ serving_size }}" />
+            <input type="hidden" name="cuisine" value="{{ cuisine }}" />
+            <input type="hidden" name="selected_dish" value="{{ dish.name }}" />
+
+            <button type="submit" class="w-100 text-start border-0 bg-transparent p-0">
+              <div
+                class="card overflow-hidden"
+                style="transition: all 0.3s; cursor: pointer"
+                onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 35px rgba(6, 78, 59, 0.2)';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='';"
+              >
+                <div style="background:{{ dish.color }}; padding:18px 24px;">
+                  <div class="d-flex align-items-center gap-3">
+                    <div style="background:rgba(255,255,255,0.2); border-radius:50%; width:52px; height:52px; display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0;">
+                      {{ dish.emoji }}
+                    </div>
+                    <div class="flex-grow-1">
+                      <h5 style="color:white; font-weight:800; margin:0;">{{ dish.name }}</h5>
+                      <p style="color:rgba(255,255,255,0.85); margin:4px 0 0; font-size:0.88rem;">{{ dish.description }}</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                      {% if dish.cost %}
+                      <span style="background:rgba(255,255,255,0.2); color:white; padding:5px 14px; border-radius:20px; font-size:0.82rem; font-weight:700;">{{ dish.cost }}</span>
+                      {% endif %}
+                      <div style="background:white; color:#1E40AF; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1rem;">→</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </button>
+          </form>
+
+          <!-- Social Quick Links for this dish -->
+          <div class="d-flex flex-wrap gap-2 mt-2 px-1">
+            <span style="font-size:0.75rem; color:#64748b; align-self:center; font-weight:600;">Explore:</span>
+            <a href="https://www.youtube.com/results?search_query={{ dish.name|urlencode }}+recipe" target="_blank"
+              style="background:#f1f5f9; color:#475569; text-decoration:none; padding:4px 12px; border-radius:20px; font-size:0.72rem; font-weight:700; display:flex; align-items:center; gap:5px; transition:transform 0.2s;"
+              onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
+              <i class="fab fa-youtube"></i> YouTube
+            </a>
+            <a href="https://www.pinterest.com/search/pins/?q={{ dish.name|urlencode }}+recipe" target="_blank"
+              style="background:linear-gradient(135deg,#E60023,#ad081b); color:white; text-decoration:none; padding:4px 12px; border-radius:20px; font-size:0.72rem; font-weight:700; display:flex; align-items:center; gap:5px; transition:transform 0.2s;"
+              onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
+              <i class="fab fa-pinterest"></i> Pinterest
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+
+      <!-- Suggest Again -->
+      <div class="text-center mb-4">
+        <a href="{% url 'suggest' %}" class="btn btn-outline-purple">
+          <i class="fas fa-redo me-2"></i> Suggest Different Dishes
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Error -->
+    {% if error_message %}
+    <div class="card p-4 mt-4" style="border: 2px solid #DCFCE7">
+      <div class="text-center">
+        <div style="font-size: 3rem">😕</div>
+        <h5 class="fw-bold mt-2" style="color: #059669">
+          Something went wrong
+        </h5>
+        <p class="text-muted">{{ error_message }}</p>
+        <a href="{% url 'suggest' %}" class="btn btn-pink">Try Again</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+
+<script>
+  function addIngredient(item) {
+      const textarea = document.querySelector('textarea[name="ingredients"]');
+      const current = textarea.value.trim();
+      if (current === '') {
+          textarea.value = item;
+      } else {
+          if (!current.toLowerCase().includes(item.toLowerCase())) {
+              textarea.value = current + ', ' + item;
+          }
+      }
+  }
+
+  function setBudget(amount) {
+      document.querySelector('input[name="budget"]').value = amount;
+  }
+
+  function showLoading() {
+      setTimeout(() => {
+          document.getElementById('loadingSection').style.display = 'block';
+      }, 100);
+  }
+
+  function simulateFridgeScan(btn) { openScanner(); }
+
+  // ── Real TF.js COCO-Scan Ingredients Scanner ──
+  const COCO_TO_INGREDIENT = {
+    'banana': 'Banana', 'apple': 'Apple', 'sandwich': 'Bread', 'orange': 'Orange',
+    'broccoli': 'Broccoli', 'carrot': 'Carrot', 'hot dog': 'Sausage',
+    'donut': 'Donut', 'cake': 'Cake', 'bottle': 'Oil/Sauce bottle',
+    'bowl': 'Bowl of food', 'egg': 'Egg', 'lemon': 'Lemon', 'corn': 'Corn',
+  };
+
+  let scannerStream = null;
+  let cocoModel = null;
+
+  function switchScannerTab(tab) {
+      const camView = document.getElementById('scanner-camera-view');
+      const upView = document.getElementById('scanner-upload-view');
+      const capBtn = document.getElementById('scanner-capture-btn');
+      const tabCam = document.getElementById('tab-camera');
+      const tabUp = document.getElementById('tab-upload');
+      if (tab === 'camera') {
+          camView.style.display='block'; upView.style.display='none'; capBtn.style.display='block';
+          tabCam.className='btn btn-light rounded-pill px-4'; tabCam.style.color='#064E3B';
+          tabUp.className='btn btn-outline-light rounded-pill px-4'; tabUp.style.color='';
+      } else {
+          camView.style.display='none'; upView.style.display='block'; capBtn.style.display='none';
+          tabUp.className='btn btn-light rounded-pill px-4'; tabUp.style.color='#064E3B';
+          tabCam.className='btn btn-outline-light rounded-pill px-4'; tabCam.style.color='';
+      }
+  }
+
+  async function openScanner() {
+      document.getElementById('scanner-overlay').style.display = 'flex';
+      switchScannerTab('camera');
+      const video = document.getElementById('scanner-video');
+      const canvas = document.getElementById('scanner-canvas');
+      const laser = document.getElementById('scanner-laser');
+      const captureBtn = document.getElementById('scanner-capture-btn');
+      video.style.display = 'block'; canvas.style.display = 'none'; laser.style.display = 'none';
+      document.getElementById('scanner-status').innerText = 'Aim at your fridge & ingredients';
+      captureBtn.style.display = 'block';
+      try {
+          scannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+          video.srcObject = scannerStream;
+          if (!cocoModel && typeof cocoSsd !== 'undefined') cocoModel = await cocoSsd.load();
+      } catch(err) {
+          alert('Could not access camera. Please allow camera permissions.');
+          closeScanner();
+      }
+  }
+
+  function closeScanner() {
+      document.getElementById('scanner-overlay').style.display = 'none';
+      if (scannerStream) { scannerStream.getTracks().forEach(t => t.stop()); scannerStream = null; }
+  }
+
+  // Shared detection runner
+  async function runDetectionOnCanvas(canvas, statusEl, laserEl) {
+      laserEl.style.display = 'block';
+      statusEl.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Loading AI Model...';
+      try {
+          if (!cocoModel) cocoModel = await cocoSsd.load();
+          statusEl.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Scanning ingredients...';
+          const predictions = await cocoModel.detect(canvas);
+          laserEl.style.display = 'none';
+          const ctx = canvas.getContext('2d');
+          const found = [];
+          predictions.forEach(pred => {
+              if (pred.score < 0.35) return;
+              const label = COCO_TO_INGREDIENT[pred.class] || pred.class;
+              if (!found.includes(label)) found.push(label);
+              ctx.strokeStyle='#00C9A7'; ctx.lineWidth=3; ctx.strokeRect(...pred.bbox);
+              ctx.fillStyle='rgba(16,185,129,0.85)'; ctx.fillRect(pred.bbox[0],pred.bbox[1]-26,pred.bbox[2],26);
+              ctx.fillStyle='white'; ctx.font='bold 14px Arial';
+              ctx.fillText(`${label} ${Math.round(pred.score*100)}%`,pred.bbox[0]+5,pred.bbox[1]-6);
+          });
+          return found;
+      } catch(e) { laserEl.style.display='none'; throw e; }
+  }
+
+  async function captureAndScan() {
+      const video = document.getElementById('scanner-video');
+      const canvas = document.getElementById('scanner-canvas');
+      const laser = document.getElementById('scanner-laser');
+      const status = document.getElementById('scanner-status');
+      const captureBtn = document.getElementById('scanner-capture-btn');
+      canvas.width = video.videoWidth||640; canvas.height = video.videoHeight||480;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video,0,0,canvas.width,canvas.height);
+      video.style.display='none'; canvas.style.display='block'; captureBtn.style.display='none';
+      try {
+          const found = await runDetectionOnCanvas(canvas, status, laser);
+          if (found.length===0) {
+              status.innerHTML='⚠️ No food items detected. Try better lighting or upload a photo!';
+              setTimeout(()=>{captureBtn.style.display='block';video.style.display='block';canvas.style.display='none';laser.style.display='none';status.innerText='Aim at fridge';},3000);
+              return;
+          }
+          status.innerHTML=`✅ Found: <b>${found.join(', ')}</b>`;
+          const ta=document.querySelector('textarea[name="ingredients"]');
+          const cur=ta.value.trim();
+          ta.value=cur?cur+', '+found.join(', '):found.join(', ');
+          setTimeout(()=>closeScanner(),2500);
+      } catch(err) {
+          laser.style.display='none'; status.innerHTML='❌ Scan failed. Try again!';
+          setTimeout(()=>{captureBtn.style.display='block';video.style.display='block';canvas.style.display='none';status.innerText='Aim at fridge';},2000);
+      }
+  }
+
+  async function handleImageUpload(input) {
+      const file=input.files[0]; if(!file) return;
+      const statusEl=document.getElementById('scanner-status-upload');
+      const laserEl=document.getElementById('scanner-laser-upload');
+      const canvas=document.getElementById('scanner-canvas-upload');
+      const placeholder=document.getElementById('upload-placeholder');
+      const img=new Image();
+      img.onload=async()=>{
+          placeholder.style.display='none'; canvas.style.display='block'; statusEl.style.display='block';
+          canvas.width=img.naturalWidth; canvas.height=img.naturalHeight;
+          const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0);
+          try {
+              const found=await runDetectionOnCanvas(canvas,statusEl,laserEl);
+              if(found.length===0){statusEl.innerHTML='⚠️ No food items detected. Try a clearer photo!';return;}
+              statusEl.innerHTML=`✅ Found: <b>${found.join(', ')}</b>`;
+              const ta=document.querySelector('textarea[name="ingredients"]');
+              const cur=ta.value.trim();
+              ta.value=cur?cur+', '+found.join(', '):found.join(', ');
+              setTimeout(()=>closeScanner(),2500);
+          } catch(e){statusEl.innerHTML='❌ Detection failed. Try again!';}
+      };
+      img.src=URL.createObjectURL(file);
+  }
+
+  {% if dishes %}
+  window.onload = function() {
+      document.getElementById('suggestions').scrollIntoView({behavior:'smooth'});
+      if(typeof addXP === 'function' && !sessionStorage.getItem('suggest_xp_given')) {
+          addXP(20, "Generated AI Suggestions!");
+          sessionStorage.setItem('suggest_xp_given', 'true');
+      }
+  }
+  {% endif %}
+</script>
+
+{% endblock %}
+
+<!-- Fridge Scanner Overlay (Suggest Page) -->
+<style>
+  @keyframes laserScan2 {
+    0%,100% { top: 0; } 50% { top: 100%; }
+  }
+  #scanner-overlay .scanner-laser { animation: laserScan2 2s ease-in-out infinite; }
+</style>
+<div id="scanner-overlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
+    <!-- Tab Switcher -->
+    <div class="d-flex gap-3 mb-4">
+        <button onclick="switchScannerTab('camera')" id="tab-camera" class="btn btn-light rounded-pill px-4" style="font-weight:700; color:#064E3B;"><i class="fas fa-camera me-2"></i>Live Camera</button>
+        <button onclick="switchScannerTab('upload')" id="tab-upload" class="btn btn-outline-light rounded-pill px-4" style="font-weight:700;"><i class="fas fa-image me-2"></i>Upload Photo</button>
+    </div>
+
+    <!-- Camera View -->
+    <div id="scanner-camera-view" style="position:relative; width:100%; max-width:600px; aspect-ratio:3/4; background:#111; overflow:hidden; border-radius:20px;">
+        <video id="scanner-video" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+        <canvas id="scanner-canvas" style="display:none; width:100%; height:100%; object-fit:contain; position:absolute; top:0; left:0; background:#000;"></canvas>
+        <div id="scanner-laser" class="scanner-laser" style="position:absolute; left:0; right:0; height:4px; background:#00C9A7; display:none; box-shadow:0 0 15px 5px rgba(16,185,129,0.5); z-index:10;"></div>
+        <div id="scanner-status" style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.75); color:white; padding:10px 20px; border-radius:30px; font-weight:700; font-size:0.9rem; z-index:20; backdrop-filter:blur(5px); white-space:nowrap; max-width:90%;">Aim at your fridge &amp; ingredients</div>
+    </div>
+
+    <!-- Upload View -->
+    <div id="scanner-upload-view" style="display:none; width:100%; max-width:600px;">
+        <label for="fridge-image-input" style="display:flex; flex-direction:column; width:100%; aspect-ratio:3/4; background:#111; border-radius:20px; border:2px dashed #00C9A7; cursor:pointer; align-items:center; justify-content:center; color:white; overflow:hidden; position:relative;">
+            <canvas id="scanner-canvas-upload" style="display:none; width:100%; height:100%; object-fit:contain;"></canvas>
+            <div id="upload-placeholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; position:absolute; inset:0;">
+                <i class="fas fa-cloud-upload-alt" style="font-size:4rem; color:#00C9A7; margin-bottom:16px;"></i>
+                <p style="font-weight:700; font-size:1.1rem; margin:0;">Tap to upload fridge photo</p>
+                <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-top:8px;">JPG, PNG supported</p>
+            </div>
+            <div id="scanner-laser-upload" style="position:absolute; left:0; right:0; height:4px; background:#00C9A7; display:none; box-shadow:0 0 15px 5px rgba(16,185,129,0.5); z-index:10;"></div>
+            <div id="scanner-status-upload" style="display:none; position:absolute; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.75); color:white; padding:10px 20px; border-radius:30px; font-weight:700; font-size:0.9rem; z-index:20; white-space:nowrap; max-width:90%;"></div>
+        </label>
+        <input type="file" id="fridge-image-input" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-flex gap-4 mt-4">
+        <button onclick="closeScanner()" class="btn btn-outline-light rounded-circle" style="width:60px;height:60px;font-size:1.5rem;"><i class="fas fa-times"></i></button>
+        <button id="scanner-capture-btn" onclick="captureAndScan()" class="btn btn-light rounded-circle shadow" style="width:60px;height:60px;font-size:1.5rem;color:#064E3B;"><i class="fas fa-camera"></i></button>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>

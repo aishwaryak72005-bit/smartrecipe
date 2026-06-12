@@ -1,0 +1,192 @@
+{% extends 'base.html' %} {% block content %}
+<div class="row justify-content-center mt-2">
+  <div class="col-lg-9">
+    <div class="text-center mb-4">
+      <span class="badge-pill">❤️ My Collection</span>
+      <h2 class="fw-bold" style="color: #1A1A1A">Saved Recipes</h2>
+      <p class="text-muted">Your favourite recipes all in one place!</p>
+    </div>
+
+    {% if saved_recipes %}
+    <div class="row g-4">
+      {% for recipe in saved_recipes %}
+      <div class="col-12">
+        <div class="card overflow-hidden">
+          <!-- Card Header -->
+          <div
+            style="
+              background: linear-gradient(135deg, #064E3B, #065F46);
+              padding: 20px 28px;
+            "
+          >
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+              <div
+                style="
+                  background: rgba(255, 255, 255, 0.2);
+                  border-radius: 50%;
+                  width: 52px;
+                  height: 52px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 1.6rem;
+                  flex-shrink: 0;
+                "
+              >
+                🍽️
+              </div>
+              <div class="flex-grow-1">
+                <h5 style="color: white; font-weight: 800; margin: 0">
+                  {{ recipe.name }}
+                </h5>
+                <p
+                  style="
+                    color: rgba(255, 255, 255, 0.8);
+                    margin: 4px 0 0;
+                    font-size: 0.85rem;
+                  "
+                >
+                  {{ recipe.description }}
+                </p>
+              </div>
+              <div class="d-flex gap-2 flex-wrap align-items-center">
+                <span
+                  style="
+                    background: rgba(255, 255, 255, 0.2);
+                    color: white;
+                    padding: 5px 14px;
+                    border-radius: 20px;
+                    font-size: 0.82rem;
+                    font-weight: 600;
+                  "
+                >
+                  💰 ₹{{ recipe.budget }}
+                </span>
+                <span
+                  style="
+                    background: rgba(255, 255, 255, 0.2);
+                    color: white;
+                    padding: 5px 14px;
+                    border-radius: 20px;
+                    font-size: 0.82rem;
+                    font-weight: 600;
+                  "
+                >
+                  📅 {{ recipe.created_at|date:"d M Y" }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div class="card-body p-4">
+            <!-- Ingredients used -->
+            <div class="mb-3">
+              <span class="fw-bold" style="color: #1A1A1A; font-size: 0.9rem">
+                🥬 Ingredients Used:
+              </span>
+              <span class="text-muted" style="font-size: 0.88rem">
+                {{ recipe.ingredients_used }}
+              </span>
+            </div>
+
+            <!-- Full Recipe -->
+            <div style="background: white; border-radius: 14px; padding: 20px; border: 2px solid #E9ECEF; margin-bottom: 16px;">
+              {% if recipe.parsed_recipe %}
+                <h6 style="color:#FF4B2B; font-weight:bold; margin-bottom:12px;"><i class="fas fa-shopping-basket"></i> Ingredients Needed</h6>
+                <ul class="list-group list-group-flush mb-4" style="border-radius:12px; overflow:hidden;">
+                  {% for item in recipe.parsed_recipe.ingredients %}
+                  <li class="list-group-item d-flex align-items-center gap-2" style="background:#FFFFFF; border-color:#E9ECEF;">
+                    <i class="fas {% if item.have %}fa-check-circle{% else %}fa-cart-plus{% endif %}" style="color: {% if item.have %}#FF416C{% else %}#FF4B2B{% endif %}"></i>
+                    {{ item.text }}
+                  </li>
+                  {% endfor %}
+                </ul>
+
+                <h6 style="color:#FF416C; font-weight:bold; margin-bottom:12px;"><i class="fas fa-fire-burner"></i> Cooking Instructions</h6>
+                <div class="p-3" style="background:#FFFFFF; border-radius:12px; border:1px solid #E9ECEF;">
+                  {% for step in recipe.parsed_recipe.instructions %}
+                  <div class="d-flex mb-2">
+                    <div style="min-width:28px; font-weight:900; color:#FF416C;">{{ forloop.counter }}.</div>
+                    <div style="color:#1A1A1A; line-height:1.5;">{{ step }}</div>
+                  </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <pre style="white-space: pre-wrap; font-family: 'Poppins', sans-serif; font-size: 0.88rem; color: #333; line-height: 1.8; margin: 0;">{{ recipe.ai_response }}</pre>
+              {% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex gap-3 flex-wrap align-items-center">
+              <a
+                href="https://blinkit.com"
+                target="_blank"
+                class="btn btn-sm"
+                style="background:linear-gradient(135deg,#10B981,#059669);color:white;border-radius:14px;padding:6px 16px;font-weight:600;"
+              >
+                <i class="fas fa-shopping-cart me-1"></i> Blinkit
+              </a>
+              <a
+                href="https://www.jiomart.com"
+                target="_blank"
+                class="btn btn-sm"
+                style="background:linear-gradient(135deg,#065F46,#064E3B);color:white;border-radius:14px;padding:6px 16px;font-weight:600;"
+              >
+                <i class="fas fa-store me-1"></i> JioMart
+              </a>
+              <a
+                href="https://www.youtube.com/results?search_query={{ recipe.name|urlencode }}+Indian+recipe"
+                target="_blank"
+                class="btn btn-sm"
+                style="background:linear-gradient(135deg,#10B981,#064E3B);color:white;border-radius:14px;padding:6px 16px;font-weight:600;"
+              >
+                <i class="fab fa-youtube me-1"></i> YouTube
+              </a>
+
+              <!-- Pinterest -->
+              <a href="https://www.pinterest.com/search/pins/?q={{ recipe.name|urlencode }}+recipe"
+                target="_blank"
+                class="btn btn-sm"
+                style="background:linear-gradient(135deg,#10B981,#10B981);color:white;border-radius:14px;padding:6px 14px;font-weight:700;"
+                title="Find on Pinterest"
+              >
+                <i class="fab fa-pinterest me-1"></i> Pinterest
+              </a>
+
+              <a
+                href="{% url 'delete_recipe' recipe.id %}"
+                onclick="return confirm('Delete this recipe?');"
+                class="btn btn-sm ms-auto"
+                style="background:#FFFFFF;color:#10B981;border:2px solid #10B981;border-radius:14px;padding:6px 16px;font-weight:600;"
+              >
+                <i class="fas fa-trash me-1"></i> Delete
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="card p-5 text-center">
+      <div style="font-size: 4rem; margin-bottom: 16px">🍽️</div>
+      <h4 class="fw-bold" style="color: #1A1A1A">No saved recipes yet!</h4>
+      <p class="text-muted mb-4">
+        Generate recipes and save your favourites here.
+      </p>
+      <div class="d-flex gap-3 justify-content-center">
+        <a href="{% url 'suggest' %}" class="btn btn-purple">
+          <i class="fas fa-lightbulb me-2"></i> Suggest Dishes
+        </a>
+        <a href="{% url 'generate' %}" class="btn btn-pink">
+          <i class="fas fa-magic me-2"></i> Generate Recipes
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

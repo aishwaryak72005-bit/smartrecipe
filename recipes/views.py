@@ -1,0 +1,1136 @@
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from groq import Groq
+from .models import SavedRecipe, MealPlan
+import os
+import requests
+import urllib.parse as _urlparse
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+
+
+def get_youtube_videos(search_query):
+    try:
+        api_key = os.getenv('YOUTUBE_API_KEY')
+        url = "https://www.googleapis.com/youtube/v3/search"
+        params = {
+            "part": "snippet",
+            "q": search_query + " Indian recipe cooking",
+            "key": api_key,
+            "maxResults": 6,
+            "type": "video",
+            "videoEmbeddable": "true",
+            "relevanceLanguage": "en",
+        }
+        response = requests.get(url, params=params)
+        data = response.json()
+        videos = []
+        for item in data.get("items", []):
+            videos.append({
+                "title": item["snippet"]["title"],
+                "thumbnail": item["snippet"]["thumbnails"]["medium"]["url"],
+                "video_id": item["id"]["videoId"],
+                "channel": item["snippet"]["channelTitle"],
+            })
+        return videos[:3]
+    except Exception as e:
+        return []
+
+
+# Per-recipe visual identity (emoji + gradient fallback when no photo found)
+DISH_EMOJIS = ['🍛', '🥘', '🍜', '🥗', '🍚', '🥙', '🍲', '🫕', '🥞', '🍱', '🥣', '🧆']
+DISH_GRADIENTS = [
+    'linear-gradient(145deg,#7c3aed 0%,#a855f7 50%,#ec4899 100%)',
+    'linear-gradient(145deg,#f59e0b 0%,#ef4444 100%)',
+    'linear-gradient(145deg,#10b981 0%,#0ea5e9 100%)',
+    'linear-gradient(145deg,#6366f1 0%,#ec4899 100%)',
+    'linear-gradient(145deg,#d97706 0%,#f59e0b 50%,#fbbf24 100%)',
+    'linear-gradient(145deg,#0f2027 0%,#203a43 50%,#2c5364 100%)',
+    'linear-gradient(145deg,#134e5e 0%,#71b280 100%)',
+    'linear-gradient(145deg,#c94b4b 0%,#4b134f 100%)',
+]
+
+# ── Realistic Indian Grocery Price Database (2024 market rates) ──────────────
+INDIAN_GROCERY_PRICES = {
+    # Oils & Fats
+    'oil': 180, 'cooking oil': 180, 'sunflower oil': 180, 'mustard oil': 150,
+    'groundnut oil': 200, 'coconut oil': 220, 'ghee': 550, 'butter': 55,
+    'refined oil': 180, 'vegetable oil': 175,
+    # Vegetables
+    'onion': 40, 'tomato': 30, 'potato': 25, 'garlic': 60, 'ginger': 80,
+    'green chilli': 30, 'capsicum': 50, 'carrot': 40, 'peas': 60,
+    'spinach': 30, 'palak': 30, 'cauliflower': 40, 'broccoli': 60,
+    'cabbage': 25, 'brinjal': 30, 'eggplant': 30, 'okra': 40, 'bhindi': 40,
+    'lady finger': 40, 'bitter gourd': 35, 'bottle gourd': 20, 'lemon': 5,
+    'lime': 5, 'curry leaves': 15, 'coriander leaves': 15, 'mint': 20,
+    'drumstick': 50, 'raw banana': 25, 'corn': 20, 'mushroom': 80,
+    'beans': 50, 'french beans': 50, 'cluster beans': 40,
+    # Pulses & Lentils
+    'dal': 120, 'toor dal': 130, 'moong dal': 120, 'chana dal': 110,
+    'urad dal': 130, 'masoor dal': 100, 'rajma': 130, 'kidney beans': 130,
+    'black gram': 130, 'green gram': 110, 'moong': 110, 'lentils': 120,
+    'chickpeas': 120, 'chana': 80, 'black chana': 80, 'white chana': 100,
+    'kabuli chana': 120,
+    # Rice & Grains
+    'rice': 60, 'basmati rice': 100, 'brown rice': 90, 'wheat': 35,
+    'wheat flour': 45, 'atta': 45, 'maida': 40, 'semolina': 50, 'suji': 50,
+    'rava': 50, 'poha': 60, 'oats': 120, 'barley': 70, 'ragi': 90,
+    'jowar': 60, 'bajra': 50, 'cornflour': 60, 'besan': 80, 'gram flour': 80,
+    # Dairy
+    'milk': 25, 'curd': 30, 'yogurt': 30, 'paneer': 90, 'cheese': 200,
+    'cream': 50, 'khoya': 180, 'mawa': 180, 'condensed milk': 110,
+    'buttermilk': 20, 'chaas': 20,
+    # Meat, Fish & Eggs
+    'egg': 8, 'eggs': 8, 'chicken': 200, 'mutton': 700, 'fish': 250,
+    'prawn': 350, 'shrimp': 350, 'tuna': 120,
+    # Spices (small packs/sachets)
+    'turmeric': 20, 'haldi': 20, 'cumin': 30, 'jeera': 30,
+    'coriander powder': 25, 'dhania': 20, 'red chilli powder': 30,
+    'chilli powder': 30, 'garam masala': 35, 'pepper': 30,
+    'black pepper': 30, 'cardamom': 70, 'elaichi': 70, 'cloves': 50,
+    'lavang': 50, 'cinnamon': 30, 'dalchini': 30, 'bay leaf': 20,
+    'tej patta': 20, 'mustard seeds': 25, 'rai': 25, 'fennel seeds': 30,
+    'saunf': 30, 'fenugreek seeds': 25, 'methi seeds': 25, 'ajwain': 25,
+    'carom seeds': 25, 'asafoetida': 30, 'hing': 30, 'star anise': 40,
+    'saffron': 250, 'kesar': 250, 'nutmeg': 40, 'jaiphal': 40,
+    'mace': 50, 'paprika': 30, 'kashmiri chilli': 40, 'chaat masala': 30,
+    'sambar powder': 40, 'rasam powder': 35, 'biryani masala': 50,
+    'curry powder': 40, 'kitchen king masala': 40, 'pav bhaji masala': 35,
+    # Dry Fruits & Nuts
+    'cashew': 700, 'cashews': 700, 'almond': 900, 'almonds': 900,
+    'raisin': 200, 'raisins': 200, 'peanut': 100, 'peanuts': 100,
+    'walnut': 800, 'pistachios': 1200, 'dates': 200,
+    # Sugar & Sweeteners
+    'sugar': 45, 'jaggery': 60, 'gur': 60, 'honey': 250,
+    'brown sugar': 80, 'powdered sugar': 50,
+    # Sauces & Condiments
+    'tomato sauce': 80, 'soy sauce': 70, 'vinegar': 40,
+    'tamarind': 50, 'imli': 50, 'kokum': 60,
+    # Staples
+    'salt': 20, 'bread': 50, 'pav': 35, 'roti': 10,
+    'water': 0, 'ice': 10,
+}
+
+def get_ingredient_price(ingredient_name):
+    """Look up realistic market price for an ingredient."""
+    name = ingredient_name.lower().strip()
+    # Direct match
+    if name in INDIAN_GROCERY_PRICES:
+        return INDIAN_GROCERY_PRICES[name]
+    # Partial match — find if any known key is contained in the ingredient name
+    for key, price in INDIAN_GROCERY_PRICES.items():
+        if key in name or name in key:
+            return price
+    return None  # Unknown ingredient, keep AI's estimate
+
+
+
+def get_nutrition_info(recipe_name, ingredients_list, serving_size):
+    """Get nutritional info for a recipe using Groq AI."""
+    try:
+        prompt = f"""
+Give the approximate nutritional information for one serving of "{recipe_name}".
+Ingredients used: {ingredients_list}
+Serving size: {serving_size} people (calculate per 1 serving)
+
+Reply ONLY in this exact format, nothing else:
+Calories: [number] kcal
+Protein: [number] g
+Carbohydrates: [number] g
+Fat: [number] g
+Fiber: [number] g
+Sodium: [number] mg
+Health Score: [number between 1-10]
+Health Note: [one short sentence about this dish health-wise]
+"""
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "You are a nutritionist. Reply only in the exact format given."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=200,
+            temperature=0.3,
+        )
+        text = response.choices[0].message.content.strip()
+        info = {}
+        for line in text.split('\n'):
+            line = line.strip()
+            if ':' in line:
+                key, _, val = line.partition(':')
+                info[key.strip()] = val.strip()
+        return {
+            'calories': info.get('Calories', 'N/A'),
+            'protein': info.get('Protein', 'N/A'),
+            'carbs': info.get('Carbohydrates', 'N/A'),
+            'fat': info.get('Fat', 'N/A'),
+            'fiber': info.get('Fiber', 'N/A'),
+            'sodium': info.get('Sodium', 'N/A'),
+            'health_score': info.get('Health Score', '7'),
+            'health_note': info.get('Health Note', ''),
+        }
+    except Exception:
+        return None
+
+
+def parse_recipes(ai_response):
+    try:
+        recipes = []
+        parts = ai_response.split('RECIPE ')
+        colors = [
+            'linear-gradient(135deg,#7c3aed,#a855f7)',
+            'linear-gradient(135deg,#ec4899,#f472b6)',
+            'linear-gradient(135deg,#6366f1,#818cf8)',
+        ]
+        emojis = ['🍛', '🥘', '🍜']
+
+        for i, part in enumerate(parts[1:]):
+            lines = part.strip().split('\n')
+            recipe = {
+                'number': i + 1,
+                'color': colors[i % len(colors)],
+                'emoji': emojis[i % len(emojis)],
+                'name': '',
+                'description': '',
+                'cost': '',
+                'time': '',
+                'ingredients': [],
+                'instructions': [],
+                'missing': [],
+            }
+            section = ''
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                if line.startswith('Name:'):
+                    recipe['name'] = line.replace('Name:', '').strip()
+                elif line.startswith('Description:'):
+                    recipe['description'] = line.replace('Description:', '').strip()
+                elif line.startswith('Estimated Cost:'):
+                    recipe['cost'] = line.replace('Estimated Cost:', '').strip()
+                elif line.startswith('Cooking Time:'):
+                    recipe['time'] = line.replace('Cooking Time:', '').strip()
+                elif 'Ingredients Needed' in line:
+                    section = 'ingredients'
+                elif 'Instructions' in line:
+                    section = 'instructions'
+                elif 'Missing Ingredients' in line:
+                    section = 'missing'
+                elif line.startswith('-') and section == 'ingredients':
+                    ingredient = line[1:].strip()
+                    has_it = '✅' in ingredient
+                    recipe['ingredients'].append({
+                        'text': ingredient.replace('✅', '').replace('❌', '').strip(),
+                        'have': has_it,
+                    })
+                elif line and line[0].isdigit() and section == 'instructions':
+                    recipe['instructions'].append(line)
+                elif line.startswith('-') and section == 'missing':
+                    raw = line[1:].strip()
+                    # Strip AI-guessed price from the ingredient name e.g. "Oil - ₹10"
+                    name_part = raw.split('-')[0].split('₹')[0].strip()
+                    if name_part.lower() != 'none':
+                        real_price = get_ingredient_price(name_part)
+                        if real_price is not None:
+                            display = f"{name_part} - ₹{real_price}"
+                        else:
+                            # Keep AI price but only if it's not suspiciously low
+                            display = raw
+                        recipe['missing'].append(display)
+                elif line.startswith('Nutritional Info:'):
+                    try:
+                        # Format: Nutritional Info: 450 kcal | 12g P | 45g C | 15g F
+                        parts = line.replace('Nutritional Info:', '').split('|')
+                        recipe['nutrition'] = {
+                            'calories': parts[0].strip(),
+                            'protein': parts[1].strip(),
+                            'carbs': parts[2].strip(),
+                            'fat': parts[3].strip(),
+                        }
+                    except:
+                        recipe['nutrition'] = None
+                elif line.startswith('AI Taste Score:'):
+                    recipe['rating'] = line.replace('AI Taste Score:', '').strip()
+
+            if recipe['name']:
+                recipes.append(recipe)
+
+        return recipes
+    except:
+        return []
+
+
+@login_required(login_url='/login/')
+def home_view(request):
+    return render(request, 'recipes/home.html')
+
+
+@login_required(login_url='/login/')
+def suggest_view(request):
+    quick_ingredients = {
+        '🧅 Vegetables': [
+            'Onion', 'Tomato', 'Potato', 'Garlic', 'Ginger',
+            'Green Chilli', 'Capsicum', 'Carrot', 'Peas', 'Spinach',
+            'Cauliflower', 'Cabbage', 'Brinjal', 'Okra / Bhindi',
+            'Bitter Gourd', 'Bottle Gourd', 'Mushroom', 'Corn',
+            'Coriander Leaves', 'Curry Leaves', 'Mint', 'Drumstick',
+            'Zucchini', 'Broccoli', 'Bell Pepper', 'Sweet Potato',
+            'Pumpkin', 'Radish', 'Beetroot', 'Spring Onion',
+        ],
+        '🫘 Dal & Lentils': [
+            'Toor Dal', 'Moong Dal', 'Chana Dal', 'Urad Dal',
+            'Masoor Dal', 'Rajma', 'Chickpeas', 'Whole Moong',
+            'Black Chana', 'Green Moong', 'Lentils', 'Kidney Beans',
+        ],
+        '🌾 Grains & Flour': [
+            'Rice', 'Basmati Rice', 'Wheat / Atta', 'Maida',
+            'Semolina / Suji', 'Poha', 'Oats', 'Besan',
+            'Ragi', 'Cornflour', 'Bread', 'Pav',
+            'Quinoa', 'Millet', 'Brown Rice', 'Rice Flour',
+        ],
+        '🍝 Pasta & Noodles': [
+            'Spaghetti', 'Macaroni', 'Penne', 'Instant Noodles',
+            'Rice Noodles', 'Hakka Noodles', 'Pasta', 'Vermicelli',
+        ],
+        '🍞 Bakery': [
+            'White Bread', 'Brown Bread', 'Burger Buns',
+            'Pizza Base', 'Tortilla / Wrap', 'Croissant',
+        ],
+        '🥛 Dairy': [
+            'Milk', 'Curd / Yogurt', 'Paneer', 'Butter',
+            'Ghee', 'Cream', 'Cheese', 'Buttermilk',
+            'Khoya / Mawa', 'Condensed Milk', 'Mozzarella',
+        ],
+        '🍗 Protein': [
+            'Egg', 'Chicken', 'Mutton', 'Fish',
+            'Prawn', 'Soya Chunks', 'Tofu',
+            'Peanuts', 'Cashews', 'Almonds',
+            'Bacon', 'Beef', 'Pork', 'Sausage',
+        ],
+        '🌶️ Spices': [
+            'Salt', 'Turmeric', 'Red Chilli Powder', 'Cumin / Jeera',
+            'Coriander Powder', 'Garam Masala', 'Mustard Seeds',
+            'Black Pepper', 'Cardamom', 'Cloves', 'Cinnamon',
+            'Bay Leaf', 'Hing / Asafoetida', 'Fennel Seeds',
+            'Chaat Masala', 'Sambar Powder', 'Biryani Masala',
+            'Oregano', 'Chilli Flakes', 'Mixed Herbs', 'Paprika',
+        ],
+        '🥫 Sauces': [
+            'Tomato Ketchup', 'Mayonnaise', 'Soy Sauce',
+            'Chilli Sauce', 'Schezwan Sauce', 'Pizza Sauce',
+            'Mustard Sauce', 'Pasta Sauce', 'Peanut Butter',
+        ],
+        '🫙 Pantry Staples': [
+            'Cooking Oil', 'Sunflower Oil', 'Mustard Oil', 'Coconut Oil',
+            'Sugar', 'Jaggery / Gur', 'Honey', 'Tamarind',
+            'Tomato Sauce', 'Soy Sauce', 'Vinegar',
+            'Olive Oil', 'Sesame Oil',
+        ],
+        '🧂 Basic Pantry': [
+            'Salt', 'Cooking Oil', 'Turmeric', 'Red Chilli Powder',
+            'Cumin / Jeera', 'Mustard Seeds', 'Coriander Powder',
+            'Garam Masala', 'Hing / Asafoetida', 'Black Pepper',
+            'Bay Leaf', 'Water', 'Ghee', 'Butter',
+        ],
+    }
+    quick_budgets = [50, 100, 150, 200, 500]
+
+
+    if request.method == 'POST':
+        ingredients = request.POST.get('ingredients', '')
+        budget = request.POST.get('budget', '')
+        serving_size = request.POST.get('serving_size', '2')
+        cuisine = request.POST.get('cuisine', 'any')
+
+        cuisine_map = {
+            'any': 'Any Indian cuisine',
+            'south_indian': 'South Indian',
+            'north_indian': 'North Indian',
+            'street_food': 'Indian Street Food',
+            'healthy': 'Healthy Indian',
+            'quick': 'Quick Indian (under 20 minutes)',
+        }
+        cuisine_text = cuisine_map.get(cuisine, 'Any Indian cuisine')
+
+        meal_type   = request.POST.get('meal_type', 'any')
+        spice_level = request.POST.get('spice_level', 'any')
+        diet_pref   = request.POST.get('diet_pref', 'any')
+
+        # Build extra context strings
+        meal_text  = '' if meal_type  == 'any' else f'Meal type: {meal_type.replace("_"," ").title()}.'
+        spice_text = '' if spice_level == 'any' else f'Spice level: {spice_level.replace("_"," ").title()}.'
+        diet_text  = '' if diet_pref  == 'any' else f'Diet preference: {diet_pref.replace("_"," ").title()}.'
+
+        # Strict dietary rules per cuisine/festival
+        DIETARY_RULES = {
+            # Festivals
+            'navratri':  '🚨 STRICT: Navratri Vrat. NO meat/fish/eggs/onion/garlic/wheat/regular rice. Only sabudana, kuttu, singhare ka atta, samak rice, sendha namak, potatoes, peanuts, dairy, fruits, vrat vegetables.',
+            'diwali':    '🚨 STRICT: Diwali. NO meat/chicken/fish/eggs. 100% pure vegetarian only. Festive sweets, namkeen, and veg curries.',
+            'holi':      '🚨 STRICT: Holi. NO meat/fish/eggs. Vegetarian only — gujiya, thandai, dahi bhalle, dal baati.',
+            'ganesh':    '🚨 STRICT: Ganesh Chaturthi. Pure vegetarian. Focus on modak, puran poli, panchamrit, and Maharashtrian prasad dishes.',
+            'pongal':    '🚨 STRICT: Pongal/Sankranti. Vegetarian. Focus on pongal, sakkarai pongal, sesame sweets, ellu bella, til ladoo.',
+            'onam':      '🚨 STRICT: Onam Sadya. Strictly vegetarian Kerala feast. Include avial, olan, sambar, payasam, thoran, pachadi, pappadam.',
+            'raksha':    '🚨 STRICT: Raksha Bandhan. Focus on sweets and festive snacks: kheer, halwa, barfi, ladoo, gulab jamun.',
+            'baisakhi':  'Baisakhi harvest festival. Punjabi food preferred — sarson da saag, makki di roti, lassi, pinni, churma.',
+            'christmas': 'Christmas special. Include plum cake, biryani, roast dishes, wine cake, fruit pudding, coconut sweets.',
+            'eid':       'Eid Mubarak! Traditional Eid non-veg dishes welcome: biryani, korma, nihari, haleem, sheer khurma, seviyan.',
+            # Regions
+            'gujarati':  '🚨 STRICT: Gujarati cuisine. NO meat/fish/eggs. Prefer no onion/garlic. Dhokla, thepla, kadhi, dal dhokli.',
+            'jain':      '🚨 STRICT: Jain diet. NO meat/fish/eggs/onion/garlic/potatoes/root vegetables. Only above-ground vegetables.',
+            'vegan':     '🚨 STRICT: Vegan diet. NO meat/fish/eggs/dairy/honey. Only plant-based ingredients.',
+            'diabetic':  '🚨 STRICT: Diabetic-friendly. Low sugar, low refined carbs, no deep frying, no maida. Prefer whole grains, dal, vegetables.',
+            'south_indian': 'South Indian. Prefer vegetarian. Use coconut, curry leaves, mustard seeds, tamarind, sambar, rasam.',
+            'kerala':    'Kerala cuisine. Coconut-based gravies, fish curry (meen curry), appam, puttu, sadya dishes.',
+            'chettinad': 'Chettinad Tamil Nadu. Known for bold spices — kalpasi, marathi mokku, star anise. Can include non-veg.',
+            'andhra':    'Andhra cuisine. Very spicy! Gongura, pesarattu, pulusu, biryani. Can include non-veg.',
+            'karnataka': 'Karnataka cuisine. Bisi bele bath, ragi mudde, vangi bath, masala dosa.',
+            'north_indian': 'North Indian style. Dal makhani, paneer, rajma, naan, roti. Veg or non-veg.',
+            'punjabi':   'Punjabi cuisine. Sarson da saag, butter chicken, lassi, makki roti, chole bhature.',
+            'rajasthani':'Rajasthani cuisine. Dal baati churma, gatte ki sabzi, ker sangri, bajra roti, laal maas.',
+            'kashmiri':  'Kashmiri cuisine. Rogan josh, dum aloo, haak, modur pulao, shufta.',
+            'bihari':    'Bihari cuisine. Litti chokha, sattu paratha, dal peetha, khaja.',
+            'bengali':   'Bengali cuisine. Fish dishes are traditional and encouraged. Hilsa, doi maach, mishti doi, sandesh, rasgulla.',
+            'odia':      'Odia cuisine. Dalma, pakhala bhat, chhena poda, santula.',
+            'maharashtrian': 'Maharashtrian cuisine. Misal pav, vada pav, puran poli, aamti, bhakri.',
+            'goan':      'Goan cuisine. Fish curry rice, vindaloo, sorpotel, bebinca, feni-based dishes.',
+            'hyderabadi':'Hyderabadi cuisine. Dum biryani, haleem, mirchi ka salan, double ka meetha.',
+            'mughlai':   'Mughlai cuisine. Biryani, korma, nihari, shahi tukda, kebabs.',
+            'healthy':   '🚨 STRICT: Healthy only. No deep frying, no excess oil, no refined sugar. Grilling, steaming, or light sautéing preferred.',
+            'quick':     '🚨 STRICT: Under 20 minutes cooking time only. No slow-cooking.',
+            'street_food': 'Indian street food. Chaat, pav bhaji, golgappa, bhel puri, kachori, samosa, dabeli.',
+        }
+        diet_rule = DIETARY_RULES.get(cuisine, '')
+
+        # Diet preference override (stricter than cuisine sometimes)
+        DIET_OVERRIDES = {
+            'vegetarian': '🚨 ALSO STRICT: User wants VEGETARIAN only. NO meat/chicken/fish/eggs.',
+            'vegan':      '🚨 ALSO STRICT: User wants VEGAN only. NO meat/fish/eggs/dairy/honey.',
+            'non_veg':    'User prefers non-vegetarian recipes. Include meat/chicken/fish options.',
+            'eggetarian': 'User is eggetarian. Eggs are allowed but NO meat or fish.',
+            'jain':       '🚨 ALSO STRICT: Jain diet. NO meat/fish/eggs/onion/garlic/root vegetables.',
+            'diabetic':   '🚨 ALSO STRICT: Diabetic-friendly. Low sugar, low carb, no maida, no deep frying.',
+            'high_protein': 'Focus on high-protein ingredients: dal, paneer, chicken, eggs, soy, sprouts.',
+        }
+        diet_override = DIET_OVERRIDES.get(diet_pref, '')
+
+        assume_pantry = request.POST.get('assume_pantry', 'no')
+        pantry_rule = ""
+        if assume_pantry == 'yes':
+            pantry_rule = "3. PANTRY STAPLES: Assume the user already has basic items like salt, cooking oil, water, turmeric, and basic Indian spices. Do not account for their cost."
+
+        prompt = f"""
+You are a helpful Indian recipe assistant.
+
+USER'S INVENTORY & CONSTRAINTS:
+Available Ingredients: {ingredients}
+Max Budget: ₹{budget}
+Serving Size: {serving_size} people
+
+{meal_text}
+{spice_text}
+{diet_rule}
+{diet_override}
+{diet_text}
+
+CRITICAL RULES:
+1. STRICT BUDGET: Every single dish suggested MUST have an estimated cost less than or equal to ₹{budget}. DO NOT suggest dishes that exceed the budget.
+2. AVAILABLE INGREDIENTS: The dishes should primarily use the 'Available Ingredients'.
+{pantry_rule}
+4. PRICING: Be practical and realistic with Indian grocery prices.
+
+Suggest exactly 5 dish names that can be made.
+Reply ONLY with this exact format — nothing else:
+
+1. [Dish name] - [one line description] - ₹[estimated cost]
+2. [Dish name] - [one line description] - ₹[estimated cost]
+3. [Dish name] - [one line description] - ₹[estimated cost]
+4. [Dish name] - [one line description] - ₹[estimated cost]
+5. [Dish name] - [one line description] - ₹[estimated cost]
+"""
+
+        try:
+            response = client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a helpful Indian recipe assistant. Reply only in the exact format requested."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                max_tokens=500,
+                temperature=0.7,
+            )
+            ai_text = response.choices[0].message.content
+
+            dishes = []
+            emojis = ['🍛', '🥘', '🍜', '🫓', '🥗']
+            colors = [
+                'linear-gradient(135deg,#7c3aed,#a855f7)',
+                'linear-gradient(135deg,#ec4899,#f472b6)',
+                'linear-gradient(135deg,#6366f1,#818cf8)',
+                'linear-gradient(135deg,#f59e0b,#fbbf24)',
+                'linear-gradient(135deg,#10b981,#34d399)',
+            ]
+
+            for i, line in enumerate(ai_text.strip().split('\n')):
+                line = line.strip()
+                if not line or not line[0].isdigit():
+                    continue
+                line = line[2:].strip() if len(line) > 1 and line[1] == '.' else line[3:].strip()
+                parts = line.split(' - ')
+                if len(parts) >= 2:
+                    dishes.append({
+                        'name': parts[0].strip(),
+                        'description': parts[1].strip() if len(parts) > 1 else '',
+                        'cost': parts[2].strip() if len(parts) > 2 else '',
+                        'emoji': emojis[i] if i < len(emojis) else '🍽️',
+                        'color': colors[i] if i < len(colors) else colors[0],
+                    })
+
+            return render(request, 'recipes/suggest.html', {
+                'dishes': dishes,
+                'ingredients': ingredients,
+                'budget': budget,
+                'serving_size': serving_size,
+                'cuisine': cuisine,
+                'quick_ingredients': quick_ingredients,
+                'quick_budgets': quick_budgets,
+            })
+
+        except Exception as e:
+            error_message = f"AI Error: {str(e)}"
+            return render(request, 'recipes/suggest.html', {
+                'quick_ingredients': quick_ingredients,
+                'quick_budgets': quick_budgets,
+                'error_message': error_message,
+            })
+
+    return render(request, 'recipes/suggest.html', {
+        'quick_ingredients': quick_ingredients,
+        'quick_budgets': quick_budgets,
+    })
+
+
+@login_required(login_url='/login/')
+def generate_view(request):
+    quick_ingredients = {
+        '🧅 Vegetables': [
+            'Onion', 'Tomato', 'Potato', 'Garlic', 'Ginger',
+            'Green Chilli', 'Capsicum', 'Carrot', 'Peas', 'Spinach',
+            'Cauliflower', 'Cabbage', 'Brinjal', 'Okra / Bhindi',
+            'Bitter Gourd', 'Bottle Gourd', 'Mushroom', 'Corn',
+            'Coriander Leaves', 'Curry Leaves', 'Mint', 'Drumstick',
+            'Zucchini', 'Broccoli', 'Bell Pepper', 'Sweet Potato',
+            'Pumpkin', 'Radish', 'Beetroot', 'Spring Onion',
+        ],
+        '🫘 Dal & Lentils': [
+            'Toor Dal', 'Moong Dal', 'Chana Dal', 'Urad Dal',
+            'Masoor Dal', 'Rajma', 'Chickpeas', 'Whole Moong',
+            'Black Chana', 'Green Moong', 'Lentils', 'Kidney Beans',
+        ],
+        '🌾 Grains & Flour': [
+            'Rice', 'Basmati Rice', 'Wheat / Atta', 'Maida',
+            'Semolina / Suji', 'Poha', 'Oats', 'Besan',
+            'Ragi', 'Cornflour', 'Bread', 'Pav',
+            'Quinoa', 'Millet', 'Brown Rice', 'Rice Flour',
+        ],
+        '🍝 Pasta & Noodles': [
+            'Spaghetti', 'Macaroni', 'Penne', 'Instant Noodles',
+            'Rice Noodles', 'Hakka Noodles', 'Pasta', 'Vermicelli',
+        ],
+        '🍞 Bakery': [
+            'White Bread', 'Brown Bread', 'Burger Buns',
+            'Pizza Base', 'Tortilla / Wrap', 'Croissant',
+        ],
+        '🥛 Dairy': [
+            'Milk', 'Curd / Yogurt', 'Paneer', 'Butter',
+            'Ghee', 'Cream', 'Cheese', 'Buttermilk',
+            'Khoya / Mawa', 'Condensed Milk', 'Mozzarella',
+        ],
+        '🍗 Protein': [
+            'Egg', 'Chicken', 'Mutton', 'Fish',
+            'Prawn', 'Soya Chunks', 'Tofu',
+            'Peanuts', 'Cashews', 'Almonds',
+            'Bacon', 'Beef', 'Pork', 'Sausage',
+        ],
+        '🌶️ Spices': [
+            'Salt', 'Turmeric', 'Red Chilli Powder', 'Cumin / Jeera',
+            'Coriander Powder', 'Garam Masala', 'Mustard Seeds',
+            'Black Pepper', 'Cardamom', 'Cloves', 'Cinnamon',
+            'Bay Leaf', 'Hing / Asafoetida', 'Fennel Seeds',
+            'Chaat Masala', 'Sambar Powder', 'Biryani Masala',
+            'Oregano', 'Chilli Flakes', 'Mixed Herbs', 'Paprika',
+        ],
+        '🥫 Sauces': [
+            'Tomato Ketchup', 'Mayonnaise', 'Soy Sauce',
+            'Chilli Sauce', 'Schezwan Sauce', 'Pizza Sauce',
+            'Mustard Sauce', 'Pasta Sauce', 'Peanut Butter',
+        ],
+        '🫙 Pantry Staples': [
+            'Cooking Oil', 'Sunflower Oil', 'Mustard Oil', 'Coconut Oil',
+            'Sugar', 'Jaggery / Gur', 'Honey', 'Tamarind',
+            'Tomato Sauce', 'Soy Sauce', 'Vinegar',
+            'Olive Oil', 'Sesame Oil',
+        ],
+        '🧂 Basic Pantry': [
+            'Salt', 'Cooking Oil', 'Turmeric', 'Red Chilli Powder',
+            'Cumin / Jeera', 'Mustard Seeds', 'Coriander Powder',
+            'Garam Masala', 'Hing / Asafoetida', 'Black Pepper',
+            'Bay Leaf', 'Water', 'Ghee', 'Butter',
+        ],
+    }
+    quick_budgets = [50, 100, 150, 200, 500]
+
+
+    if request.method == 'POST':
+        ingredients = request.POST.get('ingredients', '')
+        budget = request.POST.get('budget', '')
+        serving_size = request.POST.get('serving_size', '2')
+        cuisine = request.POST.get('cuisine', 'any')
+        leftover_mode = request.POST.get('leftover_mode', False)
+        selected_dish = request.POST.get('selected_dish', '')
+        user_xp_str = request.POST.get('user_xp', '0')
+        try:
+            user_xp = int(user_xp_str)
+        except:
+            user_xp = 0
+            
+        recipe_count = 3
+        if user_xp >= 200:
+            recipe_count = 5
+        elif user_xp >= 100:
+            recipe_count = 4
+
+        # Map cuisine values to modes
+        festivals = ['diwali', 'holi', 'eid', 'navratri']
+        regions = ['south_indian', 'north_indian', 'bengali', 'gujarati', 'maharashtrian']
+        
+        festival_text = f"Festival Special: {cuisine.capitalize()}" if cuisine in festivals else ""
+        region_text = f"Regional Style: {cuisine.capitalize()}" if cuisine in regions else ""
+        cuisine_text = "Indian Street Food" if cuisine == 'street_food' else "Any Indian cuisine"
+        
+        mode_context = f"{region_text} {festival_text} {cuisine_text}".strip()
+
+        meal_type   = request.POST.get('meal_type', 'any')
+        spice_level = request.POST.get('spice_level', 'any')
+        diet_pref   = request.POST.get('diet_pref', 'any')
+        meal_text_g  = '' if meal_type  == 'any' else f'Meal type: {meal_type.replace("_"," ").title()}.'
+        spice_text_g = '' if spice_level == 'any' else f'Spice level required: {spice_level.replace("_"," ").title()}.'
+
+        # Strict dietary rules for generate view
+        DIETARY_RULES_GEN = {
+            'navratri':  '🚨 STRICT: Navratri Vrat. NO meat/fish/eggs/onion/garlic/wheat/regular rice. Sabudana, kuttu, singhare ka atta, samak rice, sendha namak, potatoes, peanuts, dairy only.',
+            'diwali':    '🚨 STRICT: Diwali. NO meat/chicken/fish/eggs. 100% pure vegetarian. Festive sweets, namkeen, veg curries.',
+            'holi':      '🚨 STRICT: Holi. NO meat/fish/eggs. Vegetarian only. Gujiya, thandai, dal baati.',
+            'ganesh':    '🚨 STRICT: Ganesh Chaturthi. Pure vegetarian. Modak, puran poli, panchamrit, prasad dishes.',
+            'pongal':    '🚨 STRICT: Pongal/Sankranti. Vegetarian. Pongal, sakkarai pongal, sesame sweets, til ladoo.',
+            'onam':      '🚨 STRICT: Onam Sadya. Strictly vegetarian Kerala feast. Avial, olan, sambar, payasam, thoran, pachadi.',
+            'raksha':    '🚨 STRICT: Raksha Bandhan. Focus on sweets: kheer, halwa, barfi, ladoo, gulab jamun.',
+            'baisakhi':  'Baisakhi. Punjabi food. Sarson da saag, makki roti, lassi, pinni, churma.',
+            'christmas': 'Christmas. Plum cake, biryani, roast chicken, fruit pudding, coconut sweets.',
+            'eid':       'Eid. Traditional non-veg: biryani, korma, nihari, haleem, sheer khurma, seviyan. Lamb and chicken encouraged.',
+            'gujarati':  '🚨 STRICT: Gujarati. NO meat/fish/eggs. Prefer no onion/garlic. Dhokla, thepla, kadhi, undhiyu.',
+            'jain':      '🚨 STRICT: Jain. NO meat/fish/eggs/onion/garlic/potatoes/root vegetables.',
+            'vegan':     '🚨 STRICT: Vegan. NO meat/fish/eggs/dairy/honey. Plant-based only.',
+            'diabetic':  '🚨 STRICT: Diabetic-friendly. Low sugar, low refined carbs, no deep frying, no maida.',
+            'south_indian': 'South Indian. Prefer vegetarian. Coconut, curry leaves, mustard seeds, tamarind.',
+            'kerala':    'Kerala. Coconut-based, fish curry (meen curry), appam, puttu, sadya dishes.',
+            'chettinad': 'Chettinad. Bold spices. Can be non-veg.',
+            'andhra':    'Andhra. Very spicy! Gongura, pulusu. Non-veg OK.',
+            'karnataka': 'Karnataka. Bisi bele bath, ragi mudde, masala dosa.',
+            'north_indian': 'North Indian. Dal makhani, paneer, rajma, naan. Veg or non-veg.',
+            'punjabi':   'Punjabi. Butter chicken, chole, sarson da saag, lassi.',
+            'rajasthani':'Rajasthani. Dal baati churma, gatte, ker sangri, laal maas.',
+            'kashmiri':  'Kashmiri. Rogan josh, dum aloo, haak, modur pulao.',
+            'bihari':    'Bihari. Litti chokha, sattu paratha, dal peetha.',
+            'bengali':   'Bengali. Fish dishes highly encouraged. Hilsa, doi maach, mishti doi, rasgulla.',
+            'odia':      'Odia. Dalma, pakhala bhat, chhena poda.',
+            'maharashtrian': 'Maharashtrian. Misal pav, vada pav, puran poli, aamti.',
+            'goan':      'Goan. Fish curry rice, vindaloo, sorpotel, bebinca.',
+            'hyderabadi':'Hyderabadi. Dum biryani, haleem, mirchi ka salan.',
+            'mughlai':   'Mughlai. Biryani, korma, nihari, shahi tukda, kebabs.',
+            'healthy':   '🚨 STRICT: Healthy only. No deep frying, no excess oil, no refined sugar.',
+            'quick':     '🚨 STRICT: All recipes under 20 minutes. No slow-cooking.',
+            'street_food': 'Indian street food. Chaat, pav bhaji, golgappa, bhel, kachori, samosa.',
+        }
+        diet_rule_gen = DIETARY_RULES_GEN.get(cuisine, '')
+
+        DIET_OVERRIDES_GEN = {
+            'vegetarian': '🚨 ALSO: User wants VEGETARIAN only. NO meat/chicken/fish/eggs.',
+            'vegan':      '🚨 ALSO: Vegan only. NO meat/fish/eggs/dairy/honey.',
+            'non_veg':    'User prefers non-vegetarian. Include meat/chicken/fish options.',
+            'eggetarian': 'Eggetarian. Eggs allowed but NO meat or fish.',
+            'jain':       '🚨 ALSO: Jain. NO meat/fish/eggs/onion/garlic/root vegetables.',
+            'diabetic':   '🚨 ALSO: Diabetic-friendly. Low sugar, low carb, no maida.',
+            'high_protein': 'High-protein focus: dal, paneer, chicken, eggs, soy, sprouts.',
+        }
+        diet_override_gen = DIET_OVERRIDES_GEN.get(diet_pref, '')
+
+        if leftover_mode:
+            mode_text = f"These are LEFTOVER ingredients. Suggest creative recipes to use them up. {mode_context}"
+        elif selected_dish:
+            mode_text = f"The user selected '{selected_dish}'. Generate recipes focused on this dish. {mode_context}"
+        else:
+            mode_text = f"Suggest fresh recipes using these ingredients. {mode_context}"
+
+        prompt_recipes = ""
+        for i in range(1, recipe_count + 1):
+            prompt_recipes += f"""
+RECIPE {i}:
+Name: [Recipe name]
+Description: [One line description]
+AI Taste Score: [Score]/10
+Nutritional Info: [Calories] kcal | [Protein]g P | [Carbs]g C | [Fat]g F
+Estimated Cost: ₹[cost]
+Cooking Time: [time in minutes]
+Ingredients Needed:
+- [ingredient 1] - have it ✅
+- [ingredient 2] - need to buy ❌ (approx ₹[price])
+Instructions:
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
+Missing Ingredients to Buy:
+- [ingredient] - ₹[price]
+"""
+        
+        assume_pantry = request.POST.get('assume_pantry', 'no')
+        pantry_rule_gen = ""
+        if assume_pantry == 'yes':
+            pantry_rule_gen = "3. PANTRY STAPLES: Assume the user already has basic items like salt, cooking oil, water, turmeric, and basic Indian spices. DO NOT list these as missing ingredients to buy."
+
+        prompt = f"""
+You are a helpful Indian recipe assistant.
+
+USER'S INVENTORY & CONSTRAINTS:
+Available Ingredients: {ingredients}
+Max Budget: ₹{budget}
+Serving Size: {serving_size} people
+
+{mode_text}
+{meal_text_g}
+{spice_text_g}
+
+{diet_rule_gen}
+{diet_override_gen}
+
+CRITICAL RULES:
+1. STRICT BUDGET: The total Estimated Cost of the recipe MUST be less than or equal to ₹{budget}. Do NOT suggest recipes that exceed this budget.
+2. AVAILABLE INGREDIENTS: Carefully check the user's 'Available Ingredients'. Do NOT list these as 'need to buy'. They already have them!
+{pantry_rule_gen}
+4. MISSING INGREDIENTS: Only list ingredients the user DOES NOT have in the 'Missing Ingredients' section. If they have everything needed, write 'None'.
+5. PRICING: Be realistic with Indian grocery prices.
+
+Provide EXACTLY {recipe_count} recipe options.
+You must return the response strictly in the following format:
+{prompt_recipes}
+"""
+
+        try:
+            response = client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a helpful Indian recipe assistant. Always follow the exact format provided."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                max_tokens=2000,
+                temperature=0.7,
+            )
+            ai_response = response.choices[0].message.content
+            recipes = parse_recipes(ai_response)
+            youtube_videos = get_youtube_videos(
+                selected_dish if selected_dish else ingredients
+            )
+
+            # Add nutritional info + dish image to each recipe
+            for i, recipe in enumerate(recipes):
+                ing_list = ', '.join([item['text'] for item in recipe.get('ingredients', [])])
+                recipe['nutrition'] = get_nutrition_info(
+                    recipe['name'], ing_list, serving_size
+                )
+                recipe['dish_emoji'] = DISH_EMOJIS[i % len(DISH_EMOJIS)]
+                recipe['dish_gradient'] = DISH_GRADIENTS[i % len(DISH_GRADIENTS)]
+
+            return render(request, 'recipes/generate.html', {
+                'quick_ingredients': quick_ingredients,
+                'quick_budgets': quick_budgets,
+                'recipes': recipes,
+                'ai_response': ai_response,
+                'ingredients': ingredients,
+                'budget': budget,
+                'serving_size': serving_size,
+                'cuisine': cuisine,
+                'youtube_videos': youtube_videos,
+                'selected_dish': selected_dish,
+            })
+
+        except Exception as e:
+            error_message = f"AI Error: {str(e)}"
+            return render(request, 'recipes/generate.html', {
+                'quick_ingredients': quick_ingredients,
+                'quick_budgets': quick_budgets,
+                'error_message': error_message,
+            })
+
+    return render(request, 'recipes/generate.html', {
+        'quick_ingredients': quick_ingredients,
+        'quick_budgets': quick_budgets,
+    })
+
+
+@login_required(login_url='/login/')
+def save_recipe_view(request):
+    if request.method == 'POST':
+        name = request.POST.get('recipe_name', '')
+        description = request.POST.get('recipe_description', '')
+        ingredients_used = request.POST.get('ingredients', '')
+        budget = request.POST.get('budget', '')
+        cuisine = request.POST.get('cuisine', '')
+        ai_response = request.POST.get('ai_response', '')
+
+        recipe = SavedRecipe.objects.filter(
+            user=request.user,
+            name=name
+        ).first()
+
+        if not recipe:
+            recipe = SavedRecipe.objects.create(
+                user=request.user,
+                name=name,
+                description=description,
+                ingredients_used=ingredients_used,
+                budget=budget,
+                cuisine=cuisine,
+                ai_response=ai_response,
+            )
+            return JsonResponse({'status': 'saved', 'message': f'{name} saved!', 'share_id': str(recipe.share_id)})
+        else:
+            return JsonResponse({'status': 'exists', 'message': 'Already saved!', 'share_id': str(recipe.share_id)})
+
+    return JsonResponse({'status': 'error'})
+
+def shared_recipe_view(request, share_id):
+    from django.shortcuts import get_object_or_404
+    recipe_obj = get_object_or_404(SavedRecipe, share_id=share_id)
+    # Parse the recipe from the stored ai_response (which is the full Llama response)
+    # Actually, if we just want to display the specific recipe, we need to extract it
+    # We can just use the parse_recipes utility!
+    recipes = parse_recipes(recipe_obj.ai_response)
+    
+    # We want to find the specific recipe that was saved, because ai_response has 3 recipes!
+    # Or wait, the whole ai_response might be 3 recipes. Let's find the one matching the name
+    specific_recipe = None
+    for r in recipes:
+        if r['name'].lower().strip() == recipe_obj.name.lower().strip():
+            specific_recipe = r
+            break
+            
+    if not specific_recipe and recipes:
+        specific_recipe = recipes[0] # Fallback
+        
+    return render(request, 'recipes/shared_recipe.html', {
+        'recipe_obj': recipe_obj,
+        'recipe': specific_recipe,
+    })
+
+
+@login_required(login_url='/login/')
+def saved_recipes_view(request):
+    saved_recipes = SavedRecipe.objects.filter(user=request.user).order_by('-created_at')
+    for sr in saved_recipes:
+        recipes = parse_recipes(sr.ai_response)
+        specific = None
+        for r in recipes:
+            if r['name'].lower().strip() == sr.name.lower().strip():
+                specific = r
+                break
+        if not specific and recipes:
+            specific = recipes[0]
+        sr.parsed_recipe = specific
+
+    return render(request, 'recipes/saved_recipes.html', {
+        'saved_recipes': saved_recipes,
+    })
+
+
+@login_required(login_url='/login/')
+def delete_recipe_view(request, recipe_id):
+    try:
+        recipe = SavedRecipe.objects.get(id=recipe_id, user=request.user)
+        recipe.delete()
+    except SavedRecipe.DoesNotExist:
+        pass
+    return redirect('saved_recipes')
+
+
+# ─── Meal Planner ────────────────────────────────────────────────────────────
+
+DAYS_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+MEAL_ORDER = ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+
+
+@login_required(login_url='/login/')
+def meal_planner_view(request):
+    """Weekly meal planner page."""
+    plans = MealPlan.objects.filter(user=request.user)
+    # Build a grid: { day: { meal_type: MealPlan } }
+    grid = {day: {meal: None for meal in MEAL_ORDER} for day in DAYS_ORDER}
+    for plan in plans:
+        if plan.day in grid and plan.meal_type in grid[plan.day]:
+            grid[plan.day][plan.meal_type] = plan
+
+    saved_recipes = SavedRecipe.objects.filter(user=request.user).values_list('name', flat=True)
+
+    return render(request, 'recipes/meal_planner.html', {
+        'grid': grid,
+        'days': DAYS_ORDER,
+        'meals': MEAL_ORDER,
+        'saved_recipe_names': list(saved_recipes),
+    })
+
+
+@login_required(login_url='/login/')
+@require_POST
+def save_meal_view(request):
+    """Save or update a meal slot."""
+    day = request.POST.get('day', '')
+    meal_type = request.POST.get('meal_type', '')
+    recipe_name = request.POST.get('recipe_name', '').strip()
+    notes = request.POST.get('notes', '').strip()
+
+    if not day or not meal_type or not recipe_name:
+        return JsonResponse({'status': 'error', 'message': 'Missing fields'})
+
+    obj, created = MealPlan.objects.update_or_create(
+        user=request.user,
+        day=day,
+        meal_type=meal_type,
+        defaults={'recipe_name': recipe_name, 'notes': notes},
+    )
+    return JsonResponse({
+        'status': 'saved',
+        'recipe_name': obj.recipe_name,
+        'notes': obj.notes,
+        'id': obj.id,
+    })
+
+
+@login_required(login_url='/login/')
+@require_POST
+def delete_meal_view(request):
+    """Remove a meal slot."""
+    meal_id = request.POST.get('meal_id', '')
+    try:
+        meal = MealPlan.objects.get(id=meal_id, user=request.user)
+        meal.delete()
+        return JsonResponse({'status': 'deleted'})
+    except MealPlan.DoesNotExist:
+        return JsonResponse({'status': 'error'})
+
+
+# ─── Cooking Tips (AI) ────────────────────────────────────────────────────────
+
+@login_required(login_url='/login/')
+def cooking_tips_view(request):
+    """Return AI-generated quick tips for a recipe name (AJAX)."""
+    recipe_name = request.GET.get('recipe', '')
+    if not recipe_name:
+        return JsonResponse({'tips': []})
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "You are an expert Indian chef. Give practical, short tips."},
+                {"role": "user", "content": (
+                    f"Give exactly 4 quick pro cooking tips for making '{recipe_name}' perfectly. "
+                    "Each tip must be one short sentence. Reply ONLY as a numbered list:\n"
+                    "1. tip\n2. tip\n3. tip\n4. tip"
+                )},
+            ],
+            max_tokens=250,
+            temperature=0.6,
+        )
+        text = response.choices[0].message.content.strip()
+        tips = []
+        for line in text.split('\n'):
+            line = line.strip()
+            if line and line[0].isdigit() and '.' in line:
+                tips.append(line.split('.', 1)[1].strip())
+        return JsonResponse({'tips': tips[:4]})
+    except Exception:
+        return JsonResponse({'tips': []})
+
+# ─── Chatbot API ────────────────────────────────────────────────────────
+
+import json
+
+@login_required(login_url='/login/')
+@require_POST
+def chatbot_api(request):
+    """Handle chat messages to the AI assistant."""
+    try:
+        data = json.loads(request.body)
+        user_message = data.get('message', '')
+        context = data.get('context', '')
+        
+        if not user_message:
+            return JsonResponse({'error': 'Message cannot be empty'}, status=400)
+            
+        system_prompt = (
+            "You are Chef AI, a friendly and expert cooking assistant for SmartRecipe. "
+            "Keep your answers short, practical, and helpful. "
+            "Use simple Indian cooking terms where appropriate. "
+            f"Context about what the user is currently looking at: {context}"
+        )
+        
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            max_tokens=300,
+            temperature=0.7,
+        )
+        
+        reply = response.choices[0].message.content.strip()
+        return JsonResponse({'reply': reply})
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@login_required(login_url='/login/')
+@require_POST
+def bonus_recipe_api(request):
+    try:
+        data = json.loads(request.body)
+        base_recipe = data.get('base_recipe', 'Main Dish')
+        
+        prompt = f"""
+Generate exactly ONE bonus dessert or sweet dish recipe that pairs well with '{base_recipe}'.
+You must return the response strictly in the following format:
+
+RECIPE 1:
+Name: [Recipe name]
+Description: [One line description]
+AI Taste Score: [Score]/10
+Nutritional Info: [Calories] kcal | [Protein]g P | [Carbs]g C | [Fat]g F
+Estimated Cost: ₹[cost]
+Cooking Time: [time in minutes]
+Ingredients Needed:
+- [ingredient 1] - have it ✅
+Instructions:
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
+Missing Ingredients to Buy:
+None
+"""
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "You are an expert chef. Follow the exact format."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=600,
+            temperature=0.7,
+        )
+        ai_response = response.choices[0].message.content
+        recipes = parse_recipes(ai_response)
+        
+        if recipes:
+            recipe = recipes[0]
+            recipe['dish_emoji'] = '🍰'
+            recipe['dish_gradient'] = 'linear-gradient(135deg, #fcd34d, #fb923c)'
+            recipe['number'] = 'BONUS'
+            return JsonResponse({'status': 'success', 'recipe': recipe})
+        return JsonResponse({'status': 'error', 'message': 'Failed to parse bonus recipe.'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+
+# ─── AI Fridge Scanner ────────────────────────────────────────────────────────
+
+@login_required(login_url='/login/')
+@require_POST
+def scan_fridge_api(request):
+    """
+    Accept a base64-encoded image from the frontend, send it to Groq vision model,
+    and return a list of detected ingredients.
+    """
+    try:
+        data = json.loads(request.body)
+        image_data = data.get('image', '')  # base64 string, e.g. "data:image/jpeg;base64,..."
+
+        if not image_data:
+            return JsonResponse({'status': 'error', 'message': 'No image provided'}, status=400)
+
+        # Groq vision API call using llama-4-scout (vision capable)
+        response = client.chat.completions.create(
+            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": image_data,
+                            },
+                        },
+                        {
+                            "type": "text",
+                            "text": (
+                                "Look carefully at this image. Identify ALL visible food ingredients, "
+                                "vegetables, fruits, dairy, meat, spices, condiments, and pantry items. "
+                                "Reply ONLY with a comma-separated list of ingredient names. "
+                                "Use simple common names (e.g. 'onion, tomato, milk, eggs, carrot'). "
+                                "Do NOT include quantities, descriptions, or any extra text. "
+                                "If you cannot identify any food items, reply with exactly: NONE"
+                            )
+                        }
+                    ],
+                }
+            ],
+            max_tokens=200,
+            temperature=0.1,
+        )
+
+        result_text = response.choices[0].message.content.strip()
+
+        if result_text.upper() == 'NONE' or not result_text:
+            return JsonResponse({
+                'status': 'success',
+                'ingredients': [],
+                'message': 'No ingredients detected. Please try with a clearer image.'
+            })
+
+        # Parse comma-separated ingredients, clean them up
+        raw_ingredients = [i.strip().strip('.').strip() for i in result_text.split(',')]
+        ingredients = [i for i in raw_ingredients if i and len(i) > 1]
+
+        return JsonResponse({
+            'status': 'success',
+            'ingredients': ingredients,
+            'count': len(ingredients),
+        })
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': f'Vision AI error: {str(e)}'}, status=500)
+

@@ -24,91 +24,142 @@
         font-family: "Poppins", sans-serif;
         box-sizing: border-box;
       }
+      /* Dark Theme (Default) */
       body {
-        background: #FFFFFF;
+        background: #111827; 
         min-height: 100vh;
-        padding-top: 76px;
+        padding-top: 80px;
+        color: #F8FAFC;
       }
-
       .navbar {
-        background: #FFFFFF !important;
-        box-shadow: 0 4px 20px rgba(6, 78, 59, 0.08);
-        padding: 5px 0;
+        background: rgba(17, 24, 39, 0.95) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        padding: 10px 0;
       }
       .navbar-brand {
-        color: white !important;
-        font-size: 1.6rem;
-        font-weight: 900;
+        color: #F8FAFC !important;
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
       }
       .brand-highlight {
-        color: #059669;
+        color: #22C55E;
       }
       .nav-link {
-        color: #064E3B !important;
+        color: rgba(255, 255, 255, 0.8) !important;
         font-weight: 600;
-        padding: 8px 18px !important;
-        border-radius: 30px;
-        transition: all 0.3s;
+        padding: 8px 16px !important;
+        border-radius: 20px;
+        transition: all 0.2s ease;
+        font-size: 0.95rem;
       }
       .nav-link:hover {
-        background: rgba(5, 150, 105, 0.1);
-        color: #059669 !important;
+        background: rgba(255, 255, 255, 0.1);
+        color: #FFFFFF !important;
+      }
+
+      /* Light Theme Overrides */
+      @media (prefers-color-scheme: light) {
+        body {
+          background: #F8FAFC; 
+          color: #1E293B;
+        }
+        .navbar {
+          background: rgba(255, 255, 255, 0.95) !important;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+          color: #0F172A !important;
+        }
+        .nav-link {
+          color: rgba(15, 23, 42, 0.8) !important;
+        }
+        .nav-link:hover {
+          background: rgba(0, 0, 0, 0.05);
+          color: #000000 !important;
+        }
+        .footer {
+          background: #F1F5F9;
+          color: #475569;
+          border-top: 3px solid rgba(16, 185, 129, 0.2);
+        }
+        .mobile-bottom-nav {
+          background: rgba(255, 255, 255, 0.96);
+          border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .mobile-nav-item.active {
+          color: #059669;
+        }
+        .navbar-collapse {
+          background: #FFFFFF !important;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+        }
+        .navbar-collapse .nav-link {
+          color: #1E293B !important;
+          background: rgba(0, 0, 0, 0.03) !important;
+        }
       }
       .nav-btn-white {
-        background: #059669 !important;
+        background: #22C55E !important;
         color: #FFFFFF !important;
-        font-weight: 700 !important;
-        padding: 8px 22px !important;
-        border-radius: 30px !important;
+        font-weight: 600 !important;
+        padding: 8px 24px !important;
+        border-radius: 12px !important;
         margin-left: 8px;
-        transition: all 0.3s !important;
-        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+        transition: all 0.2s ease !important;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
       }
       .nav-btn-white:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 7px 20px rgba(16, 185, 129, 0.5);
+        transform: translateY(-1px);
+        background: #16A34A !important;
+        box-shadow: 0 6px 16px rgba(34, 197, 94, 0.35);
       }
       .nav-user-badge {
-        background: rgba(5, 150, 105, 0.1);
-        color: #059669 !important;
-        border-radius: 30px;
-        padding: 8px 18px !important;
+        background: #F0FDF4;
+        color: #15803D !important;
+        border-radius: 12px;
+        padding: 8px 16px !important;
         font-weight: 600 !important;
-        border: 1px solid rgba(5, 150, 105, 0.2);
+        border: 1px solid #BBF7D0;
       }
 
       /* ── BUTTONS ── */
-      .btn-purple {
-        background: linear-gradient(135deg, #059669, #059669);
+      .btn-primary-brand {
+        background: #22C55E;
         color: #FFFFFF;
         border: none;
         border-radius: 14px;
-        padding: 13px 32px;
+        padding: 14px 32px;
         font-weight: 700;
-        font-size: 1rem;
-        transition: all 0.3s;
-        box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
+        font-size: 1.05rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.25);
       }
-      .btn-purple:hover {
-        transform: translateY(-3px);
+      .btn-primary-brand:hover {
+        transform: translateY(-2px);
+        background: #16A34A;
         color: #FFFFFF;
-        box-shadow: 0 8px 28px rgba(16, 185, 129, 0.5);
+        box-shadow: 0 12px 24px rgba(34, 197, 94, 0.35);
       }
-      .btn-pink {
-        background: linear-gradient(135deg, #1F2937, #1F2937);
+      .btn-accent {
+        background: #F97316;
         color: #FFFFFF;
         border: none;
         border-radius: 14px;
-        padding: 13px 32px;
+        padding: 14px 32px;
         font-weight: 700;
-        font-size: 1rem;
-        transition: all 0.3s;
-        box-shadow: 0 4px 18px rgba(6, 78, 59, 0.3);
+        font-size: 1.05rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 8px 20px rgba(249, 115, 22, 0.25);
       }
-      .btn-pink:hover {
-        transform: translateY(-3px);
+      .btn-accent:hover {
+        transform: translateY(-2px);
+        background: #EA580C;
         color: #FFFFFF;
-        box-shadow: 0 8px 28px rgba(6, 78, 59, 0.45);
+        box-shadow: 0 12px 24px rgba(249, 115, 22, 0.35);
       }
       .btn-outline-purple {
         background: transparent;
@@ -523,12 +574,13 @@
   </script>
 </head>
   <body>
-    <nav class="navbar navbar-expand-lg fixed-top" style="z-index: 1030;">
-      <div class="container">
+    <nav class="navbar navbar-expand-sm navbar-dark fixed-top" style="z-index: 1030; min-height: 70px; background: rgba(17, 24, 39, 0.95) !important; border-bottom: 1px solid rgba(255,255,255,0.1);">
+      <div class="container" style="max-width: 1400px; width: 95%;">
         <a class="navbar-brand d-flex align-items-center gap-2" href="/" style="padding: 0; text-decoration: none;">
-          <img src="{% static 'logo.png' %}?v=2" alt="BudgetBites Logo" style="height: 60px; width: auto; object-fit: contain; margin: -5px 0;">
+          <img src="{% static 'logo.png' %}?v=2" alt="BudgetBites Logo" style="height: 40px; width: auto; object-fit: contain;">
           <div class="d-flex flex-column justify-content-center" style="line-height: 1;">
-            <span style="font-weight: 900; font-size: 1.4rem; color: #064E3B; letter-spacing: -0.5px;">Budget<span style="color: #059669;">Bites</span></span>
+            <span style="font-weight: 900; font-size: 1.4rem; color: #F8FAFC; letter-spacing: -0.5px;">Budget<span style="color: #10B981;">Bites</span></span>
+            <span style="font-size: 0.65rem; color: #10B981; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px;">Cook Smart. Spend Less. Eat Better.</span>
           </div>
         </a>
         <button
@@ -536,33 +588,31 @@
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
-          style="background: rgba(5, 150, 105, 0.1); border-radius: 12px; padding: 10px 14px;"
+          style="background: rgba(16, 185, 129, 0.1); border-radius: 8px; padding: 6px 10px;"
         >
-          <span style="color: #059669; font-size: 1.4rem"
-            ><i class="fas fa-bars"></i
-          ></span>
+          <span style="color: #10B981; font-size: 1.2rem"><i class="fas fa-bars"></i></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="collapse navbar-collapse" id="navbarNav" style="visibility: visible !important;">
           <div class="navbar-nav ms-auto align-items-center">
             {% if user.is_authenticated %}
-            <a class="nav-link" href="/">
+            <a class="nav-link text-white" href="/">
               <i class="fas fa-home me-1"></i> Home
             </a>
-            <a class="nav-link" href="{% url 'suggest' %}">
+            <a class="nav-link text-white" href="{% url 'suggest' %}">
               <i class="fas fa-lightbulb me-1"></i> Suggest
             </a>
-            <a class="nav-link" href="{% url 'generate' %}">
+            <a class="nav-link text-white" href="{% url 'generate' %}">
               <i class="fas fa-magic me-1"></i> Generate
             </a>
-            <a class="nav-link" href="{% url 'saved_recipes' %}">
+            <a class="nav-link text-white" href="{% url 'saved_recipes' %}">
               <i class="fas fa-heart me-1"></i> Saved
             </a>
-            <a class="nav-link" href="{% url 'meal_planner' %}">
+            <a class="nav-link text-white" href="{% url 'meal_planner' %}">
               <i class="fas fa-calendar-week me-1"></i> Meal Plan
             </a>
 
             <div
-              class="nav-link nav-user-badge ms-2"
+              class="nav-link nav-user-badge ms-2 text-white"
               style="
                 cursor: pointer;
                 background: linear-gradient(135deg, #059669, #059669);
@@ -574,14 +624,14 @@
               <span id="userXPDisplay">0 XP</span>
             </div>
 
-            <a class="nav-link nav-user-badge ms-2" href="{% url 'profile' %}">
+            <a class="nav-link nav-user-badge ms-2 text-white" href="{% url 'profile' %}">
               <i class="fas fa-user-circle me-1"></i> {{ user.username }}
             </a>
             <a class="nav-link nav-btn-white ms-2" href="{% url 'logout' %}">
               <i class="fas fa-sign-out-alt me-1"></i> Logout
             </a>
             {% else %}
-            <a class="nav-link" href="{% url 'login' %}">
+            <a class="nav-link text-white" href="{% url 'login' %}">
               <i class="fas fa-sign-in-alt me-1"></i> Login
             </a>
             <a class="nav-link nav-btn-white" href="{% url 'register' %}">
@@ -611,16 +661,54 @@
 
     <div class="container mt-4">{% block content %}{% endblock %}</div>
 
-    <div class="footer pb-5 pb-lg-0">
-      <div class="footer-emoji-row">🍛 🥗 🍜 🥘 🍱</div>
-      <div class="d-flex align-items-center justify-content-center mb-1">
-        <img src="{% static 'logo.png' %}?v=2" alt="BudgetBites Logo" style="height: 24px; width: 24px; object-fit: cover; border-radius: 50%; margin-right: 8px;">
-        <p class="mb-0 fw-bold" style="font-size: 1.1rem">BudgetBites</p>
+    <footer class="footer pb-5 pb-lg-0 mt-5 border-top border-slate-700 bg-slate-900">
+      <div class="container" style="max-width: 1400px; width: 95%;">
+        <div class="row pt-5 pb-4">
+          <div class="col-md-4 mb-4 mb-md-0">
+            <a class="navbar-brand d-flex align-items-center mb-3" href="{% url 'home' %}" style="text-decoration: none;">
+              <img src="{% static 'logo.png' %}" alt="Logo" width="36" height="36" class="me-2" style="border-radius: 8px;">
+              <span style="font-weight: 900; font-size: 1.4rem; color: #F8FAFC;">Budget<span style="color: #10B981;">Bites</span></span>
+            </a>
+            <p style="color: #9CA3AF; font-size: 0.95rem; line-height: 1.6;">
+              Cook Delicious Meals Within Your Budget. Our AI helps you generate affordable, tasty recipes using ingredients you already have at home.
+            </p>
+          </div>
+          <div class="col-md-2 offset-md-2 mb-4 mb-md-0">
+            <h6 style="color: #F8FAFC; font-weight: 700; margin-bottom: 1.2rem;">Platform</h6>
+            <ul class="list-unstyled" style="line-height: 2;">
+              <li><a href="{% url 'generate' %}" style="color: #9CA3AF; text-decoration: none; transition: 0.2s;">Generate Recipes</a></li>
+              <li><a href="{% url 'saved_recipes' %}" style="color: #9CA3AF; text-decoration: none; transition: 0.2s;">Saved Recipes</a></li>
+              <li><a href="{% url 'meal_planner' %}" style="color: #9CA3AF; text-decoration: none; transition: 0.2s;">Meal Planner</a></li>
+            </ul>
+          </div>
+          <div class="col-md-2 mb-4 mb-md-0">
+            <h6 style="color: #F8FAFC; font-weight: 700; margin-bottom: 1.2rem;">Company</h6>
+            <ul class="list-unstyled" style="line-height: 2;">
+              <li><a href="#" style="color: #9CA3AF; text-decoration: none; transition: 0.2s;">About BudgetBites</a></li>
+              <li><a href="#" style="color: #9CA3AF; text-decoration: none; transition: 0.2s;">Contact Us</a></li>
+              <li><a href="https://github.com" target="_blank" style="color: #9CA3AF; text-decoration: none; transition: 0.2s;">GitHub</a></li>
+            </ul>
+          </div>
+          <div class="col-md-2 mb-4 mb-md-0">
+            <h6 style="color: #F8FAFC; font-weight: 700; margin-bottom: 1.2rem;">Legal</h6>
+            <ul class="list-unstyled" style="line-height: 2;">
+              <li><a href="#" style="color: #9CA3AF; text-decoration: none; transition: 0.2s;">Privacy Policy</a></li>
+              <li><a href="#" style="color: #9CA3AF; text-decoration: none; transition: 0.2s;">Terms of Service</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="border-top pt-4 pb-4" style="border-color: rgba(255,255,255,0.1) !important;">
+          <div class="d-flex justify-content-between align-items-center flex-column flex-md-row">
+            <p class="mb-0" style="color: #6B7280; font-size: 0.85rem;">
+              &copy; 2026 BudgetBites. All rights reserved.
+            </p>
+            <p class="mb-0 mt-2 mt-md-0" style="color: #6B7280; font-size: 0.85rem;">
+              Made with ❤️ in Bangalore
+            </p>
+          </div>
+        </div>
       </div>
-      <p class="mb-0" style="font-size: 0.85rem; opacity: 0.7">
-        Cook Smart · Spend Less · Eat Better · Made with ❤️ in Bangalore
-      </p>
-    </div>
+    </footer>
 
     <!-- Mobile Bottom Navigation -->
     {% if user.is_authenticated %}

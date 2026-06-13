@@ -2,347 +2,77 @@
 <div class="row justify-content-center mt-2">
   <div class="col-lg-11">
     <!-- HERO -->
-    <div class="card mb-5 overflow-hidden">
-      <div
-        style="
-          background: linear-gradient(
-            135deg,
-            #059669 0%,
-            #1F2937 100%
-          );
-          padding: 55px 45px;
-          position: relative;
-        "
-      >
-        <div
-          style="
-            position: absolute;
-            top: -40px;
-            right: -40px;
-            width: 220px;
-            height: 220px;
-            background: rgba(255, 255, 255, 0.07);
-            border-radius: 50%;
-          "
-        ></div>
-        <div
-          style="
-            position: absolute;
-            bottom: -60px;
-            right: 100px;
-            width: 180px;
-            height: 180px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-          "
-        ></div>
-
-        <div class="row align-items-center">
-          <!-- Left Text -->
-          <div class="col-md-6" style="position: relative; z-index: 2">
+    <!-- HERO SECTION -->
+    <div class="card mb-5 overflow-hidden" style="border: none; border-radius: 24px; background: #FFFFFF; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);">
+      <div class="row g-0 align-items-center">
+        <!-- Left Content -->
+        <div class="col-lg-6 p-5 p-xl-5" style="position: relative; z-index: 2;">
+          {% if user.is_authenticated %}
+          <div class="d-inline-flex align-items-center mb-4" style="background: #F0FDF4; border: 1px solid #BBF7D0; padding: 6px 16px; border-radius: 20px;">
+            <span style="font-size: 1.2rem; margin-right: 8px;">👋</span>
+            <span style="color: #15803D; font-weight: 700; font-size: 0.95rem;">Welcome back, {{ user.username }}!</span>
+          </div>
+          {% else %}
+          <div class="d-inline-flex align-items-center mb-4" style="background: #F0FDF4; border: 1px solid #BBF7D0; padding: 6px 16px; border-radius: 20px;">
+            <span style="color: #15803D; font-weight: 700; font-size: 0.95rem;">🚀 The #1 AI Food App</span>
+          </div>
+          {% endif %}
+          
+          <h1 style="color: #0F172A; font-weight: 900; font-size: clamp(2.5rem, 4vw, 3.5rem); line-height: 1.15; letter-spacing: -1px; margin-bottom: 20px;">
+            Cook Delicious Meals<br/>
+            <span style="color: #22C55E;">Within Your Budget.</span>
+          </h1>
+          <p style="color: #475569; font-size: 1.1rem; line-height: 1.6; margin-bottom: 36px; max-width: 480px;">
+            Stop wasting money on takeout. Tell us what's in your fridge, and our AI will generate personalized, budget-friendly recipes instantly.
+          </p>
+          
+          <div class="d-flex flex-wrap gap-3">
+            <a href="{% url 'generate' %}" class="btn-primary-brand" style="text-decoration: none; display: inline-flex; align-items: center; background: #EA580C;">
+              <i class="fas fa-magic me-2"></i> Generate Recipes
+            </a>
             {% if user.is_authenticated %}
-            <div
-              class="badge-pill"
-              style="background: rgba(255, 255, 255, 0.2); color: white"
-            >
-              👋 Welcome back!
-            </div>
-            <h1
-              style="
-                color: white;
-                font-weight: 900;
-                font-size: 2.8rem;
-                line-height: 1.15;
-              "
-            >
-              Hello,<br />{{ user.username }}! 🎉
-            </h1>
-            <p
-              style="
-                color: rgba(255, 255, 255, 0.88);
-                font-size: 1.05rem;
-                margin-top: 12px;
-                line-height: 1.6;
-              "
-            >
-              Ready to discover amazing recipes within your budget?
-            </p>
-            <div class="mt-4 d-flex gap-3 flex-wrap">
-              <a
-                href="{% url 'generate' %}"
-                class="btn"
-                style="
-                  background: white;
-                  color: #059669;
-                  font-weight: 800;
-                  border-radius: 14px;
-                  padding: 13px 28px;
-                  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
-                "
-              >
-                <i class="fas fa-magic me-2"></i> Generate Recipes
-              </a>
-              <a
-                href="{% url 'saved_recipes' %}"
-                class="btn"
-                style="
-                  background: rgba(255, 255, 255, 0.15);
-                  color: white;
-                  font-weight: 600;
-                  border-radius: 14px;
-                  padding: 13px 24px;
-                  border: 2px solid rgba(255, 255, 255, 0.4);
-                "
-              >
-                <i class="fas fa-history me-2"></i> My Recipes
-              </a>
-            </div>
+            <a href="{% url 'saved_recipes' %}" class="btn" style="background: #F1F5F9; color: #334155; font-weight: 700; border-radius: 14px; padding: 14px 28px; transition: all 0.2s;">
+              <i class="fas fa-history me-2"></i> My Recipes
+            </a>
             {% else %}
-            <div class="mb-4">
-              <div class="d-flex flex-column align-items-center">
-                <img src="{% static 'logo.png' %}?v=2" alt="BudgetBites Logo" style="height: 140px; width: 140px; object-fit: cover; border-radius: 50%; box-shadow: 0 14px 40px rgba(0,0,0,0.4); background: #FFFFFF; border: 4px solid #FFFFFF;">
-                <h1 class="mt-4 mb-1" style="font-weight: 900; font-size: 2.8rem; color: #FFFFFF; letter-spacing: -1px; text-shadow: 0 4px 12px rgba(0,0,0,0.3);">Budget<span style="color: #A7F3D0;">Bites</span></h1>
-                <p style="font-size: 1.1rem; font-weight: 600; color: rgba(255,255,255,0.9); text-shadow: 0 2px 6px rgba(0,0,0,0.3); text-transform: uppercase; letter-spacing: 1px;">Cook Smart. Spend Less. Eat Better.</p>
-              </div>
-            </div>
-            <div
-              class="badge-pill"
-              style="background: rgba(255, 255, 255, 0.2); color: white"
-            >
-              🇮🇳 Made for Indian Kitchens
-            </div>
-            <h1
-              style="
-                color: #FFFFFF;
-                font-weight: 900;
-                font-size: 2.8rem;
-                line-height: 1.15;
-              "
-            >
-              Cook Smart. Spend Less.<br /><span style="color: #059669">Eat Better.</span>
-            </h1>
-            <p
-              style="
-                color: rgba(248, 249, 250, 0.88);
-                font-size: 1.05rem;
-                margin-top: 14px;
-                line-height: 1.7;
-              "
-            >
-              Enter your ingredients + budget → AI generates perfect Indian
-              recipes → Buy missing items from Blinkit or JioMart!
-            </p>
-            <div class="mt-4 d-flex gap-3 flex-wrap">
-              <a
-                href="{% url 'register' %}"
-                class="btn"
-                style="
-                  background: white;
-                  color: #059669;
-                  font-weight: 800;
-                  border-radius: 14px;
-                  padding: 13px 28px;
-                  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
-                "
-              >
-                <i class="fas fa-rocket me-2"></i> Start Cooking Free
-              </a>
-              <a
-                href="{% url 'login' %}"
-                class="btn"
-                style="
-                  background: rgba(255, 255, 255, 0.15);
-                  color: white;
-                  font-weight: 600;
-                  border-radius: 14px;
-                  padding: 13px 24px;
-                  border: 2px solid rgba(255, 255, 255, 0.4);
-                "
-              >
-                <i class="fas fa-sign-in-alt me-2"></i> Login
-              </a>
-            </div>
+            <a href="{% url 'login' %}" class="btn" style="background: #F1F5F9; color: #334155; font-weight: 700; border-radius: 14px; padding: 14px 28px; transition: all 0.2s;">
+              Login to Save
+            </a>
             {% endif %}
           </div>
-
-          <!-- Right Real Food Images -->
-          <div
-            class="col-md-6 mt-4 mt-md-0"
-            style="position: relative; z-index: 2"
-          >
-            <div class="row g-3">
-              <div class="col-6">
-                <div
-                  style="
-                    border-radius: 18px;
-                    overflow: hidden;
-                    border: 2px solid rgba(255, 255, 255, 0.25);
-                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-                  "
-                >
-                  <img
-                    src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=300&h=160&fit=crop"
-                    alt="Dal Tadka"
-                    style="width: 100%; height: 110px; object-fit: cover"
-                  />
-                  <div
-                    style="
-                      background: rgba(255, 255, 255, 0.12);
-                      backdrop-filter: blur(10px);
-                      padding: 10px 12px;
-                    "
-                  >
-                    <p
-                      style="
-                        color: white;
-                        font-size: 0.82rem;
-                        font-weight: 700;
-                        margin: 0;
-                      "
-                    >
-                      🍛 Dal Tadka
-                    </p>
-                    <p
-                      style="
-                        color: rgba(255, 255, 255, 0.75);
-                        font-size: 0.72rem;
-                        margin: 0;
-                      "
-                    >
-                      ₹80 budget
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-6">
-                <div
-                  style="
-                    border-radius: 18px;
-                    overflow: hidden;
-                    border: 2px solid rgba(255, 255, 255, 0.25);
-                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-                  "
-                >
-                  <img
-                    src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=300&h=160&fit=crop"
-                    alt="Veg Curry"
-                    style="width: 100%; height: 110px; object-fit: cover"
-                  />
-                  <div
-                    style="
-                      background: rgba(255, 255, 255, 0.12);
-                      backdrop-filter: blur(10px);
-                      padding: 10px 12px;
-                    "
-                  >
-                    <p
-                      style="
-                        color: white;
-                        font-size: 0.82rem;
-                        font-weight: 700;
-                        margin: 0;
-                      "
-                    >
-                      🥘 Veg Curry
-                    </p>
-                    <p
-                      style="
-                        color: rgba(255, 255, 255, 0.75);
-                        font-size: 0.72rem;
-                        margin: 0;
-                      "
-                    >
-                      ₹120 budget
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-6">
-                <div
-                  style="
-                    border-radius: 18px;
-                    overflow: hidden;
-                    border: 2px solid rgba(255, 255, 255, 0.25);
-                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-                  "
-                >
-                  <img
-                    src="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=300&h=160&fit=crop"
-                    alt="Noodles"
-                    style="width: 100%; height: 110px; object-fit: cover"
-                  />
-                  <div
-                    style="
-                      background: rgba(255, 255, 255, 0.12);
-                      backdrop-filter: blur(10px);
-                      padding: 10px 12px;
-                    "
-                  >
-                    <p
-                      style="
-                        color: white;
-                        font-size: 0.82rem;
-                        font-weight: 700;
-                        margin: 0;
-                      "
-                    >
-                      🍜 Masala Noodles
-                    </p>
-                    <p
-                      style="
-                        color: rgba(255, 255, 255, 0.75);
-                        font-size: 0.72rem;
-                        margin: 0;
-                      "
-                    >
-                      ₹60 budget
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-6">
-                <div
-                  style="
-                    border-radius: 18px;
-                    overflow: hidden;
-                    border: 2px solid rgba(255, 255, 255, 0.25);
-                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-                  "
-                >
-                  <img
-                    src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=300&h=160&fit=crop"
-                    alt="Paratha"
-                    style="width: 100%; height: 110px; object-fit: cover"
-                  />
-                  <div
-                    style="
-                      background: rgba(255, 255, 255, 0.12);
-                      backdrop-filter: blur(10px);
-                      padding: 10px 12px;
-                    "
-                  >
-                    <p
-                      style="
-                        color: white;
-                        font-size: 0.82rem;
-                        font-weight: 700;
-                        margin: 0;
-                      "
-                    >
-                      🫓 Aloo Paratha
-                    </p>
-                    <p
-                      style="
-                        color: rgba(255, 255, 255, 0.75);
-                        font-size: 0.72rem;
-                        margin: 0;
-                      "
-                    >
-                      ₹50 budget
-                    </p>
-                  </div>
-                </div>
-              </div>
+          
+          <!-- Trust Indicators -->
+          <div class="mt-5 d-flex align-items-center gap-4" style="opacity: 0.8;">
+            <div class="d-flex align-items-center">
+              <i class="fas fa-check-circle me-2" style="color: #EA580C;"></i>
+              <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">10,000+ Recipes Generated</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <i class="fas fa-check-circle me-2" style="color: #EA580C;"></i>
+              <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">AI Cost Tracking</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right Image/Illustration -->
+        <div class="col-lg-6 position-relative d-none d-lg-block" style="min-height: 500px; background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);">
+          <!-- Decorative Elements -->
+          <div style="position: absolute; top: 10%; right: 10%; width: 120px; height: 120px; background: rgba(255,255,255,0.4); border-radius: 50%; filter: blur(20px);"></div>
+          <div style="position: absolute; bottom: 20%; left: 10%; width: 80px; height: 80px; background: #EA580C; opacity: 0.2; border-radius: 50%; filter: blur(30px);"></div>
+          
+          <!-- Massive Emoji Art as Food Illustration -->
+          <div class="absolute inset-0 d-flex align-items-center justify-content-center" style="overflow: hidden; height: 100%;">
+            <div style="font-size: 16rem; filter: drop-shadow(0 30px 40px rgba(0,0,0,0.15)); transform: rotate(-5deg) translateY(-20px);">
+              🥘
+            </div>
+          </div>
+          
+          <!-- Floating Badge -->
+          <div style="position: absolute; bottom: 15%; right: 10%; background: white; padding: 12px 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px; transform: rotate(3deg);">
+            <div style="background: #FEF3C7; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">✨</div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.9rem; color: #0F172A;">Under $10</div>
+              <div style="font-size: 0.75rem; color: #64748B; font-weight: 600;">Healthy Bowl</div>
             </div>
           </div>
         </div>
@@ -350,9 +80,9 @@
     </div>
 
     <!-- WHY BUDGETBITES -->
-    <div class="text-center mb-4">
-      <span class="badge-pill">✨ Everything You Need</span>
-      <h3 class="fw-bold" style="color: #1B4332">Why BudgetBites?</h3>
+    <div class="text-center mb-4 mt-5">
+      <span class="badge-pill" style="background: #FFF7ED; color: #C2410C; border: 1px solid #FFEDD5;">✨ Everything You Need</span>
+      <h3 class="fw-bold mt-3" style="color: #0F172A; font-weight: 800;">Why BudgetBites?</h3>
     </div>
     <div class="row g-4 mb-5">
       <div class="col-md-3 col-6">
@@ -459,6 +189,7 @@
         </a>
       </div>
     </div>
+    {% endif %}
 
     <!-- POPULAR DISHES -->
     <div class="text-center mb-4">
@@ -467,7 +198,7 @@
       <p class="text-muted">Dishes people are loving right now</p>
     </div>
     <div class="row g-4 mb-4">
-      <div class="col-md-4">
+      <div class="col-md-3">
         <div class="food-card">
           <img
             src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=220&fit=crop"
@@ -493,7 +224,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <div class="food-card">
           <img
             src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&h=220&fit=crop"
@@ -519,7 +250,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <div class="food-card">
           <img
             src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=220&fit=crop"
@@ -545,8 +276,33 @@
           </div>
         </div>
       </div>
+      <div class="col-md-3">
+        <div class="food-card">
+          <img
+            src="https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?w=400&h=220&fit=crop"
+            alt="Poha"
+            style="width: 100%; height: 190px; object-fit: cover"
+          />
+          <div style="padding: 18px">
+            <h6 style="font-weight: 700; color: #1A1A1A">Poha</h6>
+            <p class="text-muted mb-2" style="font-size: 0.82rem">
+              Light and fluffy flattened rice breakfast
+            </p>
+            <span
+              style="
+                background: linear-gradient(135deg, #E5E7EB, #DBEAFE);
+                color: #1F2937;
+                padding: 4px 14px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 700;
+              "
+              >₹35 approx</span
+            >
+          </div>
+        </div>
+      </div>
     </div>
-    {% endif %}
   </div>
 </div>
 {% endblock %}

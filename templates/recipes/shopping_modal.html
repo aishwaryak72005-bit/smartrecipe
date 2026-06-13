@@ -1,0 +1,220 @@
+<!-- Shopping Modal -->
+<div id="shoppingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; backdrop-filter: blur(4px);">
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 550px; background: white; border-radius: 24px; padding: 32px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3); max-height: 90vh; overflow-y: auto;">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="fw-bold mb-0" style="color: #064E3B">🛒 Missing Ingredients</h4>
+        <p class="text-muted mb-0" style="font-size: 0.88rem">How would you like to shop?</p>
+      </div>
+      <button onclick="closeShoppingModal()" style="background: #f3f4f6; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 1.2rem; cursor: pointer;">✕</button>
+    </div>
+
+    <!-- View 1: Choice -->
+    <div id="shoppingModalChoice">
+      <div class="mb-3 p-3" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px dashed #f59e0b; border-radius: 16px; text-align: center;">
+        <div style="font-size: 1.2rem; margin-bottom: 4px;">🎁</div>
+        <div style="font-weight: 700; color: #b45309; font-size: 0.95rem;">Complete your pantry to unlock 1 Bonus Premium Recipe!</div>
+      </div>
+      <div class="d-flex flex-column gap-3">
+        <button onclick="handleLocalStoreChoice()" class="btn" style="background: linear-gradient(135deg, #00C9A7, #008B74); color: white; padding: 20px; border-radius: 16px; text-align: left; border: none;">
+          <div class="fw-bold" style="font-size: 1.2rem;"><i class="fas fa-store me-2"></i> Local Store</div>
+          <div style="font-size: 0.85rem; opacity: 0.9;">Open an interactive checklist for your supermarket trip.</div>
+        </button>
+        <button onclick="handleOnlineChoice()" class="btn" style="background: linear-gradient(135deg, #10B981, #059669); color: white; padding: 20px; border-radius: 16px; text-align: left; border: none;">
+          <div class="fw-bold" style="font-size: 1.2rem;"><i class="fas fa-motorcycle me-2"></i> Order Online</div>
+          <div style="font-size: 0.85rem; opacity: 0.9;">Get missing ingredients delivered in 10-20 mins via Blinkit, Zepto, etc.</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- View 2: Online Stores -->
+    <div id="shoppingModalStores" style="display: none;">
+      <div class="mb-4 p-3" style="background: linear-gradient(135deg, #FFFFFF, #FFFFFF); border-radius: 14px; border: 2px solid #E9ECEF;">
+        <p class="fw-bold mb-1" style="color: #064E3B; font-size: 0.88rem">🥬 Buying these ingredients:</p>
+        <p id="modalIngredients" class="mb-0 text-muted" style="font-size: 0.85rem"></p>
+      </div>
+      <div class="row g-3">
+        <div class="col-6">
+          <a id="blinkitLink" href="#" target="_blank" style="text-decoration: none" onclick="closeShoppingModal()">
+            <div style="background: linear-gradient(135deg, #FFFFFF, #fae8ff); border: 2px solid #059669; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
+              <div style="font-size: 2.2rem; margin-bottom: 8px">⚡</div>
+              <div style="font-weight: 800; color: #10B981">Blinkit</div>
+              <div style="font-size: 0.75rem; color: #10B981; font-weight: 600; margin-top: 4px;">10 min delivery</div>
+            </div>
+          </a>
+        </div>
+        <div class="col-6">
+          <a id="zeptoLink" href="#" target="_blank" style="text-decoration: none" onclick="closeShoppingModal()">
+            <div style="background: linear-gradient(135deg, #FFFFFF, #fae8ff); border: 2px solid #059669; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
+              <div style="font-size: 2.2rem; margin-bottom: 8px">🟣</div>
+              <div style="font-weight: 800; color: #10B981">Zepto</div>
+              <div style="font-size: 0.75rem; color: #10B981; font-weight: 600; margin-top: 4px;">10 min delivery</div>
+            </div>
+          </a>
+        </div>
+        <div class="col-6">
+          <a id="jiomartLink" href="#" target="_blank" style="text-decoration: none" onclick="closeShoppingModal()">
+            <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 2px solid #60a5fa; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
+              <div style="font-size: 2.2rem; margin-bottom: 8px">🔵</div>
+              <div style="font-weight: 800; color: #1d4ed8">JioMart</div>
+              <div style="font-size: 0.75rem; color: #1e40af; font-weight: 600; margin-top: 4px;">Express delivery</div>
+            </div>
+          </a>
+        </div>
+        <div class="col-6">
+          <a id="flipkartLink" href="#" target="_blank" style="text-decoration: none" onclick="closeShoppingModal()">
+            <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 2px solid #2563eb; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
+              <div style="font-size: 2.2rem; margin-bottom: 8px">🛍️</div>
+              <div style="font-weight: 800; color: #1d4ed8">Flipkart Fresh</div>
+              <div style="font-size: 0.75rem; color: #1e40af; font-weight: 600; margin-top: 4px;">Same day delivery</div>
+            </div>
+          </a>
+        </div>
+        <div class="col-6">
+          <a id="bigbasketLink" href="#" target="_blank" style="text-decoration: none" onclick="closeShoppingModal()">
+            <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 2px solid #4ade80; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
+              <div style="font-size: 2.2rem; margin-bottom: 8px">🧺</div>
+              <div style="font-weight: 800; color: #166534">BigBasket</div>
+              <div style="font-size: 0.75rem; color: #14532d; font-weight: 600; margin-top: 4px;">Scheduled delivery</div>
+            </div>
+          </a>
+        </div>
+        <div class="col-6">
+          <a id="swiggyLink" href="#" target="_blank" style="text-decoration: none" onclick="closeShoppingModal()">
+            <div style="background: linear-gradient(135deg, #fff7ed, #ffedd5); border: 2px solid #fb923c; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
+              <div style="font-size: 2.2rem; margin-bottom: 8px">🟠</div>
+              <div style="font-weight: 800; color: #c2410c">Instamart</div>
+              <div style="font-size: 0.75rem; color: #9a3412; font-weight: 600; margin-top: 4px;">15 min delivery</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <button onclick="closeShoppingModal()" class="btn btn-outline-secondary w-100 mt-4">Cancel</button>
+    </div>
+
+    <!-- View 3: In-App Checklist -->
+    <div id="shoppingModalChecklist" style="display: none;">
+      <div id="checklistView">
+        <h5 class="fw-bold mb-3 text-center" style="color: #00C9A7;">🛒 Supermarket Checklist</h5>
+        <p class="text-center text-muted small">Tap items as you put them in your cart!</p>
+        <div id="checklistItems" class="d-flex flex-column gap-2 mb-4">
+          <!-- JS will populate checkboxes here -->
+        </div>
+      </div>
+      <div id="checklistSuccess" style="display: none;" class="text-center py-4">
+        <div style="font-size: 4rem; animation: bounce 1s infinite;">🎉</div>
+        <h4 class="fw-bold mt-3" style="color: #10B981;">Pantry Complete!</h4>
+        <p class="text-muted">You now have everything needed to cook!</p>
+        <button onclick="unlockBonusRecipe()" class="btn btn-warning btn-lg rounded-pill fw-bold px-4 mt-3 shadow" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; border: none; font-size: 1.1rem;">
+          <i class="fas fa-gift me-2"></i> Unlock 1 Bonus Premium Recipe
+        </button>
+      </div>
+      <button onclick="closeShoppingModal()" class="btn btn-outline-secondary w-100 mt-4">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentShoppingIngredients = '';
+  let currentShoppingRecipe = '';
+
+  function openShoppingModal(ingredientsRaw, recipeName) {
+      if(!ingredientsRaw) {
+          alert('You have all ingredients!');
+          return;
+      }
+      currentShoppingIngredients = ingredientsRaw;
+      currentShoppingRecipe = recipeName || 'Recipe';
+      
+      document.getElementById('shoppingModalChoice').style.display = 'block';
+      document.getElementById('shoppingModalStores').style.display = 'none';
+      document.getElementById('shoppingModalChecklist').style.display = 'none';
+      document.getElementById('shoppingModal').style.display = 'block';
+  }
+
+  function checkAllBought() {
+      const checkboxes = document.querySelectorAll('#checklistItems input[type="checkbox"]');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      if(allChecked && checkboxes.length > 0) {
+          document.getElementById('checklistView').style.display = 'none';
+          document.getElementById('checklistSuccess').style.display = 'block';
+      }
+  }
+
+  function unlockBonusRecipe() {
+      const btn = event.currentTarget || document.querySelector('#shoppingModalChecklist button.btn-warning');
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Generating Dessert...';
+      btn.disabled = true;
+
+      fetch('/api/bonus-recipe/', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify({ base_recipe: currentShoppingRecipe })
+      })
+      .then(res => res.json())
+      .then(data => {
+          closeShoppingModal();
+          if (data.status === 'success') {
+              alert('Bonus recipe unlocked! Check your saved recipes or generate page.');
+          } else {
+              alert('Failed to generate bonus recipe: ' + (data.message || 'Unknown error'));
+              btn.innerHTML = originalHtml;
+              btn.disabled = false;
+          }
+      })
+      .catch(err => {
+          console.error(err);
+          alert('Error calling AI API.');
+          btn.innerHTML = originalHtml;
+          btn.disabled = false;
+      });
+  }
+
+  function handleLocalStoreChoice() {
+      const items = currentShoppingIngredients.split(',').map(i => i.trim()).filter(i => i !== '');
+      const container = document.getElementById('checklistItems');
+      container.innerHTML = items.map((item, i) => `
+        <label class="d-flex align-items-center p-3" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; cursor: pointer;">
+          <input type="checkbox" class="form-check-input me-3" style="width: 24px; height: 24px;" onchange="checkAllBought()">
+          <span style="font-weight: 600; font-size: 1.05rem; color: #1f2937;">${item}</span>
+        </label>
+      `).join('');
+      
+      document.getElementById('checklistView').style.display = 'block';
+      document.getElementById('checklistSuccess').style.display = 'none';
+      document.getElementById('shoppingModalChoice').style.display = 'none';
+      document.getElementById('shoppingModalChecklist').style.display = 'block';
+  }
+
+  function handleOnlineChoice() {
+      document.getElementById('modalIngredients').textContent = currentShoppingIngredients;
+      const query = encodeURIComponent(currentShoppingIngredients);
+      
+      document.getElementById('blinkitLink').href = 'https://blinkit.com/s/?q=' + query;
+      document.getElementById('zeptoLink').href = 'https://www.zeptonow.com/search?q=' + query;
+      document.getElementById('jiomartLink').href = 'https://www.jiomart.com/search/' + query;
+      document.getElementById('flipkartLink').href = 'https://www.flipkart.com/search?q=' + query;
+      document.getElementById('bigbasketLink').href = 'https://www.bigbasket.com/ps/?q=' + query;
+      document.getElementById('swiggyLink').href = 'https://www.swiggy.com/instamart/search?q=' + query;
+
+      document.getElementById('shoppingModalChoice').style.display = 'none';
+      document.getElementById('shoppingModalStores').style.display = 'block';
+  }
+
+  function closeShoppingModal() {
+      document.getElementById('shoppingModal').style.display = 'none';
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const modal = document.getElementById('shoppingModal');
+    if(modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) closeShoppingModal();
+        });
+    }
+  });
+</script>

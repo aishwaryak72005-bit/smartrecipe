@@ -7,11 +7,51 @@ from .models import SavedRecipe, MealPlan
 import os
 import requests
 import urllib.parse as _urlparse
+import urllib.request
+import json
 from dotenv import load_dotenv
 
 load_dotenv()
 
 client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+
+def call_gemini_api(prompt, system_instruction="", max_tokens=1200, temperature=0.7):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "temperature": temperature,
+            "maxOutputTokens": max_tokens
+        }
+    }
+    
+    if system_instruction:
+        payload["systemInstruction"] = {"parts": [{"text": system_instruction}]}
+        
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
+    
+    try:
+        with urllib.request.urlopen(req) as response:
+            result = json.loads(response.read().decode())
+            return result.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', '')
+    except Exception as e:
+        print(f"Gemini API Error: {e}")
+        # Fallback to Groq
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": system_instruction or "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=max_tokens,
+            temperature=temperature,
+        )
+        return response.choices[0].message.content
+
 
 
 def get_youtube_videos(search_query):
@@ -40,6 +80,85 @@ def get_youtube_videos(search_query):
         return videos[:3]
     except Exception as e:
         return []
+
+import re
+
+def scrape_bing_image(query):
+    """Scrapes Bing Images for a highly accurate recipe photo."""
+    try:
+        # Force food/dish context strongly
+        safe_query = _urlparse.quote(f'"{query}" indian food recipe plated dish -animal -bird -farm')
+        url = f"https://www.bing.com/images/search?q={safe_query}&form=HDRSC2&qft=+filterui:photo-photo"
+        
+        req = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        )
+        with urllib.request.urlopen(req, timeout=4) as response:
+            html = response.read().decode('utf-8')
+            matches = re.findall(r'murl&quot;:&quot;(.*?)&quot;', html)
+            
+            # Skip first 2 only, but validate more strictly
+            for match in matches[2:12]:  # check up to 12 results
+                if (match.startswith('http') and 
+                    any(ext in match.lower() for ext in ['jpg', 'png', 'jpeg']) and
+                    # Skip common wrong domains
+                    not any(bad in match for bad in ['wikimedia', 'wikipedia', 'alamy', 'shutterstock'])):
+                    return match
+    except Exception as e:
+        print(f"Bing Scrape Error: {e}")
+    return None
+
+def search_pexels(query):
+    """Searches Pexels API for a high-quality stock photo of the food."""
+    try:
+        url = f"https://api.pexels.com/v1/search?query={_urlparse.quote(query + ' food')}&per_page=1"
+        req = urllib.request.Request(
+            url, 
+            headers={'Authorization': 'kCoZacsyijtocE2EJeO2F0MjXQ3Ed5O1LrIW606rzzZ2BUd8AEwJjFK4'}
+        )
+        with urllib.request.urlopen(req, timeout=3) as response:
+            data = json.loads(response.read().decode())
+            if data and data.get('photos'):
+                print(f"Pexels hit for query: '{query}'")
+                return data['photos'][0]['src']['large']
+    except Exception as e:
+        print(f"Pexels Error: {e}")
+    return None
+
+
+def search_themealdb(query):
+    """Try TheMealDB with multiple query strategies."""
+    # Strategy 1: full name
+    # Strategy 2: first main ingredient only  
+    # Strategy 3: simplified name
+    queries_to_try = [
+        query,
+        query.split(' and ')[0],           # "Chicken and Egg Curry" → "Chicken"
+        query.replace(' and ', ' '),        # "Chicken Egg Curry"
+        ' '.join(query.split()[:2]),        # First 2 words only
+    ]
+    
+    for q in queries_to_try:
+        try:
+            meal_url = f"https://www.themealdb.com/api/json/v1/1/search.php?s={_urlparse.quote(q)}"
+            req = urllib.request.Request(meal_url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=2) as response:
+                data = json.loads(response.read().decode())
+                if data and data.get('meals'):
+                    print(f"TheMealDB hit for query: '{q}'")
+                    return data['meals'][0]['strMealThumb']
+        except Exception:
+            continue
+    return None
+
+
+def get_wiki_image(query):
+    """
+    Image fetching has been disabled per user request.
+    """
+    return ""
+
 
 
 # Per-recipe visual identity (emoji + gradient fallback when no photo found)
@@ -148,16 +267,11 @@ Sodium: [number] mg
 Health Score: [number between 1-10]
 Health Note: [one short sentence about this dish health-wise]
 """
-        response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
-            messages=[
-                {"role": "system", "content": "You are a nutritionist. Reply only in the exact format given."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=200,
-            temperature=0.3,
-        )
-        text = response.choices[0].message.content.strip()
+        system_instruction = "You are a nutritionist. Reply only in the exact format given."
+        
+        text = call_gemini_api(prompt, system_instruction, max_tokens=200, temperature=0.3)
+        if not text:
+            return None
         info = {}
         for line in text.split('\n'):
             line = line.strip()
@@ -178,18 +292,20 @@ Health Note: [one short sentence about this dish health-wise]
         return None
 
 
+import re
 def parse_recipes(ai_response):
-    try:
-        recipes = []
-        parts = ai_response.split('RECIPE ')
-        colors = [
-            'linear-gradient(135deg,#7c3aed,#a855f7)',
-            'linear-gradient(135deg,#ec4899,#f472b6)',
-            'linear-gradient(135deg,#6366f1,#818cf8)',
-        ]
-        emojis = ['🍛', '🥘', '🍜']
+    recipes = []
+    # Robustly split by "RECIPE 1:", "RECIPE 1.", "**RECIPE 1**", etc.
+    parts = re.split(r'\*?\*?RECIPE\s*\d+[:.]?\*?\*?\s*', ai_response, flags=re.IGNORECASE)
+    colors = [
+        'linear-gradient(135deg,#7c3aed,#a855f7)',
+        'linear-gradient(135deg,#ec4899,#f472b6)',
+        'linear-gradient(135deg,#6366f1,#818cf8)',
+    ]
+    emojis = ['🍛', '🥘', '🍜']
 
-        for i, part in enumerate(parts[1:]):
+    for i, part in enumerate(parts[1:]):
+        try:
             lines = part.strip().split('\n')
             recipe = {
                 'number': i + 1,
@@ -198,6 +314,11 @@ def parse_recipes(ai_response):
                 'name': '',
                 'description': '',
                 'cost': '',
+                'restaurant_price': '',
+                'budget_score': '',
+                'difficulty': 'Medium',
+                'servings': '2',
+                'why_this_recipe': '',
                 'time': '',
                 'ingredients': [],
                 'instructions': [],
@@ -208,17 +329,27 @@ def parse_recipes(ai_response):
             }
             section = ''
             for line in lines:
-                line = line.strip()
+                line = line.replace('**', '').replace('*', '').strip()
                 if not line:
                     continue
-                if line.startswith('Name:'):
-                    recipe['name'] = line.replace('Name:', '').strip()
-                elif line.startswith('Description:'):
-                    recipe['description'] = line.replace('Description:', '').strip()
-                elif line.startswith('Estimated Cost:'):
-                    recipe['cost'] = line.replace('Estimated Cost:', '').strip()
-                elif line.startswith('Cooking Time:'):
-                    recipe['time'] = line.replace('Cooking Time:', '').strip()
+                if 'Name:' in line:
+                    recipe['name'] = line.split('Name:')[1].strip()
+                elif 'Description:' in line:
+                    recipe['description'] = line.split('Description:')[1].strip()
+                elif 'Estimated Cost:' in line:
+                    recipe['cost'] = line.split('Estimated Cost:')[1].strip()
+                elif 'Restaurant Price:' in line:
+                    recipe['restaurant_price'] = line.split('Restaurant Price:')[1].strip()
+                elif 'Budget Score:' in line:
+                    recipe['budget_score'] = line.split('Budget Score:')[1].strip()
+                elif 'Difficulty Level:' in line:
+                    recipe['difficulty'] = line.split('Difficulty Level:')[1].strip()
+                elif 'Servings:' in line:
+                    recipe['servings'] = line.split('Servings:')[1].strip()
+                elif 'Why this recipe:' in line:
+                    recipe['why_this_recipe'] = line.split('Why this recipe:')[1].strip()
+                elif 'Cooking Time:' in line:
+                    recipe['time'] = line.split('Cooking Time:')[1].strip()
                 elif 'Ingredients Needed' in line:
                     section = 'ingredients'
                 elif 'Instructions' in line:
@@ -227,11 +358,24 @@ def parse_recipes(ai_response):
                     section = 'missing'
                 elif line.startswith('-') and section == 'ingredients':
                     ingredient = line[1:].strip()
-                    has_it = '✅' in ingredient
-                    recipe['ingredients'].append({
-                        'text': ingredient.replace('✅', '').replace('❌', '').strip(),
-                        'have': has_it,
-                    })
+                    has_it = '✅' in ingredient or 'have it' in ingredient.lower()
+                    
+                    if '|' in ingredient:
+                        ing_parts = [p.strip() for p in ingredient.split('|')]
+                        ing_name = ing_parts[0].replace('✅', '').replace('❌', '').strip()
+                        measurement = ing_parts[1] if len(ing_parts) > 1 else ""
+                        recipe['ingredients'].append({
+                            'text': ing_name,
+                            'measurement': measurement,
+                            'have': has_it,
+                        })
+                    else:
+                        # Fallback for old recipes
+                        recipe['ingredients'].append({
+                            'text': ingredient.replace('✅', '').replace('❌', '').strip(),
+                            'measurement': '',
+                            'have': has_it,
+                        })
                 elif line and line[0].isdigit() and section == 'instructions':
                     recipe['instructions'].append(line)
                 elif line.startswith('-') and section == 'missing':
@@ -239,41 +383,49 @@ def parse_recipes(ai_response):
                     # Strip AI-guessed price from the ingredient name e.g. "Oil - ₹10"
                     name_part = raw.split('-')[0].split('₹')[0].strip()
                     if name_part.lower() != 'none':
-                        real_price = get_ingredient_price(name_part)
-                        if real_price is not None:
-                            display = f"{name_part} - ₹{real_price}"
-                        else:
-                            # Keep AI price but only if it's not suspiciously low
+                        try:
+                            real_price = get_ingredient_price(name_part)
+                            if real_price is not None:
+                                display = f"{name_part} - ₹{real_price}"
+                            else:
+                                display = raw
+                        except Exception:
                             display = raw
                         recipe['missing'].append(display)
-                elif line.startswith('Nutritional Info:'):
+                elif 'Nutritional Info:' in line:
                     try:
                         # Format: Nutritional Info: 450 kcal | 12g P | 45g C | 15g F
-                        parts = line.replace('Nutritional Info:', '').split('|')
+                        nutri_parts = line.split('Nutritional Info:')[1].split('|')
                         recipe['nutrition'] = {
-                            'calories': parts[0].strip(),
-                            'protein': parts[1].strip(),
-                            'carbs': parts[2].strip(),
-                            'fat': parts[3].strip(),
+                            'calories': nutri_parts[0].strip() if len(nutri_parts) > 0 else '',
+                            'protein': nutri_parts[1].strip() if len(nutri_parts) > 1 else '',
+                            'carbs': nutri_parts[2].strip() if len(nutri_parts) > 2 else '',
+                            'fat': nutri_parts[3].strip() if len(nutri_parts) > 3 else '',
                         }
                     except:
                         recipe['nutrition'] = None
-                elif line.startswith('Dietary Preference:'):
-                    raw_pref = line.replace('Dietary Preference:', '').strip()
+                elif 'Dietary Preference:' in line:
+                    raw_pref = line.split('Dietary Preference:')[1].strip()
                     recipe['dietary_preference'] = [p.strip() for p in raw_pref.split(',') if p.strip()]
-                elif line.startswith('Tips:'):
-                    recipe['tips'] = line.replace('Tips:', '').strip()
-                elif line.startswith('Variations:'):
-                    recipe['variations'] = line.replace('Variations:', '').strip()
-                elif line.startswith('AI Taste Score:'):
-                    recipe['rating'] = line.replace('AI Taste Score:', '').strip()
+                elif 'Tips:' in line:
+                    recipe['tips'] = line.split('Tips:')[1].strip()
+                elif 'Variations:' in line:
+                    recipe['variations'] = line.split('Variations:')[1].strip()
+                elif 'AI Taste Score:' in line:
+                    recipe['rating'] = line.split('AI Taste Score:')[1].strip()
 
             if recipe['name']:
+                try:
+                    recipe['image_url'] = get_wiki_image(recipe['name'])
+                except:
+                    recipe['image_url'] = ''
                 recipes.append(recipe)
+        except Exception as e:
+            print(f"Error parsing recipe {i}: {e}")
+            continue
 
-        return recipes
-    except:
-        return []
+    # Even if recipes is empty, return what we have (could be empty list)
+    return recipes
 
 
 @login_required(login_url='/login/')
@@ -466,7 +618,7 @@ Reply ONLY with this exact format — nothing else:
 
         try:
             response = client.chat.completions.create(
-                model="llama-3.1-8b-instant",
+                model="llama-3.3-70b-versatile",
                 messages=[
                     {
                         "role": "system",
@@ -701,11 +853,16 @@ Description: [One line description]
 AI Taste Score: [Score]/10
 Nutritional Info: [Calories] kcal | [Protein]g P | [Carbs]g C | [Fat]g F
 Estimated Cost: ₹[cost]
+Restaurant Price: ₹[cost]
+Budget Score: [Score between 1-10]
+Difficulty Level: [Easy/Medium/Hard]
+Servings: [number]
+Why this recipe: [One short sentence explaining why this fits their ingredients and budget]
 Cooking Time: [time in minutes]
 Dietary Preference: [e.g., Vegetarian, Gluten-Free]
 Ingredients Needed:
-- [ingredient 1] ([exact measurement]) - have it ✅
-- [ingredient 2] ([exact measurement]) - need to buy ❌ (approx ₹[price])
+- [ingredient 1] | [exact measurement] | have it ✅
+- [ingredient 2] | [exact measurement] | need to buy ❌ (approx ₹[price])
 Instructions:
 1. [Step 1]
 2. [Step 2]
@@ -749,33 +906,20 @@ You must return the response strictly in the following format:
 """
 
         try:
-            response = client.chat.completions.create(
-                model="llama-3.1-8b-instant",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are a helpful Indian recipe assistant. Always follow the exact format provided."
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                max_tokens=2000,
-                temperature=0.7,
-            )
-            ai_response = response.choices[0].message.content
+            system_instruction = "You are a helpful Indian recipe assistant. Always follow the exact format provided."
+            ai_response = call_gemini_api(prompt, system_instruction, max_tokens=1200, temperature=0.7)
+            
             recipes = parse_recipes(ai_response)
             youtube_videos = get_youtube_videos(
                 selected_dish if selected_dish else ingredients
             )
 
-            import urllib.parse
-            # Add nutritional info + dish image to each recipe
+            # Add dish image to each recipe (already done in parse_recipes, but ensure fallback)
             for i, recipe in enumerate(recipes):
                 recipe['dish_emoji'] = DISH_EMOJIS[i % len(DISH_EMOJIS)]
                 recipe['dish_gradient'] = DISH_GRADIENTS[i % len(DISH_GRADIENTS)]
-                recipe['image_url'] = f"https://image.pollinations.ai/prompt/Delicious%20Indian%20dish%20{urllib.parse.quote(recipe.get('name', 'food'))}"
+                # Image fetching is fully disabled, so we intentionally leave image_url empty
+                pass
 
             return render(request, 'recipes/generate.html', {
                 'quick_ingredients': quick_ingredients,
@@ -872,6 +1016,10 @@ def saved_recipes_view(request):
                 break
         if not specific and recipes:
             specific = recipes[0]
+            
+        if specific:
+            specific['missing'] = [ing['text'] for ing in specific.get('ingredients', []) if not ing.get('have')]
+            
         sr.parsed_recipe = specific
 
     return render(request, 'recipes/saved_recipes.html', {
@@ -964,7 +1112,7 @@ def cooking_tips_view(request):
         return JsonResponse({'tips': []})
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "You are an expert Indian chef. Give practical, short tips."},
                 {"role": "user", "content": (
@@ -1004,26 +1152,27 @@ def chatbot_api(request):
             
         system_prompt = (
             "You are Chef AI, a friendly and expert cooking assistant for BudgetBites. "
-            "Keep your answers short, practical, and helpful. "
-            "Use simple Indian cooking terms where appropriate. "
-            f"Context about what the user is currently looking at: {context}"
+            "Help the user with recipe substitutions, cooking techniques, and Indian cuisine. "
+            "Keep answers concise and very helpful. "
+            f"Current Context: {context}"
         )
-        
+
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message},
+                {"role": "user", "content": user_message}
             ],
-            max_tokens=300,
+            max_tokens=500,
             temperature=0.7,
         )
-        
-        reply = response.choices[0].message.content.strip()
-        return JsonResponse({'reply': reply})
+        ai_reply = response.choices[0].message.content
+        return JsonResponse({'reply': ai_reply})
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
 @login_required(login_url='/login/')
 @require_POST
@@ -1053,7 +1202,7 @@ Missing Ingredients to Buy:
 None
 """
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "You are an expert chef. Follow the exact format."},
                 {"role": "user", "content": prompt}
@@ -1143,4 +1292,3 @@ def scan_fridge_api(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': f'Vision AI error: {str(e)}'}, status=500)
-

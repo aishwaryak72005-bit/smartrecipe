@@ -1,11 +1,61 @@
-{% extends 'base.html' %} {% block content %}
-<div class="row justify-content-center mt-2">
-  <div class="col-lg-10">
-    <div class="text-center mb-4">
-      <span class="badge-pill">🤖 AI Powered</span>
-      <h2 class="fw-bold" style="color: #064E3B">Generate Your Recipe</h2>
-      <p class="text-muted">Tell us what you have — AI does the rest!</p>
+{% extends 'base.html' %} 
+{% block content %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    corePlugins: {
+      preflight: false,
+    },
+    theme: {
+      extend: {
+        colors: {
+          emerald: {
+            50: '#ecfdf5',
+            100: '#d1fae5',
+            500: '#10b981',
+            600: '#059669',
+            700: '#047857',
+            800: '#065f46',
+            900: '#064e3b',
+          }
+        }
+      }
+    }
+  }
+</script>
+<div style="max-width: 1400px; width: 95%; margin: 0 auto;" class="mt-2">
+    {% if not recipes %}
+    <div class="row align-items-center mb-5 mt-4">
+      <div class="col-lg-6 mb-5 mb-lg-0 pr-lg-5">
+        <span class="badge-pill" style="background: rgba(16, 185, 129, 0.1); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 8px 16px; border-radius: 30px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; margin-bottom: 20px; display: inline-block;">🤖 AI Powered Kitchen</span>
+        <h1 class="fw-bold mb-4" style="color: #F8FAFC; font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -1px; line-height: 1.1;">
+          Cook Delicious Meals Within <span style="color: #10B981;">Your Budget</span>
+        </h1>
+        <p class="mb-5" style="color: #9CA3AF; font-size: 1.25rem; max-width: 550px; line-height: 1.6;">
+          Generate affordable, restaurant-quality AI-powered recipes using the ingredients you already have at home.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <button onclick="document.getElementById('recipeForm').scrollIntoView({behavior: 'smooth'})" class="btn" style="background: #10B981; color: white; border-radius: 14px; padding: 14px 32px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3); transition: all 0.3s; border: none;">
+            Generate Recipes <i class="fas fa-magic ms-2"></i>
+          </button>
+          <a href="{% url 'home' %}" class="btn" style="background: rgba(255,255,255,0.05); color: #F8FAFC; border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px 32px; font-weight: 700; font-size: 1.1rem; transition: all 0.3s;">
+            Explore Recipes
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-6 text-center position-relative">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 80%; background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0) 70%); border-radius: 50%; filter: blur(40px); z-index: 0;"></div>
+        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80" alt="Delicious Food Bowl" style="width: 100%; max-width: 500px; aspect-ratio: 1/1; object-fit: cover; border-radius: 50%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 8px solid rgba(255,255,255,0.05); position: relative; z-index: 1; animation: float 6s ease-in-out infinite;">
+      </div>
     </div>
+    <style>
+      @keyframes float {
+        0% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(2deg); }
+        100% { transform: translateY(0px) rotate(0deg); }
+      }
+    </style>
+    {% endif %}
 
     <div class="card p-4 p-md-5">
       <form method="POST" action="{% url 'generate' %}" id="recipeForm">
@@ -294,44 +344,38 @@
           type="submit"
           class="btn btn-purple w-100 btn-lg"
           style="font-size: 1.1rem; padding: 16px; background: linear-gradient(135deg, #10B981, #059669); border: none;"
-          onclick="document.getElementById('hidden_user_xp').value = parseInt(localStorage.getItem('smartrecipe_xp') || '0'); showLoading();"
+          onclick="document.getElementById('hidden_user_xp').value = parseInt(localStorage.getItem('budgetbites_xp') || '0'); showLoading();"
         >
           <i class="fas fa-magic me-2"></i> Generate My Recipes with AI ✨
         </button>
       </form>
     </div>
 
-    <div
-      class="card p-4 mt-4"
-      style="
-        background: linear-gradient(135deg, #FFFFFF, #FFFFFF);
-        border: 2px solid #F0FDF4;
-      "
-    >
-      <h6 class="fw-bold mb-3" style="color: #064E3B">
+    <div class="card p-4 mt-4 bg-white dark:bg-slate-800 border border-emerald-50 dark:border-slate-700 shadow-sm" style="border-radius: 16px;">
+      <h6 class="font-bold mb-3 text-emerald-900 dark:text-emerald-400">
         💡 Tips for Better Recipes
       </h6>
-      <div class="row g-3">
-        <div class="col-md-4">
-          <div class="d-flex align-items-start gap-2">
-            <span style="font-size: 1.3rem">✅</span>
-            <p class="mb-0" style="font-size: 0.85rem; color: #555">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <div class="flex items-start gap-2">
+            <span class="text-xl">✅</span>
+            <p class="mb-0 text-sm text-gray-600 dark:text-slate-300">
               Add more ingredients for more recipe options
             </p>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="d-flex align-items-start gap-2">
-            <span style="font-size: 1.3rem">✅</span>
-            <p class="mb-0" style="font-size: 0.85rem; color: #555">
+        <div>
+          <div class="flex items-start gap-2">
+            <span class="text-xl">✅</span>
+            <p class="mb-0 text-sm text-gray-600 dark:text-slate-300">
               Higher budget unlocks more recipe varieties
             </p>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="d-flex align-items-start gap-2">
-            <span style="font-size: 1.3rem">✅</span>
-            <p class="mb-0" style="font-size: 0.85rem; color: #555">
+        <div>
+          <div class="flex items-start gap-2">
+            <span class="text-xl">✅</span>
+            <p class="mb-0 text-sm text-gray-600 dark:text-slate-300">
               Select cuisine for more relevant recipes
             </p>
           </div>
@@ -339,35 +383,43 @@
       </div>
     </div>
 
-    <!-- Loading -->
-    <div id="loadingSection" style="display: none" class="text-center mt-5">
-      <div class="card p-5">
-        <div
-          style="
-            font-size: 4rem;
-            animation: spin 2s linear infinite;
-            display: inline-block;
-          "
-        >
-          🍳
+    <!-- Loading Skeleton -->
+    <div id="loadingSection" style="display: none" class="mt-10">
+      <div class="text-center mb-8">
+        <div class="spinner-grow text-emerald-500" role="status" style="width: 3rem; height: 3rem;">
+          <span class="visually-hidden">Loading...</span>
         </div>
-        <h4 class="fw-bold mt-3" style="color: #064E3B">
-          AI is cooking your recipes...
-        </h4>
-        <p class="text-muted">Please wait 5-10 seconds</p>
-        <div class="progress mt-3" style="height: 8px; border-radius: 10px">
-          <div
-            class="progress-bar"
-            id="progressBar"
-            style="
-              background: linear-gradient(135deg, #10B981, #059669);
-              border-radius: 10px;
-              width: 0%;
-            "
-          ></div>
+        <h3 class="font-bold mt-4 text-gray-900 dark:text-white text-2xl">AI is analyzing your ingredients...</h3>
+        <p class="text-gray-500 dark:text-slate-400">Designing the perfect budget-friendly recipes</p>
+      </div>
+      
+      <!-- Skeleton Cards -->
+      <div class="flex flex-col gap-8">
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-xl ring-1 ring-gray-200 dark:ring-slate-700">
+          <div class="flex flex-col md:flex-row gap-6">
+            <div class="w-full md:w-1/3 h-64 bg-gray-100 dark:bg-slate-700 rounded-2xl animate-pulse"></div>
+            <div class="w-full md:w-2/3 flex flex-col justify-center py-4">
+              <div class="w-1/3 h-6 bg-gray-100 dark:bg-slate-700 rounded-full mb-4 animate-pulse"></div>
+              <div class="w-4/5 h-10 bg-gray-100 dark:bg-slate-700 rounded-xl mb-4 animate-pulse" style="animation-delay: 0.2s;"></div>
+              <div class="w-11/12 h-5 bg-gray-100 dark:bg-slate-700 rounded-full mb-2 animate-pulse" style="animation-delay: 0.3s;"></div>
+              <div class="w-3/5 h-5 bg-gray-100 dark:bg-slate-700 rounded-full mb-6 animate-pulse" style="animation-delay: 0.4s;"></div>
+              <div class="flex gap-3">
+                <div class="w-32 h-10 bg-gray-100 dark:bg-slate-700 rounded-full animate-pulse" style="animation-delay: 0.5s;"></div>
+                <div class="w-32 h-10 bg-gray-100 dark:bg-slate-700 rounded-full animate-pulse" style="animation-delay: 0.6s;"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    
+    <style>
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+      }
+    </style>
 
     <!-- Results -->
     {% if recipes %}
@@ -382,248 +434,196 @@
         </p>
       </div>
 
-      <!-- Recipe Cards -->
-      <div class="row g-4 mb-4">
+      <!-- 🍽️ RECIPES LIST -->
+      <div class="flex flex-col gap-8">
         {% for recipe in recipes %}
-        <div class="col-12">
-          <div class="card overflow-hidden">
+        {% include "recipes/tailwind_recipe_card.html" %}
+        {% comment %}
+        <div class="card overflow-hidden" style="border: none; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); background: #fff;">
 
-            <!-- ═══ RECIPE HEADER ═══════════════════════════════════════ -->
-            <div class="recipe-header" style="position:relative; overflow:hidden; background: {{ recipe.dish_gradient }};">
+          <!-- ═══ RECIPE HEADER (CANVA SPLIT STYLE) ═══════════════════════════════════════ -->
+          <div class="row g-0">
+            <!-- LEFT SIDE: Image Presentation -->
+            <div class="col-12 col-lg-5 p-0" style="position: relative; min-height: 350px; background: {{ recipe.dish_gradient }};">
+              <!-- Full cover image -->
+              <div style="position: absolute; inset: 0; background-image: url('{{ recipe.image_url }}'); background-size: cover; background-position: center; opacity: 0.85;"></div>
               
-              <div class="d-flex align-items-center gap-4" style="position:relative; z-index:2; padding: 32px 24px;">
-                <!-- Big emoji -->
-                <div style="font-size: 4.5rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25)); flex-shrink: 0;">
-                  {{ recipe.dish_emoji }}
-                </div>
-                
-                <div style="flex:1; min-width:0;">
-                  <span style="
-                    display:inline-block;
-                    background: rgba(255,255,255,0.2);
-                    backdrop-filter: blur(8px);
-                    color: white;
-                    padding: 4px 14px;
-                    border-radius: 20px;
-                    font-size: 0.72rem;
-                    font-weight: 800;
-                    letter-spacing: 1.5px;
-                    text-transform: uppercase;
-                    margin-bottom: 8px;
-                    border: 1px solid rgba(255,255,255,0.3);
-                  ">🍽️ Recipe {{ recipe.number }}</span>
-                  <h3 style="
-                    color: white;
-                    font-weight: 900;
-                    margin: 0 0 6px;
-                    font-size: clamp(1.4rem, 4vw, 2rem);
-                    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
-                    line-height: 1.2;
-                  ">{{ recipe.name }}</h3>
-                  <p style="
-                    color: rgba(255,255,255,0.9);
-                    font-size: 0.95rem;
-                    margin: 0;
-                    text-shadow: 0 1px 4px rgba(0,0,0,0.2);
-                    line-height: 1.4;
-                  ">{{ recipe.description }}</p>
-                </div>
-
-                <!-- Cost + Time + Rating pills (Desktop view, wrapped on mobile) -->
-                <div class="d-none d-md-flex flex-column gap-2 align-items-end" style="flex-shrink:0;">
-                  {% if recipe.rating %}
-                  <span style="background: linear-gradient(135deg, #fef08a, #fde047); color:#854d0e; padding:6px 16px; border-radius:20px; font-size:0.85rem; font-weight:900; box-shadow: 0 4px 12px rgba(253, 224, 71, 0.4); text-transform:uppercase; letter-spacing:0.5px;">⭐ {{ recipe.rating }}/10 Taste</span>
-                  {% endif %}
-                  {% if recipe.cost %}
-                  <span style="background:rgba(255,255,255,0.9); color:#059669; padding:6px 16px; border-radius:20px; font-size:0.85rem; font-weight:800; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">💰 {{ recipe.cost }}</span>
-                  {% endif %}
-                  {% if recipe.time %}
-                  <span style="background:rgba(255,255,255,0.9); color:#10B981; padding:6px 16px; border-radius:20px; font-size:0.85rem; font-weight:800; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">⏱️ {{ recipe.time }}</span>
-                  {% endif %}
-                </div>
+              <!-- Gradient Overlay for Text Readability -->
+              <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);"></div>
+              
+              <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 40px 30px; z-index: 2; color: white;">
+                <span style="background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 12px; display: inline-block;">🍽️ Recipe {{ recipe.number }}</span>
+                <h3 style="font-weight: 900; font-size: clamp(2rem, 4vw, 2.5rem); text-shadow: 0 2px 10px rgba(0,0,0,0.5); line-height: 1.1; margin-bottom: 12px;">{{ recipe.name }}</h3>
+                <p style="font-size: 1.05rem; opacity: 0.95; text-shadow: 0 1px 5px rgba(0,0,0,0.4); margin-bottom: 0; line-height: 1.4;">{{ recipe.description }}</p>
               </div>
+
+              <!-- Floating Emoji -->
+              <div style="position: absolute; top: 25px; right: 25px; font-size: 3.5rem; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3)); background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid rgba(255,255,255,0.4);">
+                {{ recipe.dish_emoji }}
+              </div>
+            </div>
+
+            <!-- RIGHT SIDE: Recipe Stats & Actions -->
+            <div class="col-12 col-lg-7 d-flex flex-column justify-content-center p-4 p-md-5" style="background: #ffffff;">
               
-              <!-- Cost + Time + Rating pills (Mobile view) -->
-              <div class="d-flex d-md-none gap-2 flex-wrap px-4 pb-2" style="position:relative; z-index:2;">
+              <!-- Quick Stats Row -->
+              <div class="d-flex flex-wrap gap-2 mb-4">
                 {% if recipe.rating %}
-                <span style="background: linear-gradient(135deg, #fef08a, #fde047); color:#854d0e; padding:5px 14px; border-radius:20px; font-size:0.8rem; font-weight:900; box-shadow: 0 4px 8px rgba(253, 224, 71, 0.4);">⭐ {{ recipe.rating }}/10 Taste</span>
+                <span style="background: linear-gradient(135deg, #fef08a, #fde047); color: #854d0e; padding: 10px 20px; border-radius: 24px; font-size: 0.9rem; font-weight: 800; box-shadow: 0 4px 10px rgba(253, 224, 71, 0.3);">⭐ {{ recipe.rating }}/10 Taste</span>
                 {% endif %}
                 {% if recipe.cost %}
-                <span style="background:rgba(255,255,255,0.9); color:#059669; padding:5px 14px; border-radius:20px; font-size:0.8rem; font-weight:800; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">💰 {{ recipe.cost }}</span>
+                <span style="background: #F0FDF4; color: #059669; padding: 10px 20px; border-radius: 24px; font-size: 0.9rem; font-weight: 800; border: 1px solid #DCFCE7;">💰 {{ recipe.cost }}</span>
                 {% endif %}
                 {% if recipe.time %}
-                <span style="background:rgba(255,255,255,0.9); color:#10B981; padding:5px 14px; border-radius:20px; font-size:0.8rem; font-weight:800; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">⏱️ {{ recipe.time }}</span>
+                <span style="background: #F8FAFC; color: #3B82F6; padding: 10px 20px; border-radius: 24px; font-size: 0.9rem; font-weight: 800; border: 1px solid #E2E8F0;">⏱️ {{ recipe.time }}</span>
                 {% endif %}
               </div>
 
-              <!-- ── Action buttons ── -->
-              <div class="d-flex flex-wrap gap-2 px-4 pb-4" style="position:relative; z-index:4;">
+              <!-- Macros (if available) -->
+              {% if recipe.macros %}
+              <div class="row g-2 mb-4">
+                {% for macro in recipe.macros %}
+                <div class="col-6 col-sm-3">
+                  <div style="background:#F8FAFC; border-radius:16px; padding:16px; text-align:center; border:1px solid #E2E8F0;">
+                    <span style="display:block; font-size:0.75rem; color:#64748B; font-weight:800; text-transform:uppercase; margin-bottom:6px; letter-spacing: 0.5px;">{{ macro.label }}</span>
+                    <strong style="color:#0F172A; font-size:1.25rem;">{{ macro.value }}</strong>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
+              
+              <!-- Action buttons -->
+              <div class="d-flex flex-wrap gap-3 mt-auto pt-4" style="border-top: 1px solid #E9ECEF;">
                 <button
                   onclick="startCookingMode(this.closest('.card'), '{{ recipe.name|escapejs }}')"
-                  style="
-                    background: #10B981;
-                    color: white;
-                    border: none;
-                    padding: 8px 18px;
-                    border-radius: 24px;
-                    font-size: 0.82rem;
-                    font-weight: 800;
-                    cursor: pointer;
-                    display: flex; align-items: center; gap: 8px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                    transition: transform 0.2s, box-shadow 0.2s;
-                  "
-                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.25)';"
-                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
+                  style="background: #10B981; color: white; border: none; padding: 10px 24px; border-radius: 24px; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: all 0.2s;"
+                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(16,185,129,0.4)';"
+                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(16,185,129,0.3)';"
                 >
                   <i class="fas fa-play"></i> Start Cooking
                 </button>
                 <button
                   onclick="shareRecipeLink('{{ recipe.name|escapejs }}', '{{ recipe.description|escapejs }}', this)"
-                  style="
-                    background: #25D366;
-                    color: white;
-                    border: none;
-                    padding: 8px 18px;
-                    border-radius: 24px;
-                    font-size: 0.82rem;
-                    font-weight: 800;
-                    cursor: pointer;
-                    display: flex; align-items: center; gap: 8px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                    transition: transform 0.2s, box-shadow 0.2s;
-                  "
-                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.25)';"
-                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
+                  style="background: #25D366; color: white; border: none; padding: 10px 24px; border-radius: 24px; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(37,211,102,0.3); transition: all 0.2s;"
+                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(37,211,102,0.4)';"
+                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(37,211,102,0.3)';"
                 >
                   <i class="fab fa-whatsapp"></i> Share
                 </button>
                 <a href="https://www.youtube.com/results?search_query={{ recipe.name|urlencode }}+recipe" target="_blank"
-                  style="
-                    background: #ef4444;
-                    color: white;
-                    text-decoration: none;
-                    padding: 8px 18px;
-                    border-radius: 24px;
-                    font-size: 0.82rem;
-                    font-weight: 800;
-                    display: flex; align-items: center; gap: 8px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                    transition: transform 0.2s, box-shadow 0.2s;
-                  "
-                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.25)';"
-                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
+                  style="background: #ef4444; color: white; text-decoration: none; padding: 10px 24px; border-radius: 24px; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(239,68,68,0.3); transition: all 0.2s;"
+                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(239,68,68,0.4)';"
+                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(239,68,68,0.3)';"
                 >
                   <i class="fab fa-youtube"></i> Video
                 </a>
-
-                <!-- Social Divider -->
-                <div style="width:100%; height:0; margin: 2px 0;"></div>
-
-                <!-- Pinterest -->
                 <a href="https://www.pinterest.com/search/pins/?q={{ recipe.name|urlencode }}+recipe" target="_blank"
-                  style="
-                    background: linear-gradient(135deg, #E60023, #ad081b);
-                    color: white;
-                    text-decoration: none;
-                    padding: 7px 16px;
-                    border-radius: 24px;
-                    font-size: 0.78rem;
-                    font-weight: 800;
-                    display: flex; align-items: center; gap: 7px;
-                    box-shadow: 0 4px 12px rgba(230,0,35,0.35);
-                    transition: transform 0.2s, box-shadow 0.2s;
-                  "
-                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 18px rgba(230,0,35,0.5)';"
-                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(230,0,35,0.35)';"
+                  style="background: linear-gradient(135deg, #E60023, #ad081b); color: white; text-decoration: none; padding: 10px 24px; border-radius: 24px; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(230,0,35,0.3); transition: all 0.2s;"
+                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(230,0,35,0.4)';"
+                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(230,0,35,0.3)';"
                   title="Find {{ recipe.name }} ideas on Pinterest"
                 >
                   <i class="fab fa-pinterest"></i> Pinterest
                 </a>
-
               </div>
             </div>
-            <!-- ═══ END RECIPE HEADER ═════════════════════════════════════ -->
+          </div>
+          <!-- ═══ END RECIPE HEADER ═════════════════════════════════════ -->
 
-            <div class="card-body p-4" id="recipe-content-{{ forloop.counter }}">
-              <div class="row g-4">
-                <div class="col-md-5">
-                  <h6 class="fw-bold mb-3" style="color: #064E3B">
-                    🥬 Ingredients
-                  </h6>
-                  {% for ing in recipe.ingredients %}
-                  <div class="d-flex align-items-center gap-2 mb-2">
-                    {% if ing.have %}
-                    <span
-                      style="
-                        background: #DCFCE7;
-                        color: #10B981;
-                        padding: 3px 10px;
-                        border-radius: 12px;
-                        font-size: 0.75rem;
-                        font-weight: 600;
-                        flex-shrink: 0;
-                      "
-                      >✅ Have</span
-                    >
-                    {% else %}
-                    <span
-                      style="
-                        background: #FFFFFF;
-                        color: #6C757D;
-                        padding: 3px 10px;
-                        border-radius: 12px;
-                        font-size: 0.75rem;
-                        font-weight: 600;
-                        flex-shrink: 0;
-                      "
-                      >❌ Buy</span
-                    >
-                    {% endif %}
-                    <span style="font-size: 0.88rem; color: #444"
-                      >{{ ing.text }}</span
-                    >
-                  </div>
-                  {% endfor %}
-                </div>
-                <div class="col-md-7">
-                  <h6 class="fw-bold mb-3" style="color: #064E3B">
-                    📋 Instructions
-                  </h6>
-                  {% for step in recipe.instructions %}
-                  <div class="d-flex gap-3 mb-3">
-                    <div
-                      style="
-                        background: linear-gradient(135deg, #10B981, #059669);
-                        color: white;
-                        border-radius: 50%;
-                        width: 28px;
-                        height: 28px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 0.78rem;
-                        font-weight: 800;
-                        flex-shrink: 0;
-                        margin-top: 2px;
-                      "
-                    >
-                      {{ forloop.counter }}
+            <div class="card-body p-0" id="recipe-content-{{ forloop.counter }}" style="background: #FAFAFA;">
+              <!-- TABS NAV -->
+              <div class="d-flex" style="border-bottom: 1px solid #E2E8F0; background: #ffffff;">
+                <button onclick="switchTab('{{ forloop.counter }}', 'ingredients')" id="tab-btn-ing-{{ forloop.counter }}" class="flex-fill border-0 py-3 fw-bold" style="background: transparent; color: #10B981; border-bottom: 3px solid #10B981; transition: all 0.2s;">🥬 Ingredients</button>
+                <button onclick="switchTab('{{ forloop.counter }}', 'instructions')" id="tab-btn-inst-{{ forloop.counter }}" class="flex-fill border-0 py-3 fw-bold" style="background: transparent; color: #64748B; border-bottom: 3px solid transparent; transition: all 0.2s;">📋 Instructions</button>
+              </div>
+              
+              <!-- TABS CONTENT -->
+              <div class="p-4 p-md-5">
+                
+                <!-- INGREDIENTS TAB -->
+                <div id="tab-ing-{{ forloop.counter }}" style="display: block;">
+                  <div class="row g-3">
+                    {% for ing in recipe.ingredients %}
+                    <div class="col-12 col-md-6">
+                      <div class="d-flex align-items-center p-3" style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        
+                        <!-- Icon -->
+                        <div style="background: {% if ing.have %}#DCFCE7{% else %}#FEE2E2{% endif %}; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; margin-right: 15px;">
+                          {% if ing.have %}✅{% else %}❌{% endif %}
+                        </div>
+
+                        <!-- Measurement & Name -->
+                        <div class="flex-fill">
+                          <div style="color: #0F172A; font-weight: 800; font-size: 0.95rem;">{{ ing.text }}</div>
+                          {% if ing.measurement %}
+                          <div style="margin-top: 4px;">
+                            <span style="background: #F8FAFC; border: 1px solid #E2E8F0; color: #475569; padding: 3px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.5px;">⚖️ {{ ing.measurement }}</span>
+                          </div>
+                          {% endif %}
+                        </div>
+
+                        <!-- Buy Badge -->
+                        {% if not ing.have %}
+                        <span style="background: #EF4444; color: white; padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">Buy</span>
+                        {% endif %}
+                      </div>
                     </div>
-                    <p
-                      class="instruction-text"
-                      style="
-                        font-size: 0.88rem;
-                        color: #444;
-                        margin: 0;
-                        line-height: 1.6;
-                      "
-                    >
-                      {{ step|slice:"2:" }}
-                    </p>
+                    {% endfor %}
                   </div>
-                  {% endfor %}
+                  
+                  <!-- NUTRITION CARD -->
+                  {% if recipe.nutrition %}
+                  <div class="mt-5 p-4 rounded-4" style="background: linear-gradient(145deg, #ffffff, #F8FAFC); border: 1px solid #E2E8F0; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
+                    <h6 class="fw-bold mb-4 d-flex align-items-center" style="color: #0F172A; font-size: 1.05rem;">
+                      <i class="fas fa-fire-alt me-2" style="color: #F59E0B; font-size: 1.2rem;"></i> Nutritional Value <span style="font-size:0.75rem; color:#64748B; font-weight:normal; margin-left:8px;">(Est. per serving)</span>
+                    </h6>
+                    <div class="row g-3 text-center">
+                      <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-4" style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.15);">
+                          <div style="font-weight: 900; color: #d97706; font-size: 1.3rem; margin-bottom: 2px;">{{ recipe.nutrition.calories }}</div>
+                          <div style="font-size: 0.7rem; color: #b45309; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Calories</div>
+                        </div>
+                      </div>
+                      <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-4" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.15);">
+                          <div style="font-weight: 900; color: #059669; font-size: 1.3rem; margin-bottom: 2px;">{{ recipe.nutrition.protein }}</div>
+                          <div style="font-size: 0.7rem; color: #047857; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Protein</div>
+                        </div>
+                      </div>
+                      <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-4" style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.15);">
+                          <div style="font-weight: 900; color: #2563eb; font-size: 1.3rem; margin-bottom: 2px;">{{ recipe.nutrition.carbs }}</div>
+                          <div style="font-size: 0.7rem; color: #1d4ed8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Carbs</div>
+                        </div>
+                      </div>
+                      <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-4" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.15);">
+                          <div style="font-weight: 900; color: #dc2626; font-size: 1.3rem; margin-bottom: 2px;">{{ recipe.nutrition.fat }}</div>
+                          <div style="font-size: 0.7rem; color: #b91c1c; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Fat</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
                 </div>
+
+                <!-- INSTRUCTIONS TAB -->
+                <div id="tab-inst-{{ forloop.counter }}" style="display: none;">
+                  <div class="d-flex flex-column gap-4">
+                    {% for step in recipe.instructions %}
+                    <div class="d-flex gap-4 p-4" style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                      <div style="background: linear-gradient(135deg, #10B981, #059669); color: white; border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 900; flex-shrink: 0; box-shadow: 0 4px 12px rgba(16,185,129,0.3);">
+                        {{ forloop.counter }}
+                      </div>
+                      <p style="font-size: 1.05rem; color: #334155; margin: 0; line-height: 1.7; font-weight: 500;">
+                        {{ step|slice:"2:" }}
+                      </p>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+
               </div>
 
 
@@ -744,6 +744,7 @@
             </div>
           </div>
         </div>
+        {% endcomment %}
         {% endfor %}
       </div>
       <!-- END Recipe Cards Loop -->
@@ -1202,13 +1203,6 @@
   function showLoading() {
       setTimeout(() => {
           document.getElementById('loadingSection').style.display = 'block';
-          let width = 0;
-          const bar = document.getElementById('progressBar');
-          const interval = setInterval(() => {
-              if (width >= 90) clearInterval(interval);
-              width += 2;
-              bar.style.width = width + '%';
-          }, 200);
       }, 100);
   }
 
@@ -1277,7 +1271,7 @@
               const newCard = document.createElement('div');
               newCard.className = 'col-12 mt-4';
               newCard.innerHTML = `
-                <div class="card overflow-hidden" style="border: 2px solid #fbbf24; box-shadow: 0 8px 32px rgba(245,158,11,0.2);">
+                <div class="card overflow-hidden" style="border: 2px solid #fbbf24; box-shadow: 0 8px 32px rgba(245,158,11,0.2); background-color: #1e293b;">
                   <div class="recipe-header" style="position:relative; overflow:hidden; background: ${r.dish_gradient}; padding: 32px 24px;">
                     <div class="d-flex align-items-center gap-4" style="position:relative; z-index:2;">
                       <div style="font-size: 4.5rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25)); flex-shrink: 0;">${r.dish_emoji}</div>
@@ -1288,12 +1282,12 @@
                       </div>
                     </div>
                   </div>
-                  <div class="card-body p-4">
-                    <h6 class="fw-bold mb-3" style="color: #064E3B">📋 Instructions</h6>
+                  <div class="card-body p-4" style="background-color: #1e293b;">
+                    <h6 class="fw-bold mb-3 text-white">📋 Instructions</h6>
                     ${r.instructions.map((step, idx) => `
-                      <div class="d-flex gap-3 mb-3">
-                        <div style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; flex-shrink: 0; margin-top: 2px;">${idx + 1}</div>
-                        <p style="font-size: 0.88rem; color: #444; margin: 0; line-height: 1.6;">${step.substring(2)}</p>
+                      <div class="d-flex gap-3 mb-3 p-3 rounded-3" style="background: rgba(255,255,255,0.05);">
+                        <div style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; flex-shrink: 0; margin-top: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${idx + 1}</div>
+                        <p style="font-size: 0.9rem; color: #cbd5e1; margin: 0; line-height: 1.6; font-weight: 500;">${step}</p>
                       </div>
                     `).join('')}
                   </div>
@@ -1812,6 +1806,11 @@
       const compScreen = document.getElementById('cooking-completion-screen');
       compScreen.style.display = 'flex';
       
+      // ADD XP LOGIC
+      let currentXp = parseInt(localStorage.getItem('budgetbites_xp') || '0');
+      currentXp += 150;
+      localStorage.setItem('budgetbites_xp', currentXp);
+      
       // Animate in
       setTimeout(() => {
           compScreen.style.opacity = '1';
@@ -1824,7 +1823,7 @@
 
           // Animate XP Bar
           setTimeout(() => {
-              document.getElementById('completion-xp-bar').style.width = '75%';
+              document.getElementById('completion-xp-bar').style.width = '100%';
           }, 600);
       }, 50);
   }
@@ -2148,26 +2147,26 @@
 </script>
 
 <!-- Full Screen Cooking Overlay HTML -->
-<div id="cooking-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #111827; z-index: 1050; flex-direction: column; color: white;">
+<div id="cooking-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #064E3B, #059669); z-index: 1050; flex-direction: column; color: white; overflow: hidden;">
     
     <!-- BRANDED TOP NAVBAR (CANVA-STYLE) -->
-    <div style="height: 70px; background: rgba(255,255,255,0.02); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 20; flex-shrink: 0; position: relative;">
+    <div style="height: 70px; background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 20; flex-shrink: 0; position: relative;">
         <!-- Glowing Progress Bar -->
-        <div id="cooking-progress-bar" style="position: absolute; top: 0; left: 0; height: 3px; background: #10B981; width: 0%; transition: width 0.4s ease-out; box-shadow: 0 0 10px #10B981, 0 0 20px #10B981;"></div>
+        <div id="cooking-progress-bar" style="position: absolute; top: 0; left: 0; height: 4px; background: #34D399; width: 0%; transition: width 0.4s ease-out; box-shadow: 0 0 15px #34D399, 0 0 25px #10B981;"></div>
         
         <div class="d-flex align-items-center gap-3">
             <div class="d-flex align-items-center gap-2">
-                <div style="background: linear-gradient(135deg, #10B981, #059669); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(16,185,129,0.3);">🍳</div>
+                <div style="background: white; color: #064E3B; width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">🍳</div>
                 <div style="display: flex; flex-direction: column; justify-content: center;">
-                    <span style="font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; line-height: 1; background: linear-gradient(to right, #ffffff, #A7F3D0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BudgetBites</span>
-                    <span style="font-size: 0.65rem; color: #9CA3AF; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px;">Cook Smart. Spend Less.</span>
+                    <span style="font-weight: 900; font-size: 1.35rem; letter-spacing: -0.5px; line-height: 1; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">BudgetBites</span>
+                    <span style="font-size: 0.65rem; color: #A7F3D0; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px;">Cook Smart. Spend Less.</span>
                 </div>
             </div>
         </div>
-        <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34D399; padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">
-            <i class="fas fa-magic me-2"></i> Kitchen AI Engine
+        <div class="d-none d-md-block" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <i class="fas fa-magic me-2 text-warning"></i> Kitchen AI Engine
         </div>
-        <button onclick="closeCookingMode()" class="btn" style="background: rgba(239, 68, 68, 0.1); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 20px; font-weight: 700; font-size: 0.85rem; padding: 6px 18px; transition: all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">
+        <button onclick="closeCookingMode()" class="btn" style="background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 20px; font-weight: 800; font-size: 0.85rem; padding: 6px 20px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1)';">
             Exit Kitchen <i class="fas fa-times ms-2"></i>
         </button>
     </div>
@@ -2176,10 +2175,10 @@
     <div style="flex: 1; display: flex; flex-direction: row; min-height: 0; position: relative;">
 
         <!-- LEFT SIDEBAR: TIMELINE -->
-        <div style="width: 350px; background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; padding: 30px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); z-index: 10;">
+        <div style="width: 350px; background: rgba(0,0,0,0.25); backdrop-filter: blur(25px); border-right: 1px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; padding: 30px; box-shadow: 5px 0 25px rgba(0,0,0,0.3); z-index: 10;">
             <div class="mb-4">
-                <h5 id="cooking-recipe-name" style="color: #A7F3D0; font-weight: 800; margin: 0 0 4px 0; line-height: 1.3;">Recipe Name</h5>
-                <span style="font-size: 0.8rem; color: #9CA3AF; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Cooking Timeline</span>
+                <h5 id="cooking-recipe-name" style="color: white; font-weight: 900; margin: 0 0 6px 0; line-height: 1.3; font-size: 1.4rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Recipe Name</h5>
+                <span style="font-size: 0.8rem; color: #A7F3D0; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;"><i class="fas fa-list-ol me-1"></i> Cooking Timeline</span>
             </div>
             
             <div id="cooking-timeline" style="flex: 1; overflow-y: auto; padding-right: 10px; position: relative; margin-left: 5px;">
@@ -2405,5 +2404,29 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
 
+<script>
+function switchTab(recipeId, tabName) {
+  const tabIng = document.getElementById(`tab-ing-${recipeId}`);
+  const tabInst = document.getElementById(`tab-inst-${recipeId}`);
+  const btnIng = document.getElementById(`tab-btn-ing-${recipeId}`);
+  const btnInst = document.getElementById(`tab-btn-inst-${recipeId}`);
+
+  if(tabName === 'ingredients') {
+    tabIng.style.display = 'block';
+    tabInst.style.display = 'none';
+    btnIng.style.color = '#10B981';
+    btnIng.style.borderBottom = '3px solid #10B981';
+    btnInst.style.color = '#64748B';
+    btnInst.style.borderBottom = '3px solid transparent';
+  } else {
+    tabIng.style.display = 'none';
+    tabInst.style.display = 'block';
+    btnInst.style.color = '#10B981';
+    btnInst.style.borderBottom = '3px solid #10B981';
+    btnIng.style.color = '#64748B';
+    btnIng.style.borderBottom = '3px solid transparent';
+  }
+}
+</script>
 
 {% endblock %}

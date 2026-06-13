@@ -43,26 +43,26 @@
               </div>
               <div>
                 <p class="mb-0 text-muted" style="font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Experience (XP)</p>
-                <h3 class="fw-bold mb-0" style="color: #92400E;">0 XP</h3>
+                <h3 class="fw-bold mb-0" style="color: #92400E;" id="profileXPDisplay">0 XP</h3>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Theme Settings Card -->
-    <div class="card p-4" style="border-radius: 20px;">
-      <h5 class="fw-bold mb-4"><i class="fas fa-paint-roller me-2 text-primary"></i>Appearance</h5>
       
-      <div class="d-flex justify-content-between align-items-center p-3 rounded" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
-        <div>
-          <h6 class="fw-bold mb-1">Dark Theme</h6>
-          <p class="text-muted mb-0" style="font-size: 0.85rem;">Switch to a dark, sleek appearance that's easy on the eyes.</p>
+      <h5 class="fw-bold mb-3 mt-4">Appearance</h5>
+      <div class="p-4 rounded d-flex justify-content-between align-items-center" style="background: rgba(139, 92, 246, 0.05); border: 1px solid rgba(139, 92, 246, 0.1);">
+        <div class="d-flex align-items-center">
+          <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background: #8B5CF6; color: white; font-size: 1.2rem;">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1" style="color: #4C1D95;" id="themeText">Dark Mode</h6>
+            <p class="mb-0 text-muted" style="font-size: 0.85rem;">Toggle between dark and light themes</p>
+          </div>
         </div>
-        
-        <div class="form-check form-switch" style="font-size: 1.5rem; margin: 0;">
-          <input class="form-check-input" type="checkbox" role="switch" id="darkThemeToggle" style="cursor: pointer;">
+        <div class="form-check form-switch" style="transform: scale(1.3);">
+          <input class="form-check-input" type="checkbox" role="switch" id="themeToggle" style="cursor: pointer;">
         </div>
       </div>
     </div>
@@ -71,22 +71,50 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('darkThemeToggle');
-    
-    // Check local storage for theme
-    if (localStorage.getItem('theme') === 'dark') {
-      themeToggle.checked = true;
+    // Update XP from localStorage
+    const profileXP = document.getElementById('profileXPDisplay');
+    if (profileXP) {
+        let currentXP = parseInt(localStorage.getItem('budgetbites_xp')) || 0;
+        profileXP.textContent = currentXP + ' XP';
     }
 
-    // Toggle event listener
+    // Theme Toggle Logic
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeText = document.getElementById('themeText');
+    const htmlEl = document.documentElement;
+    const bodyEl = document.body;
+    
+    // Check current theme
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'light') {
+        themeToggle.checked = false;
+        themeIcon.className = 'fas fa-sun';
+        themeText.textContent = 'Light Mode';
+        htmlEl.setAttribute('data-bs-theme', 'light');
+        bodyEl.classList.add('light-mode');
+    } else {
+        themeToggle.checked = true;
+        themeIcon.className = 'fas fa-moon';
+        themeText.textContent = 'Dark Mode';
+        htmlEl.setAttribute('data-bs-theme', 'dark');
+        bodyEl.classList.remove('light-mode');
+    }
+
     themeToggle.addEventListener('change', function() {
-      if (this.checked) {
-        document.body.classList.add('dark-mode');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.body.classList.remove('dark-mode');
-        localStorage.setItem('theme', 'light');
-      }
+        if (this.checked) {
+            localStorage.setItem('theme', 'dark');
+            themeIcon.className = 'fas fa-moon';
+            themeText.textContent = 'Dark Mode';
+            htmlEl.setAttribute('data-bs-theme', 'dark');
+            bodyEl.classList.remove('light-mode');
+        } else {
+            localStorage.setItem('theme', 'light');
+            themeIcon.className = 'fas fa-sun';
+            themeText.textContent = 'Light Mode';
+            htmlEl.setAttribute('data-bs-theme', 'light');
+            bodyEl.classList.add('light-mode');
+        }
     });
   });
 </script>

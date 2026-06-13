@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from recipes.models import SavedRecipe
 
 # Register View
 def register_view(request):
@@ -10,7 +12,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, 'Account created successfully! Welcome to SmartRecipe!')
+            messages.success(request, 'Account created successfully! Welcome to BudgetBites!')
             return redirect('home')
         else:
             messages.error(request, 'Please fix the errors below.')
@@ -27,7 +29,8 @@ def login_view(request):
             user = form.get_user()
             login(request, user)
             messages.success(request, f'Welcome back {user.username}! 👋')
-            return redirect('home')
+            next_url = request.GET.get('next', 'home')
+            return redirect(next_url)
         else:
             messages.error(request, 'Invalid username or password.')
     else:
@@ -40,3 +43,11 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'Logged out successfully! See you soon 👋')
     return redirect('login')
+
+@login_required
+def profile_view(request):
+    saved_recipes_count = SavedRecipe.objects.filter(user=request.user).count()
+    context = {
+        'saved_recipes_count': saved_recipes_count,
+    }
+    return render(request, 'users/profile.html', context)

@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} {% load static %} {% block content %}
 <div class="row justify-content-center mt-2">
   <div class="col-lg-11">
     <!-- HERO -->
@@ -8,7 +8,7 @@
           background: linear-gradient(
             135deg,
             #059669 0%,
-            #065F46 100%
+            #1F2937 100%
           );
           padding: 55px 45px;
           position: relative;
@@ -73,7 +73,7 @@
                 class="btn"
                 style="
                   background: white;
-                  color: #10B981;
+                  color: #059669;
                   font-weight: 800;
                   border-radius: 14px;
                   padding: 13px 28px;
@@ -98,6 +98,13 @@
               </a>
             </div>
             {% else %}
+            <div class="mb-4">
+              <div class="d-flex flex-column align-items-center">
+                <img src="{% static 'logo.png' %}?v=2" alt="BudgetBites Logo" style="height: 140px; width: 140px; object-fit: cover; border-radius: 50%; box-shadow: 0 14px 40px rgba(0,0,0,0.4); background: #FFFFFF; border: 4px solid #FFFFFF;">
+                <h1 class="mt-4 mb-1" style="font-weight: 900; font-size: 2.8rem; color: #FFFFFF; letter-spacing: -1px; text-shadow: 0 4px 12px rgba(0,0,0,0.3);">Budget<span style="color: #A7F3D0;">Bites</span></h1>
+                <p style="font-size: 1.1rem; font-weight: 600; color: rgba(255,255,255,0.9); text-shadow: 0 2px 6px rgba(0,0,0,0.3); text-transform: uppercase; letter-spacing: 1px;">Cook Smart. Spend Less. Eat Better.</p>
+              </div>
+            </div>
             <div
               class="badge-pill"
               style="background: rgba(255, 255, 255, 0.2); color: white"
@@ -112,7 +119,7 @@
                 line-height: 1.15;
               "
             >
-              Cook Smart.<br /><span style="color: #10B981">Spend Less.</span>
+              Cook Smart. Spend Less.<br /><span style="color: #059669">Eat Better.</span>
             </h1>
             <p
               style="
@@ -131,7 +138,7 @@
                 class="btn"
                 style="
                   background: white;
-                  color: #10B981;
+                  color: #059669;
                   font-weight: 800;
                   border-radius: 14px;
                   padding: 13px 28px;
@@ -342,21 +349,21 @@
       </div>
     </div>
 
-    <!-- WHY SMARTRECIPE -->
+    <!-- WHY BUDGETBITES -->
     <div class="text-center mb-4">
       <span class="badge-pill">✨ Everything You Need</span>
-      <h3 class="fw-bold" style="color: #1B4332">Why SmartRecipe?</h3>
+      <h3 class="fw-bold" style="color: #1B4332">Why BudgetBites?</h3>
     </div>
     <div class="row g-4 mb-5">
       <div class="col-md-3 col-6">
         <div class="food-card p-4">
           <div
             class="food-icon-circle"
-            style="background: linear-gradient(135deg, #F0FDF4, #DCFCE7)"
+            style="background: linear-gradient(135deg, #F8FAFC, #E2E8F0)"
           >
             🤖
           </div>
-          <h6 style="font-weight: 700; color: #1B4332">AI Powered</h6>
+          <h6 style="font-weight: 700; color: #1F2937">AI Powered</h6>
           <p class="text-muted mb-0" style="font-size: 0.82rem">
             Smart recipes from your ingredients
           </p>
@@ -366,11 +373,11 @@
         <div class="food-card p-4">
           <div
             class="food-icon-circle"
-            style="background: linear-gradient(135deg, #DCFCE7, #BBF7D0)"
+            style="background: linear-gradient(135deg, #E2E8F0, #E2E8F0)"
           >
             💰
           </div>
-          <h6 style="font-weight: 700; color: #1B4332">Budget Friendly</h6>
+          <h6 style="font-weight: 700; color: #1F2937">Budget Friendly</h6>
           <p class="text-muted mb-0" style="font-size: 0.82rem">
             Always within your ₹ budget
           </p>
@@ -380,11 +387,11 @@
         <div class="food-card p-4">
           <div
             class="food-icon-circle"
-            style="background: linear-gradient(135deg, #F0FDF4, #DCFCE7)"
+            style="background: linear-gradient(135deg, #F8FAFC, #E2E8F0)"
           >
             🛒
           </div>
-          <h6 style="font-weight: 700; color: #1B4332">Shop Instantly</h6>
+          <h6 style="font-weight: 700; color: #1F2937">Shop Instantly</h6>
           <p class="text-muted mb-0" style="font-size: 0.82rem">
             Blinkit & JioMart in one click
           </p>
@@ -398,7 +405,7 @@
           >
             ▶️
           </div>
-          <h6 style="font-weight: 700; color: #1B4332">Watch & Cook</h6>
+          <h6 style="font-weight: 700; color: #1F2937">Watch & Cook</h6>
           <p class="text-muted mb-0" style="font-size: 0.82rem">
             YouTube videos for each recipe
           </p>
@@ -474,8 +481,8 @@
             </p>
             <span
               style="
-                background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
-                color: #1B4332;
+                background: linear-gradient(135deg, #F8FAFC, #E2E8F0);
+                color: #1F2937;
                 padding: 4px 14px;
                 border-radius: 20px;
                 font-size: 0.8rem;
@@ -501,7 +508,7 @@
             <span
               style="
                 background: linear-gradient(135deg, #E5E7EB, #DBEAFE);
-                color: #1B4332;
+                color: #1F2937;
                 padding: 4px 14px;
                 border-radius: 20px;
                 font-size: 0.8rem;
@@ -527,7 +534,7 @@
             <span
               style="
                 background: linear-gradient(135deg, #E5E7EB, #DBEAFE);
-                color: #1B4332;
+                color: #1F2937;
                 padding: 4px 14px;
                 border-radius: 20px;
                 font-size: 0.8rem;

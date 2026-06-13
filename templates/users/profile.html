@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center mt-2">
+  <div class="col-lg-8">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="fw-bold mb-0">My Profile</h3>
+    </div>
+
+    <div class="card p-4 mb-4" style="border-radius: 20px;">
+      <div class="d-flex align-items-center mb-4">
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background: rgba(5, 150, 105, 0.1); color: #059669; font-size: 2.5rem;">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="ms-4">
+          <h4 class="fw-bold mb-1">{{ user.username }}</h4>
+          <p class="text-muted mb-0"><i class="fas fa-envelope me-2"></i>{{ user.email|default:"No email provided" }}</p>
+          <p class="text-muted mb-0"><i class="fas fa-calendar-alt me-2"></i>Joined {{ user.date_joined|date:"F Y" }}</p>
+        </div>
+      </div>
+
+      <hr style="border-color: #E5E7EB;">
+
+      <h5 class="fw-bold mb-3 mt-3">Statistics</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="p-4 rounded" style="background: rgba(5, 150, 105, 0.05); border: 1px solid rgba(5, 150, 105, 0.1);">
+            <div class="d-flex align-items-center">
+              <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background: #059669; color: white; font-size: 1.2rem;">
+                <i class="fas fa-heart"></i>
+              </div>
+              <div>
+                <p class="mb-0 text-muted" style="font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Saved Recipes</p>
+                <h3 class="fw-bold mb-0" style="color: #064E3B;">{{ saved_recipes_count }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="p-4 rounded" style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.1);">
+            <div class="d-flex align-items-center">
+              <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background: #F59E0B; color: white; font-size: 1.2rem;">
+                <i class="fas fa-star"></i>
+              </div>
+              <div>
+                <p class="mb-0 text-muted" style="font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Experience (XP)</p>
+                <h3 class="fw-bold mb-0" style="color: #92400E;">0 XP</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Theme Settings Card -->
+    <div class="card p-4" style="border-radius: 20px;">
+      <h5 class="fw-bold mb-4"><i class="fas fa-paint-roller me-2 text-primary"></i>Appearance</h5>
+      
+      <div class="d-flex justify-content-between align-items-center p-3 rounded" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
+        <div>
+          <h6 class="fw-bold mb-1">Dark Theme</h6>
+          <p class="text-muted mb-0" style="font-size: 0.85rem;">Switch to a dark, sleek appearance that's easy on the eyes.</p>
+        </div>
+        
+        <div class="form-check form-switch" style="font-size: 1.5rem; margin: 0;">
+          <input class="form-check-input" type="checkbox" role="switch" id="darkThemeToggle" style="cursor: pointer;">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('darkThemeToggle');
+    
+    // Check local storage for theme
+    if (localStorage.getItem('theme') === 'dark') {
+      themeToggle.checked = true;
+    }
+
+    // Toggle event listener
+    themeToggle.addEventListener('change', function() {
+      if (this.checked) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('theme', 'light');
+      }
+    });
+  });
+</script>
+{% endblock %}

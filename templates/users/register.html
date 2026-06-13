@@ -7,7 +7,7 @@
           style="
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+            background: linear-gradient(135deg, #F8FAFC, #E2E8F0);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -18,8 +18,8 @@
         >
           🍽️
         </div>
-        <span class="badge-pill">Join SmartRecipe!</span>
-        <h3 class="fw-bold mt-2" style="color: #064E3B">Create Your Account</h3>
+        <span class="badge-pill">Join BudgetBites!</span>
+        <h3 class="fw-bold mt-2" style="color: #1F2937">Create Your Account</h3>
         <p class="text-muted" style="font-size: 0.9rem">
           Free forever · No credit card needed
         </p>
@@ -28,8 +28,8 @@
       <form method="POST">
         {% csrf_token %} {% for field in form %}
         <div class="mb-3">
-          <label class="form-label" style="font-weight: 600; color: #064E3B">
-            <i class="fas fa-pen me-1" style="color: #10B981"></i>
+          <label class="form-label" style="font-weight: 600; color: #1F2937">
+            <i class="fas fa-pen me-1" style="color: #059669"></i>
             {{ field.label }}
           </label>
           <input
@@ -39,7 +39,7 @@
             placeholder="Enter {{ field.label }}"
             style="
               border-radius: 14px;
-              border: 2px solid #F0FDF4;
+              border: 2px solid #F8FAFC;
               padding: 13px 18px;
               font-size: 0.95rem;
             "
@@ -53,7 +53,7 @@
             {{ field.errors|striptags }}
           </div>
           {% endif %} {% if field.help_text %}
-          <div class="mt-1" style="color: #a0aec0; font-size: 0.78rem">
+          <div class="mt-1" style="color: #6B7280; font-size: 0.78rem">
             <i class="fas fa-info-circle me-1"></i>
             {{ field.help_text }}
           </div>
@@ -71,7 +71,7 @@
           Already have an account?
           <a
             href="{% url 'login' %}"
-            style="color: #10B981; font-weight: 700; text-decoration: none"
+            style="color: #059669; font-weight: 700; text-decoration: none"
           >
             Login here 👋
           </a>

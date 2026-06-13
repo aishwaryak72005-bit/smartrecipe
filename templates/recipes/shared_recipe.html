@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ recipe.name }} - SmartRecipe{% endblock %}
+{% block title %}{{ recipe.name }} - BudgetBites{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -8,14 +8,14 @@
     <div class="col-md-8 col-lg-6">
       
       <div class="text-center mb-4">
-        <h2 style="font-weight:900; color:#064E3B;">🍲 Shared Recipe</h2>
+        <h2 style="font-weight:900; color:#1F2937;">🍲 Shared Recipe</h2>
         <p style="color:#6b7280; font-weight: 500;">A recipe shared by {{ recipe_obj.user.username }}</p>
       </div>
 
       <div class="card overflow-hidden" style="background:#FFFFFF; border:none; box-shadow:0 8px 32px rgba(0,0,0,0.1);">
         
         <!-- HEADER -->
-        <div class="recipe-header" style="position:relative; overflow:hidden; background: linear-gradient(135deg, #22C55E, #16A34A); padding: 32px 24px;">
+        <div class="recipe-header" style="position:relative; overflow:hidden; background: linear-gradient(135deg, #059669, #059669); padding: 32px 24px;">
           <div style="position:absolute; top:-30px; right:-30px; width:160px; height:160px; background:rgba(255,255,255,0.15); border-radius:50%;"></div>
           <div style="position:absolute; bottom:-40px; left:-20px; width:120px; height:120px; background:rgba(255,255,255,0.1); border-radius:50%;"></div>
 
@@ -41,21 +41,21 @@
             <span class="badge bg-success px-3 py-2" style="font-size:0.9rem;">⏱️ {{ recipe.time }}</span>
           </div>
 
-          <h5 style="color:#10B981; font-weight:bold; margin-bottom:12px;"><i class="fas fa-shopping-basket"></i> Ingredients Needed</h5>
+          <h5 style="color:#059669; font-weight:bold; margin-bottom:12px;"><i class="fas fa-shopping-basket"></i> Ingredients Needed</h5>
           <ul class="list-group list-group-flush mb-4" style="border-radius:12px; overflow:hidden;">
             {% for item in recipe.ingredients %}
-            <li class="list-group-item d-flex align-items-center gap-2" style="background:#FFFFFF; color:#064E3B; border-color:rgba(17,24,39,0.05);">
+            <li class="list-group-item d-flex align-items-center gap-2" style="background:#FFFFFF; color:#1F2937; border-color:rgba(17,24,39,0.05);">
               <i class="fas {% if item.have %}fa-check-circle text-success{% else %}fa-cart-plus text-warning{% endif %}"></i>
               {{ item.text }}
             </li>
             {% endfor %}
           </ul>
 
-          <h5 style="color:#10B981; font-weight:bold; margin-bottom:12px;"><i class="fas fa-fire-burner"></i> Cooking Instructions</h5>
-          <div class="p-3" style="background:#F0FDF4; border-radius:12px; border:1px solid rgba(17,24,39,0.05);">
+          <h5 style="color:#059669; font-weight:bold; margin-bottom:12px;"><i class="fas fa-fire-burner"></i> Cooking Instructions</h5>
+          <div class="p-3" style="background:#F8FAFC; border-radius:12px; border:1px solid rgba(17,24,39,0.05);">
             {% for step in recipe.instructions %}
             <div class="d-flex mb-3">
-              <div style="min-width:28px; font-weight:900; color:#10B981;">{{ forloop.counter }}.</div>
+              <div style="min-width:28px; font-weight:900; color:#059669;">{{ forloop.counter }}.</div>
               <div style="color:rgba(17,24,39,0.85); line-height:1.5;">{{ step }}</div>
             </div>
             {% endfor %}

@@ -202,6 +202,9 @@ def parse_recipes(ai_response):
                 'ingredients': [],
                 'instructions': [],
                 'missing': [],
+                'dietary_preference': 'None',
+                'tips': 'No tips available.',
+                'variations': 'No variations available.',
             }
             section = ''
             for line in lines:
@@ -255,6 +258,13 @@ def parse_recipes(ai_response):
                         }
                     except:
                         recipe['nutrition'] = None
+                elif line.startswith('Dietary Preference:'):
+                    raw_pref = line.replace('Dietary Preference:', '').strip()
+                    recipe['dietary_preference'] = [p.strip() for p in raw_pref.split(',') if p.strip()]
+                elif line.startswith('Tips:'):
+                    recipe['tips'] = line.replace('Tips:', '').strip()
+                elif line.startswith('Variations:'):
+                    recipe['variations'] = line.replace('Variations:', '').strip()
                 elif line.startswith('AI Taste Score:'):
                     recipe['rating'] = line.replace('AI Taste Score:', '').strip()
 
@@ -682,7 +692,6 @@ def generate_view(request):
             mode_text = f"The user selected '{selected_dish}'. Generate recipes focused on this dish. {mode_context}"
         else:
             mode_text = f"Suggest fresh recipes using these ingredients. {mode_context}"
-
         prompt_recipes = ""
         for i in range(1, recipe_count + 1):
             prompt_recipes += f"""
@@ -693,13 +702,16 @@ AI Taste Score: [Score]/10
 Nutritional Info: [Calories] kcal | [Protein]g P | [Carbs]g C | [Fat]g F
 Estimated Cost: ₹[cost]
 Cooking Time: [time in minutes]
+Dietary Preference: [e.g., Vegetarian, Gluten-Free]
 Ingredients Needed:
-- [ingredient 1] - have it ✅
-- [ingredient 2] - need to buy ❌ (approx ₹[price])
+- [ingredient 1] ([exact measurement]) - have it ✅
+- [ingredient 2] ([exact measurement]) - need to buy ❌ (approx ₹[price])
 Instructions:
 1. [Step 1]
 2. [Step 2]
 3. [Step 3]
+Tips: [One expert tip]
+Variations: [One variation idea]
 Missing Ingredients to Buy:
 - [ingredient] - ₹[price]
 """
@@ -758,14 +770,12 @@ You must return the response strictly in the following format:
                 selected_dish if selected_dish else ingredients
             )
 
+            import urllib.parse
             # Add nutritional info + dish image to each recipe
             for i, recipe in enumerate(recipes):
-                ing_list = ', '.join([item['text'] for item in recipe.get('ingredients', [])])
-                recipe['nutrition'] = get_nutrition_info(
-                    recipe['name'], ing_list, serving_size
-                )
                 recipe['dish_emoji'] = DISH_EMOJIS[i % len(DISH_EMOJIS)]
                 recipe['dish_gradient'] = DISH_GRADIENTS[i % len(DISH_GRADIENTS)]
+                recipe['image_url'] = f"https://image.pollinations.ai/prompt/Delicious%20Indian%20dish%20{urllib.parse.quote(recipe.get('name', 'food'))}"
 
             return render(request, 'recipes/generate.html', {
                 'quick_ingredients': quick_ingredients,
@@ -993,7 +1003,7 @@ def chatbot_api(request):
             return JsonResponse({'error': 'Message cannot be empty'}, status=400)
             
         system_prompt = (
-            "You are Chef AI, a friendly and expert cooking assistant for SmartRecipe. "
+            "You are Chef AI, a friendly and expert cooking assistant for BudgetBites. "
             "Keep your answers short, practical, and helpful. "
             "Use simple Indian cooking terms where appropriate. "
             f"Context about what the user is currently looking at: {context}"

@@ -1,10 +1,20 @@
 {% extends 'base.html' %} {% block content %}
+<style>
+  /* Dark Mode Overrides for Suggest Page */
+  .dark-mode h2[style], .dark-mode label[style], .dark-mode .dish-title { color: #F9FAFB !important; }
+  .dark-mode .fridge-banner { background: linear-gradient(135deg, #1F2937, #111827) !important; border-color: #374151 !important; }
+  .dark-mode .fridge-banner h6, .dark-mode .fridge-banner p { color: #F9FAFB !important; }
+  .dark-mode .btn[style*="border-color: rgba(27,67,50,0.15)"] { background: #374151 !important; color: #F9FAFB !important; border-color: #4B5563 !important; }
+  .dark-mode .btn[style*="border-color: rgba(27,67,50,0.15)"]:hover { background: #4B5563 !important; }
+  .dark-mode .input-group-text { background: #374151 !important; color: #F9FAFB !important; border-color: #4B5563 !important; }
+  .dark-mode .form-control[style], .dark-mode .form-select[style] { background: #374151 !important; color: #F9FAFB !important; border-color: #4B5563 !important; }
+</style>
 <div class="row justify-content-center mt-2">
   <div class="col-lg-9">
     <!-- Page Header -->
     <div class="text-center mb-4">
       <span class="badge-pill">✨ Smart Suggestions</span>
-      <h2 class="fw-bold" style="color: #064E3B">What Should We Cook?</h2>
+      <h2 class="fw-bold" style="color: #1F2937">What Should We Cook?</h2>
       <p class="text-muted">
         Enter your ingredients — AI suggests the best dishes for you!
       </p>
@@ -19,7 +29,7 @@
         <div class="mb-4">
           <label
             class="form-label fw-bold"
-            style="color: #064E3B; font-size: 1.05rem"
+            style="color: #1F2937; font-size: 1.05rem"
           >
             🥬 What ingredients do you have?
           </label>
@@ -43,12 +53,12 @@
 
         <!-- Fridge Scanner Button -->
         <div class="mb-4">
-          <div class="d-flex align-items-center justify-content-between p-3" style="background: linear-gradient(135deg, #DCFCE7, #FFFFFF); border-radius: 14px; border: 1px solid #064E3B;">
+          <div class="fridge-banner d-flex align-items-center justify-content-between p-3" style="background: linear-gradient(135deg, #E2E8F0, #FFFFFF); border-radius: 14px; border: 1px solid #1F2937;">
             <div>
-              <h6 class="fw-bold mb-1" style="color: #064E3B">🧊 AI Fridge Scanner</h6>
-              <p class="mb-0" style="font-size: 0.8rem; color: #064E3B">Point camera at your fridge — AI detects ingredients!</p>
+              <h6 class="fw-bold mb-1" style="color: #1F2937">🧊 AI Fridge Scanner</h6>
+              <p class="mb-0" style="font-size: 0.8rem; color: #1F2937">Point camera at your fridge — AI detects ingredients!</p>
             </div>
-            <button type="button" class="btn btn-sm" style="background: #10B981; color: white; border-radius: 12px; font-weight: 700;" onclick="openScanner()">
+            <button type="button" class="btn btn-sm" style="background: #059669; color: white; border-radius: 12px; font-weight: 700;" onclick="openScanner()">
               <i class="fas fa-camera me-1"></i> Scan
             </button>
           </div>
@@ -57,7 +67,7 @@
 
         <!-- Quick Add Ingredients — Categorized -->
         <div class="mb-4">
-          <p style="font-size:0.9rem; font-weight:700; color:#064E3B; margin-bottom:12px;">
+          <p style="font-size:0.9rem; font-weight:700; color:#1F2937; margin-bottom:12px;">
             ⚡ Quick Add Ingredients
           </p>
 
@@ -67,7 +77,7 @@
             <button type="button"
               onclick="showCategory('cat_{{ forloop.counter }}')"
               id="tab_{{ forloop.counter }}"
-              style="background:{% if forloop.first %}#064E3B{% else %}#F0FDF4{% endif %}; color:{% if forloop.first %}#FFFFFF{% else %}#065F46{% endif %}; border:none; border-radius:20px; padding:6px 14px; font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.2s;">
+              style="background:{% if forloop.first %}#1F2937{% else %}#F8FAFC{% endif %}; color:{% if forloop.first %}#FFFFFF{% else %}#1F2937{% endif %}; border:none; border-radius:20px; padding:6px 14px; font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.2s;">
               {{ category }}
             </button>
             {% endfor %}
@@ -81,7 +91,7 @@
               onclick="addIngredient('{{ item }}')"
               style="
                 background: #FFFFFF;
-                color: #064E3B;
+                color: #1F2937;
                 padding: 7px 16px;
                 border-radius: 20px;
                 font-size: 0.82rem;
@@ -91,8 +101,8 @@
                 border: 1.5px solid rgba(27,67,50,0.15);
                 box-shadow: 0 2px 8px rgba(27,67,50,0.06);
               "
-              onmouseover="this.style.background='#10B981'; this.style.color='white'; this.style.borderColor='#10B981'; this.style.transform='translateY(-2px)';"
-              onmouseout="this.style.background='#FFFFFF'; this.style.color='#064E3B'; this.style.borderColor='rgba(27,67,50,0.15)'; this.style.transform='translateY(0)';"
+              onmouseover="this.style.background='#059669'; this.style.color='white'; this.style.borderColor='#059669'; this.style.transform='translateY(-2px)';"
+              onmouseout="this.style.background='#FFFFFF'; this.style.color='#1F2937'; this.style.borderColor='rgba(27,67,50,0.15)'; this.style.transform='translateY(0)';"
             >
               + {{ item }}
             </span>
@@ -108,11 +118,11 @@
               const tabNum = id.replace('cat_', '');
               document.querySelectorAll('#ingredientCategoryTabs button').forEach((btn, i) => {
                 if ((i + 1) == tabNum) {
-                  btn.style.background = '#064E3B';
+                  btn.style.background = '#1F2937';
                   btn.style.color = '#FFFFFF';
                 } else {
-                  btn.style.background = '#F0FDF4';
-                  btn.style.color = '#065F46';
+                  btn.style.background = '#F8FAFC';
+                  btn.style.color = '#1F2937';
                 }
               });
             }
@@ -123,17 +133,17 @@
         <div class="row g-4 mb-4">
           <!-- Budget -->
           <div class="col-md-4">
-            <label class="form-label fw-bold" style="color: #064E3B"
+            <label class="form-label fw-bold" style="color: #1F2937"
               >💰 Budget</label
             >
             <div class="input-group">
               <span
                 class="input-group-text fw-bold"
                 style="
-                  background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
-                  border: 2px solid #F0FDF4;
+                  background: linear-gradient(135deg, #F8FAFC, #E2E8F0);
+                  border: 2px solid #F8FAFC;
                   border-right: none;
-                  color: #064E3B;
+                  color: #1F2937;
                   border-radius: 14px 0 0 14px;
                 "
                 >₹</span
@@ -161,13 +171,13 @@
                 onclick="setBudget('{{ amt }}')"
                 style="
                   background: #FFFFFF;
-                  color: #064E3B;
+                  color: #1F2937;
                   padding: 4px 12px;
                   border-radius: 15px;
                   font-size: 0.78rem;
                   font-weight: 600;
                   cursor: pointer;
-                  border: 1px solid #F0FDF4;
+                  border: 1px solid #F8FAFC;
                 "
               >
                 ₹{{ amt }}
@@ -178,7 +188,7 @@
 
           <!-- Serving -->
           <div class="col-md-4">
-            <label class="form-label fw-bold" style="color: #064E3B"
+            <label class="form-label fw-bold" style="color: #1F2937"
               >👥 Serving Size</label
             >
             <select
@@ -199,7 +209,7 @@
 
           <!-- Cuisine -->
           <div class="col-md-4">
-            <label class="form-label fw-bold" style="color: #064E3B">🍽️ Cuisine & Festival</label>
+            <label class="form-label fw-bold" style="color: #1F2937">🍽️ Cuisine & Festival</label>
             <select name="cuisine" class="form-select form-select-lg" style="border-radius: 14px; border: 2px solid #E9ECEF; padding: 13px 18px;">
               <optgroup label="🌍 General">
                 <option value="any">🍽️ Any Cuisine</option>
@@ -254,7 +264,7 @@
         <div class="row g-4 mb-4">
           <!-- Meal Type -->
           <div class="col-md-4">
-            <label class="form-label fw-bold" style="color: #064E3B">🍳 Meal Type</label>
+            <label class="form-label fw-bold" style="color: #1F2937">🍳 Meal Type</label>
             <select name="meal_type" class="form-select form-select-lg" style="border-radius:14px; border:2px solid #E9ECEF; padding:13px 18px;">
               <option value="any">🍽️ Any Meal</option>
               <option value="breakfast">🌅 Breakfast</option>
@@ -267,7 +277,7 @@
           </div>
           <!-- Spice Level -->
           <div class="col-md-4">
-            <label class="form-label fw-bold" style="color: #064E3B">🌶️ Spice Level</label>
+            <label class="form-label fw-bold" style="color: #1F2937">🌶️ Spice Level</label>
             <select name="spice_level" class="form-select form-select-lg" style="border-radius:14px; border:2px solid #E9ECEF; padding:13px 18px;">
               <option value="any">🤷 Any Spice</option>
               <option value="mild">😊 Mild (No Spice)</option>
@@ -278,7 +288,7 @@
           </div>
           <!-- Diet Preference -->
           <div class="col-md-4">
-            <label class="form-label fw-bold" style="color: #064E3B">🥦 Diet Preference</label>
+            <label class="form-label fw-bold" style="color: #1F2937">🥦 Diet Preference</label>
             <select name="diet_pref" class="form-select form-select-lg" style="border-radius:14px; border:2px solid #E9ECEF; padding:13px 18px;">
               <option value="any">🍽️ No Preference</option>
               <option value="vegetarian">🌿 Vegetarian</option>
@@ -298,7 +308,7 @@
 
 
         <!-- Submit -->
-        <button type="submit" class="btn btn-purple w-100 btn-lg" style="font-size: 1.1rem; padding: 16px" onclick="showLoading()">
+        <button type="submit" class="btn btn-purple w-100 btn-lg" style="font-size: 1.1rem; padding: 16px" onclick="showLoading('AI is thinking of dishes...')">
           <i class="fas fa-lightbulb me-2"></i> Suggest Dishes for Me ✨
         </button>
       </form>
@@ -320,7 +330,7 @@
         >
           🤔
         </div>
-        <h5 class="fw-bold mt-3" style="color: #064E3B">
+        <h5 class="fw-bold mt-3" style="color: #1F2937" id="loadingMessage">
           AI is thinking of dishes...
         </h5>
         <p class="text-muted">Just a moment!</p>
@@ -332,7 +342,7 @@
     <div id="suggestions">
       <div class="text-center mb-4">
         <span class="badge-pill">🍽️ AI Suggestions</span>
-        <h3 class="fw-bold" style="color: #064E3B">Pick a Dish You Like!</h3>
+        <h3 class="fw-bold" style="color: #1F2937">Pick a Dish You Like!</h3>
         <p class="text-muted">
           Click any dish to get the full recipe instantly
         </p>
@@ -348,8 +358,9 @@
             <input type="hidden" name="serving_size" value="{{ serving_size }}" />
             <input type="hidden" name="cuisine" value="{{ cuisine }}" />
             <input type="hidden" name="selected_dish" value="{{ dish.name }}" />
+            <input type="hidden" name="user_xp" class="hidden_user_xp" value="0" />
 
-            <button type="submit" class="w-100 text-start border-0 bg-transparent p-0">
+            <button type="submit" class="w-100 text-start border-0 bg-transparent p-0" onclick="this.parentElement.querySelector('.hidden_user_xp').value = parseInt(localStorage.getItem('budgetbites_xp') || '0'); showLoading('AI is writing your recipe...')">
               <div
                 class="card overflow-hidden"
                 style="transition: all 0.3s; cursor: pointer"
@@ -369,7 +380,7 @@
                       {% if dish.cost %}
                       <span style="background:rgba(255,255,255,0.2); color:white; padding:5px 14px; border-radius:20px; font-size:0.82rem; font-weight:700;">{{ dish.cost }}</span>
                       {% endif %}
-                      <div style="background:white; color:#1E40AF; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1rem;">→</div>
+                      <div style="background:white; color:#064E3B; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1rem;">→</div>
                     </div>
                   </div>
                 </div>
@@ -381,12 +392,12 @@
           <div class="d-flex flex-wrap gap-2 mt-2 px-1">
             <span style="font-size:0.75rem; color:#64748b; align-self:center; font-weight:600;">Explore:</span>
             <a href="https://www.youtube.com/results?search_query={{ dish.name|urlencode }}+recipe" target="_blank"
-              style="background:#f1f5f9; color:#475569; text-decoration:none; padding:4px 12px; border-radius:20px; font-size:0.72rem; font-weight:700; display:flex; align-items:center; gap:5px; transition:transform 0.2s;"
+              style="background:#E2E8F0; color:#475569; text-decoration:none; padding:4px 12px; border-radius:20px; font-size:0.72rem; font-weight:700; display:flex; align-items:center; gap:5px; transition:transform 0.2s;"
               onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
               <i class="fab fa-youtube"></i> YouTube
             </a>
             <a href="https://www.pinterest.com/search/pins/?q={{ dish.name|urlencode }}+recipe" target="_blank"
-              style="background:linear-gradient(135deg,#E60023,#ad081b); color:white; text-decoration:none; padding:4px 12px; border-radius:20px; font-size:0.72rem; font-weight:700; display:flex; align-items:center; gap:5px; transition:transform 0.2s;"
+              style="background:linear-gradient(135deg,#A7F3D0,#EA580C); color:white; text-decoration:none; padding:4px 12px; border-radius:20px; font-size:0.72rem; font-weight:700; display:flex; align-items:center; gap:5px; transition:transform 0.2s;"
               onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
               <i class="fab fa-pinterest"></i> Pinterest
             </a>
@@ -407,7 +418,7 @@
 
     <!-- Error -->
     {% if error_message %}
-    <div class="card p-4 mt-4" style="border: 2px solid #DCFCE7">
+    <div class="card p-4 mt-4" style="border: 2px solid #E2E8F0">
       <div class="text-center">
         <div style="font-size: 3rem">😕</div>
         <h5 class="fw-bold mt-2" style="color: #059669">
@@ -476,11 +487,11 @@
       const tabUp = document.getElementById('tab-upload');
       if (tab === 'camera') {
           camView.style.display='block'; upView.style.display='none'; capBtn.style.display='block';
-          tabCam.className='btn btn-light rounded-pill px-4'; tabCam.style.color='#064E3B';
+          tabCam.className='btn btn-light rounded-pill px-4'; tabCam.style.color='#1F2937';
           tabUp.className='btn btn-outline-light rounded-pill px-4'; tabUp.style.color='';
       } else {
           camView.style.display='none'; upView.style.display='block'; capBtn.style.display='none';
-          tabUp.className='btn btn-light rounded-pill px-4'; tabUp.style.color='#064E3B';
+          tabUp.className='btn btn-light rounded-pill px-4'; tabUp.style.color='#1F2937';
           tabCam.className='btn btn-outline-light rounded-pill px-4'; tabCam.style.color='';
       }
   }
@@ -609,7 +620,7 @@
 <div id="scanner-overlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
     <!-- Tab Switcher -->
     <div class="d-flex gap-3 mb-4">
-        <button onclick="switchScannerTab('camera')" id="tab-camera" class="btn btn-light rounded-pill px-4" style="font-weight:700; color:#064E3B;"><i class="fas fa-camera me-2"></i>Live Camera</button>
+        <button onclick="switchScannerTab('camera')" id="tab-camera" class="btn btn-light rounded-pill px-4" style="font-weight:700; color:#1F2937;"><i class="fas fa-camera me-2"></i>Live Camera</button>
         <button onclick="switchScannerTab('upload')" id="tab-upload" class="btn btn-outline-light rounded-pill px-4" style="font-weight:700;"><i class="fas fa-image me-2"></i>Upload Photo</button>
     </div>
 
@@ -639,7 +650,7 @@
     <!-- Buttons -->
     <div class="d-flex gap-4 mt-4">
         <button onclick="closeScanner()" class="btn btn-outline-light rounded-circle" style="width:60px;height:60px;font-size:1.5rem;"><i class="fas fa-times"></i></button>
-        <button id="scanner-capture-btn" onclick="captureAndScan()" class="btn btn-light rounded-circle shadow" style="width:60px;height:60px;font-size:1.5rem;color:#064E3B;"><i class="fas fa-camera"></i></button>
+        <button id="scanner-capture-btn" onclick="captureAndScan()" class="btn btn-light rounded-circle shadow" style="width:60px;height:60px;font-size:1.5rem;color:#1F2937;"><i class="fas fa-camera"></i></button>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>

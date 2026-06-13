@@ -4,7 +4,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SmartRecipe 🍽️</title>
+    <title>BudgetBites - Cook Smart. Spend Less. Eat Better.</title>
+    <link rel="icon" href="{% static 'logo.png' %}?v=2" type="image/png">
+    <link rel="shortcut icon" href="{% static 'logo.png' %}?v=2" type="image/png">
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -29,9 +31,9 @@
       }
 
       .navbar {
-        background: #064E3B !important;
-        box-shadow: 0 4px 20px rgba(6, 78, 59, 0.3);
-        padding: 14px 0;
+        background: #FFFFFF !important;
+        box-shadow: 0 4px 20px rgba(6, 78, 59, 0.08);
+        padding: 5px 0;
       }
       .navbar-brand {
         color: white !important;
@@ -39,21 +41,21 @@
         font-weight: 900;
       }
       .brand-highlight {
-        color: #10B981;
+        color: #059669;
       }
       .nav-link {
-        color: rgba(255, 255, 255, 0.88) !important;
-        font-weight: 500;
+        color: #064E3B !important;
+        font-weight: 600;
         padding: 8px 18px !important;
         border-radius: 30px;
         transition: all 0.3s;
       }
       .nav-link:hover {
-        background: rgba(255, 255, 255, 0.18);
-        color: white !important;
+        background: rgba(5, 150, 105, 0.1);
+        color: #059669 !important;
       }
       .nav-btn-white {
-        background: #10B981 !important;
+        background: #059669 !important;
         color: #FFFFFF !important;
         font-weight: 700 !important;
         padding: 8px 22px !important;
@@ -67,17 +69,17 @@
         box-shadow: 0 7px 20px rgba(16, 185, 129, 0.5);
       }
       .nav-user-badge {
-        background: rgba(248, 249, 250, 0.15);
-        color: #FFFFFF !important;
+        background: rgba(5, 150, 105, 0.1);
+        color: #059669 !important;
         border-radius: 30px;
         padding: 8px 18px !important;
         font-weight: 600 !important;
-        border: 1px solid rgba(248, 249, 250, 0.2);
+        border: 1px solid rgba(5, 150, 105, 0.2);
       }
 
       /* ── BUTTONS ── */
       .btn-purple {
-        background: linear-gradient(135deg, #10B981, #059669);
+        background: linear-gradient(135deg, #059669, #059669);
         color: #FFFFFF;
         border: none;
         border-radius: 14px;
@@ -93,7 +95,7 @@
         box-shadow: 0 8px 28px rgba(16, 185, 129, 0.5);
       }
       .btn-pink {
-        background: linear-gradient(135deg, #064E3B, #065F46);
+        background: linear-gradient(135deg, #1F2937, #1F2937);
         color: #FFFFFF;
         border: none;
         border-radius: 14px;
@@ -110,15 +112,15 @@
       }
       .btn-outline-purple {
         background: transparent;
-        color: #064E3B;
-        border: 2px solid #064E3B;
+        color: #1F2937;
+        border: 2px solid #1F2937;
         border-radius: 14px;
         padding: 11px 30px;
         font-weight: 700;
         transition: all 0.3s;
       }
       .btn-outline-purple:hover {
-        background: #064E3B;
+        background: #1F2937;
         color: #FFFFFF;
         transform: translateY(-3px);
       }
@@ -138,20 +140,20 @@
         font-weight: 500;
       }
       .alert-success {
-        background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
-        color: #064E3B;
-        border-left: 4px solid #10B981;
+        background: linear-gradient(135deg, #E2E8F0, #E2E8F0);
+        color: #1F2937;
+        border-left: 4px solid #059669;
       }
 
       /* ── FORMS ── */
       .form-control:focus,
       .form-select:focus {
-        border-color: #10B981 !important;
+        border-color: #059669 !important;
         box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.2) !important;
       }
       .form-check-input:checked {
-        background-color: #10B981 !important;
-        border-color: #10B981 !important;
+        background-color: #059669 !important;
+        border-color: #059669 !important;
       }
       .custom-switch {
         transition: background-color 0.2s, border-color 0.2s;
@@ -185,8 +187,8 @@
 
       /* ── BADGE PILL ── */
       .badge-pill {
-        background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
-        color: #064E3B;
+        background: linear-gradient(135deg, #E2E8F0, #E2E8F0);
+        color: #1F2937;
         padding: 6px 16px;
         border-radius: 30px;
         font-size: 0.82rem;
@@ -206,14 +208,14 @@
         transition: all 0.3s;
       }
       .step-card:hover {
-        border-color: #10B981;
+        border-color: #059669;
         transform: translateY(-4px);
         box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15);
       }
       .step-number {
         width: 48px;
         height: 48px;
-        background: linear-gradient(135deg, #10B981, #059669);
+        background: linear-gradient(135deg, #059669, #059669);
         color: white;
         border-radius: 50%;
         display: flex;
@@ -226,7 +228,7 @@
 
       /* ── FOOTER ── */
       .footer {
-        background: #064E3B;
+        background: #1F2937;
         color: rgba(248, 249, 250, 0.8);
         padding: 40px 0;
         margin-top: 70px;
@@ -278,10 +280,10 @@
         margin-bottom: 4px;
       }
       .mobile-nav-item.active {
-        color: #10B981;
+        color: #059669;
       }
       .mobile-nav-item:hover {
-        color: #064E3B;
+        color: #1F2937;
       }
 
       @media (max-width: 991px) {
@@ -292,7 +294,7 @@
           padding-bottom: 80px;
         }
         .navbar-collapse {
-          background: #065F46;
+          background: #1F2937;
           padding: 15px;
           border-radius: 12px;
           margin-top: 10px;
@@ -322,7 +324,7 @@
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #10B981, #059669);
+        background: linear-gradient(135deg, #059669, #059669);
         color: white;
         display: flex;
         align-items: center;
@@ -367,7 +369,7 @@
         }
       }
       .chatbot-header {
-        background: linear-gradient(135deg, #064E3B, #065F46);
+        background: linear-gradient(135deg, #1F2937, #1F2937);
         color: #FFFFFF;
         padding: 15px 20px;
         font-weight: 700;
@@ -393,13 +395,13 @@
       }
       .chat-msg.bot {
         background: white;
-        color: #065F46;
+        color: #1F2937;
         align-self: flex-start;
         border: 1px solid rgba(6, 78, 59, 0.15);
         border-bottom-left-radius: 4px;
       }
       .chat-msg.user {
-        background: #10B981;
+        background: #059669;
         color: white;
         align-self: flex-end;
         border-bottom-right-radius: 4px;
@@ -421,7 +423,7 @@
         background: #FFFFFF;
       }
       .chat-send-btn {
-        background: #10B981;
+        background: #059669;
         color: white;
         border: none;
         border-radius: 50%;
@@ -435,34 +437,117 @@
 
       /* ── PROGRESS / MISC ── */
       .progress-bar {
-        background: linear-gradient(135deg, #10B981, #064E3B) !important;
+        background: linear-gradient(135deg, #059669, #1F2937) !important;
+      }
+      /* ── DARK MODE ── */
+      .dark-mode body {
+        background: #111827 !important;
+        color: #F9FAFB !important;
+      }
+      .dark-mode .navbar {
+        background: #1F2937 !important;
+        border-bottom: 1px solid #374151;
+        box-shadow: none !important;
+      }
+      .dark-mode .navbar-brand span {
+        color: #F9FAFB !important;
+      }
+      .dark-mode .nav-link {
+        color: #D1D5DB !important;
+      }
+      .dark-mode .nav-link:hover {
+        color: #10B981 !important;
+        background: rgba(16, 185, 129, 0.1);
+      }
+      .dark-mode .nav-user-badge {
+        color: #10B981 !important;
+        border-color: #10B981;
+      }
+      .dark-mode .card {
+        background: #1F2937 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+      }
+      .dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode h4, .dark-mode h5, .dark-mode h6 {
+        color: #F9FAFB !important;
+      }
+      .dark-mode p, .dark-mode span, .dark-mode div {
+        color: #D1D5DB;
+      }
+      .dark-mode .text-muted {
+        color: #9CA3AF !important;
+      }
+      .dark-mode hr {
+        border-color: #374151 !important;
+      }
+      .dark-mode .form-control, .dark-mode .form-select {
+        background: #374151 !important;
+        border-color: #4B5563 !important;
+        color: #F9FAFB !important;
+      }
+      .dark-mode .modal-content {
+        background: #1F2937 !important;
+      }
+      .dark-mode .accordion-item {
+        background: #1F2937 !important;
+        border-color: #374151 !important;
+      }
+      .dark-mode .accordion-button {
+        background: #1F2937 !important;
+        color: #F9FAFB !important;
+      }
+      .dark-mode .accordion-button:not(.collapsed) {
+        background: rgba(16, 185, 129, 0.1) !important;
+      }
+      .dark-mode .shopping-btn {
+        opacity: 0.9;
+      }
+      .dark-mode .shopping-btn:hover {
+        opacity: 1;
+      }
+      .dark-mode .alert-success {
+        background: rgba(16, 185, 129, 0.15) !important;
+        color: #A7F3D0 !important;
+        border: 1px solid rgba(16, 185, 129, 0.3) !important;
       }
     </style>
     <!-- Web App Manifest -->
   <link rel="manifest" href="{% static 'manifest.json' %}">
-  <meta name="theme-color" content="#10B981">
+  <meta name="theme-color" content="#059669">
   <link rel="apple-touch-icon" href="https://via.placeholder.com/192/10B981/FFFFFF?text=SR">
+  
+  <script>
+    // Immediately apply theme before rendering to prevent white flash
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark-mode');
+    }
+  </script>
 </head>
   <body>
     <nav class="navbar navbar-expand-lg fixed-top" style="z-index: 1030;">
       <div class="container">
-        <a class="navbar-brand" href="/"
-          >🍽️ Smart<span class="brand-highlight">Recipe</span></a
-        >
+        <a class="navbar-brand d-flex align-items-center gap-2" href="/" style="padding: 0; text-decoration: none;">
+          <img src="{% static 'logo.png' %}?v=2" alt="BudgetBites Logo" style="height: 60px; width: auto; object-fit: contain; margin: -5px 0;">
+          <div class="d-flex flex-column justify-content-center" style="line-height: 1;">
+            <span style="font-weight: 900; font-size: 1.4rem; color: #064E3B; letter-spacing: -0.5px;">Budget<span style="color: #059669;">Bites</span></span>
+          </div>
+        </a>
         <button
           class="navbar-toggler border-0"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
-          style="background: rgba(255,255,255,0.25); border-radius: 12px; padding: 10px 14px;"
+          style="background: rgba(5, 150, 105, 0.1); border-radius: 12px; padding: 10px 14px;"
         >
-          <span style="color: white; font-size: 1.4rem"
+          <span style="color: #059669; font-size: 1.4rem"
             ><i class="fas fa-bars"></i
           ></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <div class="navbar-nav ms-auto align-items-center">
             {% if user.is_authenticated %}
+            <a class="nav-link" href="/">
+              <i class="fas fa-home me-1"></i> Home
+            </a>
             <a class="nav-link" href="{% url 'suggest' %}">
               <i class="fas fa-lightbulb me-1"></i> Suggest
             </a>
@@ -480,7 +565,7 @@
               class="nav-link nav-user-badge ms-2"
               style="
                 cursor: pointer;
-                background: linear-gradient(135deg, #10B981, #059669);
+                background: linear-gradient(135deg, #059669, #059669);
                 border: none;
               "
               onclick="showXPModal()"
@@ -489,7 +574,7 @@
               <span id="userXPDisplay">0 XP</span>
             </div>
 
-            <a class="nav-link nav-user-badge ms-2" href="#">
+            <a class="nav-link nav-user-badge ms-2" href="{% url 'profile' %}">
               <i class="fas fa-user-circle me-1"></i> {{ user.username }}
             </a>
             <a class="nav-link nav-btn-white ms-2" href="{% url 'logout' %}">
@@ -511,9 +596,9 @@
     <div class="container mt-3">
       {% for message in messages %}
       <div
-        class="alert alert-success alert-dismissible fade show d-flex align-items-center"
+        class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show d-flex align-items-center"
       >
-        <i class="fas fa-check-circle me-2" style="color: #10B981"></i>
+        <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} me-2" style="color: {% if message.tags == 'error' %}#DC2626{% else %}#059669{% endif %}"></i>
         <span>{{ message }}</span>
         <button
           type="button"
@@ -528,7 +613,10 @@
 
     <div class="footer pb-5 pb-lg-0">
       <div class="footer-emoji-row">🍛 🥗 🍜 🥘 🍱</div>
-      <p class="mb-1 fw-bold" style="font-size: 1.1rem">🍽️ SmartRecipe</p>
+      <div class="d-flex align-items-center justify-content-center mb-1">
+        <img src="{% static 'logo.png' %}?v=2" alt="BudgetBites Logo" style="height: 24px; width: 24px; object-fit: cover; border-radius: 50%; margin-right: 8px;">
+        <p class="mb-0 fw-bold" style="font-size: 1.1rem">BudgetBites</p>
+      </div>
       <p class="mb-0" style="font-size: 0.85rem; opacity: 0.7">
         Cook Smart · Spend Less · Eat Better · Made with ❤️ in Bangalore
       </p>
@@ -595,7 +683,7 @@
           box-shadow: 0 24px 64px rgba(0,0,0,0.3);
       ">
         <!-- Header -->
-        <div style="background: linear-gradient(135deg, #064E3B, #065F46); padding: 18px 24px; display:flex; align-items:center; justify-content:space-between;">
+        <div style="background: linear-gradient(135deg, #1F2937, #1F2937); padding: 18px 24px; display:flex; align-items:center; justify-content:space-between;">
           <div>
             <h5 style="color:#FFFFFF; margin:0; font-weight:800; font-size:1.1rem;">🧊 AI Ingredients Scanner</h5>
             <p style="color:rgba(250,248,245,0.7); margin:0; font-size:0.78rem;">Point camera at ingredients — AI detects them!</p>
@@ -622,7 +710,7 @@
 
           <!-- Scanning overlay animation -->
           <div id="scanningOverlay" style="display:none; position:absolute; inset:0; background:rgba(27,67,50,0.65); display:none; align-items:center; justify-content:center; flex-direction:column;">
-            <div style="width:56px; height:56px; border:4px solid #10B981; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+            <div style="width:56px; height:56px; border:4px solid #059669; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
             <p style="color:white; margin-top:14px; font-weight:700; font-size:0.95rem;">🤖 AI is detecting ingredients...</p>
           </div>
         </div>
@@ -633,7 +721,7 @@
           <!-- Step 1: Start camera -->
           <div id="scanStep1">
             <button onclick="startFridgeCamera()" style="
-                width:100%; background:linear-gradient(135deg,#064E3B,#065F46);
+                width:100%; background:linear-gradient(135deg,#1F2937,#1F2937);
                 color:white; border:none; border-radius:14px; padding:13px;
                 font-size:1rem; font-weight:700; cursor:pointer;
                 box-shadow:0 4px 16px rgba(27,67,50,0.3); transition:all 0.3s;
@@ -647,7 +735,7 @@
               onchange="handleFridgeFile(event)"
               style="display:none;" />
             <button onclick="document.getElementById('fridgeFileInput').click()" style="
-                width:100%; background:#FFFFFF; color:#064E3B;
+                width:100%; background:#FFFFFF; color:#1F2937;
                 border:2px solid rgba(27,67,50,0.2); border-radius:14px;
                 padding:10px; font-size:0.88rem; font-weight:700;
                 cursor:pointer; margin-top:8px; transition:all 0.3s;
@@ -659,7 +747,7 @@
           <!-- Step 2: Capture & scan (shown after camera starts) -->
           <div id="scanStep2" style="display:none;">
             <button onclick="captureAndScan()" style="
-                width:100%; background:linear-gradient(135deg,#10B981,#059669);
+                width:100%; background:linear-gradient(135deg,#059669,#059669);
                 color:white; border:none; border-radius:14px; padding:13px;
                 font-size:1rem; font-weight:700; cursor:pointer;
                 box-shadow:0 4px 16px rgba(224,122,95,0.4); transition:all 0.3s;
@@ -667,7 +755,7 @@
               <i class="fas fa-bolt me-2"></i> Capture & Scan with AI
             </button>
             <button onclick="retakePhoto()" style="
-                width:100%; background:transparent; color:#064E3B;
+                width:100%; background:transparent; color:#1F2937;
                 border:2px solid rgba(27,67,50,0.2); border-radius:14px;
                 padding:9px; font-size:0.85rem; font-weight:600;
                 cursor:pointer; margin-top:8px;
@@ -678,14 +766,14 @@
 
           <!-- Step 3: Results (shown after scan) -->
           <div id="scanStep3" style="display:none;">
-            <div style="background:#DCFCE7; border-radius:14px; padding:14px; margin-bottom:14px; border:1px solid rgba(27,67,50,0.15);">
-              <p style="color:#064E3B; font-size:0.85rem; font-weight:700; margin-bottom:8px;">
+            <div style="background:#E2E8F0; border-radius:14px; padding:14px; margin-bottom:14px; border:1px solid rgba(27,67,50,0.15);">
+              <p style="color:#1F2937; font-size:0.85rem; font-weight:700; margin-bottom:8px;">
                 ✅ <span id="detectedCount">0</span> ingredients detected:
               </p>
               <div id="detectedIngredientChips" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
             </div>
             <button onclick="addAllDetected()" style="
-                width:100%; background:linear-gradient(135deg,#064E3B,#065F46);
+                width:100%; background:linear-gradient(135deg,#1F2937,#1F2937);
                 color:white; border:none; border-radius:14px; padding:13px;
                 font-size:1rem; font-weight:700; cursor:pointer;
                 box-shadow:0 4px 16px rgba(27,67,50,0.3);
@@ -704,7 +792,7 @@
           <!-- Error state -->
           <div id="scanError" style="display:none; text-align:center; padding:8px;">
             <p id="scanErrorMsg" style="color:#059669; font-weight:600; font-size:0.88rem; margin:0;"></p>
-            <button onclick="resetScanner()" style="background:transparent; border:none; color:#064E3B; font-weight:600; cursor:pointer; margin-top:6px; font-size:0.85rem;">Try Again</button>
+            <button onclick="resetScanner()" style="background:transparent; border:none; color:#1F2937; font-weight:600; cursor:pointer; margin-top:6px; font-size:0.85rem;">Try Again</button>
           </div>
         </div>
       </div>
@@ -845,7 +933,7 @@
         ingredients.forEach(ing => {
           const chip = document.createElement('span');
           chip.textContent = ing;
-          chip.style.cssText = 'background:#064E3B; color:#FFFFFF; padding:5px 13px; border-radius:20px; font-size:0.78rem; font-weight:600; cursor:pointer;';
+          chip.style.cssText = 'background:#1F2937; color:#FFFFFF; padding:5px 13px; border-radius:20px; font-size:0.78rem; font-weight:600; cursor:pointer;';
           chip.title = 'Click to remove';
           chip.onclick = function() {
             detectedIngredients = detectedIngredients.filter(i => i !== ing);
@@ -984,7 +1072,7 @@
           <div
             class="modal-header"
             style="
-              background: linear-gradient(135deg, #064E3B, #2C1E18);
+              background: linear-gradient(135deg, #1F2937, #2C1E18);
               color: white;
               border: none;
             "
@@ -1000,7 +1088,7 @@
           </div>
           <div class="modal-body text-center p-4">
             <h1 style="font-size: 3rem; margin-bottom: 0">👨‍🍳</h1>
-            <h4 class="fw-bold mt-2" style="color: #E07A5F">
+            <h4 class="fw-bold mt-2" style="color: #A7F3D0">
               Level <span id="userLevelDisplay">1</span> Chef
             </h4>
             <p class="text-muted mb-4">
@@ -1015,10 +1103,10 @@
                 id="xpProgressBar"
                 class="progress-bar progress-bar-striped progress-bar-animated"
                 role="progressbar"
-                style="width: 0%; background: linear-gradient(135deg, #E07A5F, #064E3B);"
+                style="width: 0%; background: linear-gradient(135deg, #A7F3D0, #1F2937);"
               ></div>
             </div>
-            <p class="mt-2 fw-bold" style="font-size: 0.9rem; color: #E07A5F">
+            <p class="mt-2 fw-bold" style="font-size: 0.9rem; color: #A7F3D0">
               <span id="xpProgressText">0</span> /
               <span id="xpNextLevel">100</span> XP to next level
             </p>
@@ -1029,7 +1117,7 @@
 
     <script>
       // Gamification Logic
-      let userXP = parseInt(localStorage.getItem("smartrecipe_xp") || "0");
+      let userXP = parseInt(localStorage.getItem("budgetbites_xp") || "0");
 
       function updateXPDisplay() {
         document.getElementById("userXPDisplay").innerText = userXP + " XP";
@@ -1048,14 +1136,14 @@
 
       function addXP(amount, message) {
         userXP += amount;
-        localStorage.setItem("smartrecipe_xp", userXP);
+        localStorage.setItem("budgetbites_xp", userXP);
         updateXPDisplay();
 
         // Show floating toast
         const toast = document.createElement("div");
         toast.innerHTML = `<i class="fas fa-star text-warning"></i> +${amount} XP: ${message}`;
         toast.style.cssText =
-          "position:fixed; top:20px; right:20px; background:white; padding:12px 20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.2); z-index:9999; font-weight:700; color:#E07A5F; animation: slideIn 0.3s ease-out;";
+          "position:fixed; top:20px; right:20px; background:white; padding:12px 20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.2); z-index:9999; font-weight:700; color:#A7F3D0; animation: slideIn 0.3s ease-out;";
         document.body.appendChild(toast);
         setTimeout(() => {
           toast.style.animation = "slideOut 0.3s ease-in forwards";

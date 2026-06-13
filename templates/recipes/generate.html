@@ -1630,6 +1630,9 @@
       const stepElements = cardElement.querySelectorAll('.instruction-text');
       cookingSteps = Array.from(stepElements).map(el => el.innerText.trim());
       
+      const ingElements = cardElement.querySelectorAll('.ingredient-text');
+      cookingIngredients = Array.from(ingElements).map(el => el.innerText.trim());
+      
       if (cookingSteps.length === 0) {
           alert("No instructions found!");
           return;
@@ -1637,6 +1640,20 @@
 
       currentStepIndex = 0;
       document.getElementById('cooking-recipe-name').innerText = recipeName;
+      
+      // Inject timeline
+      const timelineHtml = cookingSteps.map((step, idx) => `
+          <div id="timeline-step-${idx}" class="d-flex align-items-start mb-4 position-relative" style="cursor: pointer; opacity: 0.5; transition: opacity 0.3s;" onclick="jumpToCookingStep(${idx})">
+              <div class="timeline-line ${idx === 0 ? 'active' : ''}"></div>
+              <div class="timeline-dot ${idx === 0 ? 'active' : ''}"></div>
+              <div style="margin-left: 30px; padding-top: 2px;">
+                  <div style="font-weight: 800; font-size: 0.85rem; color: #9CA3AF; margin-bottom: 4px; letter-spacing: 1px;">STEP ${idx + 1}</div>
+                  <div style="font-size: 0.95rem; color: #E5E7EB; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${step}</div>
+              </div>
+          </div>
+      `).join('');
+      document.getElementById('cooking-timeline').innerHTML = timelineHtml;
+
       updateCookingOverlay();
       
       // Show overlay
@@ -1646,26 +1663,130 @@
       speakStep();
   }
 
+  function jumpToCookingStep(idx) {
+      currentStepIndex = idx;
+      updateCookingOverlay();
+      speakStep();
+  }
+
   function closeCookingMode() {
       document.getElementById('cooking-overlay').style.display = 'none';
+      document.getElementById('cooking-completion-screen').style.display = 'none';
+      document.getElementById('cooking-completion-screen').style.opacity = '0';
       if (synth) synth.cancel();
       if (overlayTimerInterval) clearInterval(overlayTimerInterval);
       if (handsFreeRec && handsFreeRec.running) handsFreeRec.stop();
   }
 
   function updateCookingOverlay() {
-      document.getElementById('cooking-step-number').innerText = 'Step ' + (currentStepIndex + 1) + ' of ' + cookingSteps.length;
-      document.getElementById('cooking-step-text').innerText = cookingSteps[currentStepIndex];
+      document.getElementById('cooking-step-number').innerText = 'STEP ' + (currentStepIndex + 1);
+      const textElem = document.getElementById('cooking-step-text');
+      textElem.style.opacity = '0';
+      textElem.style.transform = 'translateY(15px)';
+      
+      const text = cookingSteps[currentStepIndex];
+      const lowerText = text.toLowerCase();
+      setTimeout(() => {
+          textElem.innerText = text;
+          textElem.style.opacity = '1';
+          textElem.style.transform = 'translateY(0)';
+      }, 300);
+      
+      // Update Timeline styles
+      cookingSteps.forEach((_, idx) => {
+          const item = document.getElementById('timeline-step-' + idx);
+          if (item) {
+              item.classList.remove('active', 'completed');
+              item.style.opacity = '0.5';
+              const dot = item.querySelector('.timeline-dot');
+              dot.classList.remove('active', 'completed');
+              
+              if (idx < currentStepIndex) {
+                  item.classList.add('completed');
+                  dot.classList.add('completed');
+                  item.style.opacity = '0.8';
+              } else if (idx === currentStepIndex) {
+                  item.classList.add('active');
+                  dot.classList.add('active');
+                  item.style.opacity = '1';
+                  item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+          }
+      });
+
+      // Update Progress Bar
+      const progressPercent = ((currentStepIndex + 1) / cookingSteps.length) * 100;
+      document.getElementById('cooking-progress-bar').style.width = progressPercent + '%';
+
+      // Reactive Ambient Lighting
+      const bg1 = document.getElementById('ambient-light-1');
+      const bg2 = document.getElementById('ambient-light-2');
+      if (lowerText.includes('heat') || lowerText.includes('boil') || lowerText.includes('fry') || lowerText.includes('cook')) {
+          bg1.style.background = 'rgba(239, 68, 68, 0.4)';
+          bg2.style.background = 'rgba(245, 158, 11, 0.4)';
+      } else if (lowerText.includes('cool') || lowerText.includes('wash') || lowerText.includes('water')) {
+          bg1.style.background = 'rgba(59, 130, 246, 0.4)';
+          bg2.style.background = 'rgba(14, 165, 233, 0.4)';
+      } else {
+          bg1.style.background = 'rgba(5, 150, 105, 0.4)';
+          bg2.style.background = 'rgba(59, 130, 246, 0.4)';
+      }
+
+      // Update "Needed Now" Widget
+      const neededWidget = document.getElementById('cooking-needed-now');
+      const neededContainer = document.getElementById('cooking-needed-items');
+      const foundIngredients = [];
+      
+      if (cookingIngredients && cookingIngredients.length > 0) {
+          cookingIngredients.forEach(ing => {
+              const mainWord = ing.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '');
+              if (mainWord.length > 2 && lowerText.includes(mainWord)) {
+                  foundIngredients.push(ing);
+              }
+          });
+      }
+      
+      if (foundIngredients.length > 0) {
+          neededContainer.innerHTML = foundIngredients.map(ing => `
+              <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; color: white;">
+                  <i class="fas fa-check-circle" style="color: #34D399; margin-right: 6px;"></i> ${ing}
+              </div>
+          `).join('');
+          neededWidget.style.display = 'block';
+          setTimeout(() => {
+              neededWidget.style.opacity = '1';
+              neededWidget.style.transform = 'translateY(0)';
+          }, 50);
+      } else {
+          neededContainer.innerHTML = `
+              <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); padding: 12px; border-radius: 10px; font-size: 0.85rem; color: #E5E7EB; text-align: center; font-weight: 600;">
+                  <i class="fas fa-hand-sparkles" style="color: #A78BFA; font-size: 1.2rem; margin-bottom: 6px; display: block;"></i>
+                  Focus on Technique!
+                  <div style="font-size: 0.7rem; font-weight: 400; color: #9CA3AF; margin-top: 4px;">No new ingredients needed here.</div>
+              </div>
+          `;
+          neededWidget.style.display = 'block';
+          setTimeout(() => {
+              neededWidget.style.opacity = '1';
+              neededWidget.style.transform = 'translateY(0)';
+          }, 50);
+      }
       
       // Check for Smart Timer
-      const text = cookingSteps[currentStepIndex];
       const timeMatch = text.match(/\b(\d+)\s*(?:min|minute|minutes)\b/i);
       const timerDiv = document.getElementById('cooking-smart-timer');
       if (timeMatch) {
           const mins = parseInt(timeMatch[1]);
-          document.getElementById('cooking-timer-btn').innerHTML = `<i class="fas fa-clock me-2"></i> Start ${mins} Min Timer`;
-          document.getElementById('cooking-timer-btn').onclick = function() { startOverlayTimer(mins, this); };
-          timerDiv.style.display = 'block';
+          document.getElementById('cooking-timer-text').innerText = `${mins} MIN`;
+          const btn = document.getElementById('cooking-timer-btn');
+          btn.onclick = function() { startOverlayTimer(mins, this); };
+          
+          btn.style.background = 'rgba(5, 150, 105, 0.1)';
+          btn.style.color = '#34D399';
+          btn.style.borderColor = '#059669';
+          document.getElementById('cooking-timer-icon').className = 'fas fa-play';
+          
+          timerDiv.style.display = 'flex';
       } else {
           timerDiv.style.display = 'none';
       }
@@ -1676,12 +1797,51 @@
       
       const nextBtn = document.getElementById('cooking-next-btn');
       if (currentStepIndex === cookingSteps.length - 1) {
-          nextBtn.innerHTML = '<i class="fas fa-check me-2"></i> Finish';
-          nextBtn.classList.replace('btn-light', 'btn-success');
+          nextBtn.innerHTML = '<i class="fas fa-flag"></i>';
+          nextBtn.style.background = '#EC4899';
+          nextBtn.style.boxShadow = '0 10px 25px rgba(236, 72, 153, 0.4)';
       } else {
-          nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right ms-2"></i>';
-          nextBtn.classList.replace('btn-success', 'btn-light');
+          nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+          nextBtn.style.background = '#059669';
+          nextBtn.style.boxShadow = '0 10px 25px rgba(5, 150, 105, 0.4)';
       }
+  }
+
+  function showCompletionScreen() {
+      if (synth) synth.cancel();
+      const compScreen = document.getElementById('cooking-completion-screen');
+      compScreen.style.display = 'flex';
+      
+      // Animate in
+      setTimeout(() => {
+          compScreen.style.opacity = '1';
+          
+          // Trigger confetti
+          confetti({ particleCount: 150, spread: 80, origin: { y: 0.3 }, colors: ['#10B981', '#FBBF24', '#EC4899'] });
+          setTimeout(() => {
+              confetti({ particleCount: 100, spread: 120, origin: { y: 0.3 }, colors: ['#3B82F6', '#8B5CF6'] });
+          }, 400);
+
+          // Animate XP Bar
+          setTimeout(() => {
+              document.getElementById('completion-xp-bar').style.width = '75%';
+          }, 600);
+      }, 50);
+  }
+
+  function triggerCameraShare() {
+      // Simulate opening camera for Cookbook photo
+      const btn = event.currentTarget;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Opening Camera...';
+      setTimeout(() => {
+          btn.innerHTML = '<i class="fas fa-check-circle me-2"></i> Saved to Cookbook!';
+          btn.style.background = 'linear-gradient(135deg, #10B981, #059669)';
+          setTimeout(() => {
+              btn.innerHTML = originalText;
+              btn.style.background = 'linear-gradient(135deg, #EC4899, #8B5CF6)';
+          }, 3000);
+      }, 1500);
   }
 
   function nextCookingStep() {
@@ -1988,45 +2148,179 @@
 </script>
 
 <!-- Full Screen Cooking Overlay HTML -->
-<div id="cooking-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #064E3B, #059669); z-index: 1050; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 20px;">
+<div id="cooking-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #111827; z-index: 1050; flex-direction: column; color: white;">
     
-    <button onclick="closeCookingMode()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: none; color: white; width: 50px; height: 50px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; backdrop-filter: blur(10px);">
-        <i class="fas fa-times"></i>
-    </button>
-
-    <div style="text-align: center; max-width: 800px; width: 100%;">
-        <h4 id="cooking-recipe-name" style="color: #fde68a; font-weight: 800; margin-bottom: 30px; letter-spacing: 1px; text-transform: uppercase;">Recipe Name</h4>
+    <!-- BRANDED TOP NAVBAR (CANVA-STYLE) -->
+    <div style="height: 70px; background: rgba(255,255,255,0.02); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 20; flex-shrink: 0; position: relative;">
+        <!-- Glowing Progress Bar -->
+        <div id="cooking-progress-bar" style="position: absolute; top: 0; left: 0; height: 3px; background: #10B981; width: 0%; transition: width 0.4s ease-out; box-shadow: 0 0 10px #10B981, 0 0 20px #10B981;"></div>
         
-        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); border-radius: 30px; padding: 50px 30px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
-            <div id="cooking-step-number" style="background: rgba(255,255,255,0.2); display: inline-block; padding: 8px 20px; border-radius: 20px; font-weight: 700; margin-bottom: 20px; letter-spacing: 1px;">Step 1 of 5</div>
-            
-            <p id="cooking-step-text" style="font-size: clamp(1.5rem, 5vw, 2.5rem); font-weight: 800; line-height: 1.4; margin-bottom: 40px;">
-                Chop the onions and tomatoes finely.
-            </p>
-
-            <div id="cooking-smart-timer" style="display: none; margin-bottom: 30px;">
-                <button id="cooking-timer-btn" class="btn btn-warning btn-lg rounded-pill px-5 shadow-lg" style="font-weight: 800; font-size: 1.2rem; background: linear-gradient(135deg, #f59e0b, #fbbf24); border: none; color: white;">
-                    <i class="fas fa-clock me-2"></i> Start Timer
-                </button>
-            </div>
-
-            <div class="d-flex justify-content-center gap-3">
-                <button id="cooking-prev-btn" onclick="prevCookingStep()" class="btn btn-outline-light btn-lg rounded-pill px-4" style="font-weight: 700;">
-                    <i class="fas fa-arrow-left me-2"></i> Prev
-                </button>
-                <button onclick="speakStep()" class="btn btn-outline-light btn-lg rounded-pill px-4" style="font-weight: 700;" title="Read Aloud">
-                    <i class="fas fa-volume-up"></i>
-                </button>
-                <button id="handsfree-btn" onclick="toggleHandsFree()" class="btn btn-outline-light btn-lg rounded-pill px-4" style="font-weight: 700;" title="Hands-Free Voice Control">
-                    <i class="fas fa-microphone"></i>
-                </button>
-                <button id="cooking-next-btn" onclick="nextCookingStep()" class="btn btn-light btn-lg rounded-pill px-4" style="font-weight: 700; color: #064E3B;">
-                    Next <i class="fas fa-arrow-right ms-2"></i>
-                </button>
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2">
+                <div style="background: linear-gradient(135deg, #10B981, #059669); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(16,185,129,0.3);">🍳</div>
+                <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <span style="font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; line-height: 1; background: linear-gradient(to right, #ffffff, #A7F3D0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BudgetBites</span>
+                    <span style="font-size: 0.65rem; color: #9CA3AF; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px;">Cook Smart. Spend Less.</span>
+                </div>
             </div>
         </div>
+        <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34D399; padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">
+            <i class="fas fa-magic me-2"></i> Kitchen AI Engine
+        </div>
+        <button onclick="closeCookingMode()" class="btn" style="background: rgba(239, 68, 68, 0.1); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 20px; font-weight: 700; font-size: 0.85rem; padding: 6px 18px; transition: all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">
+            Exit Kitchen <i class="fas fa-times ms-2"></i>
+        </button>
     </div>
+
+    <!-- MAIN ROW CONTAINER -->
+    <div style="flex: 1; display: flex; flex-direction: row; min-height: 0; position: relative;">
+
+        <!-- LEFT SIDEBAR: TIMELINE -->
+        <div style="width: 350px; background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; padding: 30px; box-shadow: 10px 0 30px rgba(0,0,0,0.5); z-index: 10;">
+            <div class="mb-4">
+                <h5 id="cooking-recipe-name" style="color: #A7F3D0; font-weight: 800; margin: 0 0 4px 0; line-height: 1.3;">Recipe Name</h5>
+                <span style="font-size: 0.8rem; color: #9CA3AF; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Cooking Timeline</span>
+            </div>
+            
+            <div id="cooking-timeline" style="flex: 1; overflow-y: auto; padding-right: 10px; position: relative; margin-left: 5px;">
+                <!-- Timeline steps will be injected here by JS -->
+            </div>
+        </div>
+
+        <!-- MAIN STAGE: TELEPROMPTER & TIMER -->
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; position: relative; overflow: hidden;">
+            
+            <div style="max-width: 900px; width: 100%; text-align: center; position: relative; z-index: 2;">
+                <div id="cooking-step-number" style="background: rgba(5, 150, 105, 0.2); color: #34D399; display: inline-block; padding: 8px 24px; border-radius: 30px; font-weight: 800; font-size: 0.9rem; margin-bottom: 30px; letter-spacing: 2px; border: 1px solid rgba(5, 150, 105, 0.3);">STEP 1</div>
+                
+                <p id="cooking-step-text" style="font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 900; line-height: 1.3; margin-bottom: 50px; color: #F9FAFB; text-shadow: 0 4px 20px rgba(0,0,0,0.5); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateY(0); opacity: 1;">
+                    Instruction text goes here.
+                </p>
+
+                <!-- SMART TIMER -->
+                <div id="cooking-smart-timer" style="display: none; margin-bottom: 40px; justify-content: center;">
+                    <button id="cooking-timer-btn" class="btn rounded-circle p-0" style="width: 140px; height: 140px; background: rgba(5, 150, 105, 0.1); border: 4px solid #059669; color: #34D399; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(5, 150, 105, 0.2); transition: all 0.3s; margin: 0 auto;">
+                        <i class="fas fa-play" id="cooking-timer-icon" style="font-size: 2rem; margin-bottom: 8px;"></i>
+                        <span id="cooking-timer-text" style="font-weight: 800; font-size: 1.1rem; text-transform: uppercase;">START</span>
+                    </button>
+                </div>
+
+                <!-- CONTROLS -->
+                <div class="d-flex justify-content-center align-items-center gap-4 mt-5">
+                    <button id="cooking-prev-btn" onclick="prevCookingStep()" class="btn btn-dark rounded-circle d-flex justify-content-center align-items-center" style="width: 60px; height: 60px; font-size: 1.2rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button onclick="speakStep()" class="btn btn-dark rounded-circle d-flex justify-content-center align-items-center" style="width: 70px; height: 70px; font-size: 1.4rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px); transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <button id="handsfree-btn" onclick="toggleHandsFree()" class="btn btn-dark rounded-circle d-flex justify-content-center align-items-center" style="width: 70px; height: 70px; font-size: 1.4rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px); position: relative; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+                        <i class="fas fa-microphone"></i>
+                        <div id="listening-ring" style="position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px; border-radius: 50%; border: 2px solid #3B82F6; display: none; animation: pulseRing 1.5s infinite;"></div>
+                    </button>
+                    <button id="cooking-next-btn" onclick="nextCookingStep()" class="btn btn-success rounded-circle d-flex justify-content-center align-items-center" style="width: 60px; height: 60px; font-size: 1.2rem; background: #059669; border: none; box-shadow: 0 10px 25px rgba(5, 150, 105, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Ambient Background -->
+            <div id="ambient-light-1" style="position: absolute; top: -100px; right: -100px; width: 600px; height: 600px; background: rgba(5, 150, 105, 0.4); filter: blur(120px); border-radius: 50%; z-index: 0; pointer-events: none; transition: background 1s ease;"></div>
+            <div id="ambient-light-2" style="position: absolute; bottom: -100px; left: 50px; width: 500px; height: 500px; background: rgba(59, 130, 246, 0.4); filter: blur(120px); border-radius: 50%; z-index: 0; pointer-events: none; transition: background 1s ease;"></div>
+
+            <!-- "Needed Now" Smart Widget -->
+            <div id="cooking-needed-now" style="position: absolute; top: 30px; right: 30px; background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; width: 280px; z-index: 10; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transform: translateY(-20px); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="fas fa-magic" style="color: #FBBF24;"></i>
+                    <h6 style="color: #F9FAFB; margin: 0; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.5px;">NEEDED NOW</h6>
+                </div>
+                <div id="cooking-needed-items" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Items injected via JS -->
+                </div>
+            </div>
+
+            <!-- COMPLETION SCREEN OVERLAY -->
+            <div id="cooking-completion-screen" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(25px); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s ease; padding: 40px; overflow-y: auto;">
+                
+                <div style="max-width: 800px; width: 100%; text-align: center; margin-top: auto; margin-bottom: auto;">
+                    <!-- Section 1: XP Level-Up -->
+                    <div style="margin-bottom: 40px;">
+                        <div style="font-size: 5rem; margin-bottom: 20px; text-shadow: 0 0 40px rgba(251, 191, 36, 0.5); animation: pulseRing 3s ease-in-out infinite;">🏆</div>
+                        <h2 style="font-weight: 900; font-size: 3rem; color: #F9FAFB; margin-bottom: 10px;">Recipe Mastered!</h2>
+                        <div class="d-inline-block px-4 py-2" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10B981; border-radius: 30px; color: #34D399; font-weight: 800; font-size: 1.2rem; box-shadow: 0 0 20px rgba(16,185,129,0.3);">
+                            +150 XP Earned
+                        </div>
+                        <div style="margin-top: 20px; width: 300px; height: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-left: auto; margin-right: auto; overflow: hidden; position: relative;">
+                            <div id="completion-xp-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10B981, #34D399); transition: width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Cards Row -->
+                    <div class="row g-4 mb-5 text-start">
+                        <!-- Post-Meal Breakdown -->
+                        <div class="col-md-6">
+                            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 30px; height: 100%; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                                <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(59, 130, 246, 0.2); filter: blur(40px); border-radius: 50%;"></div>
+                                <h5 style="color: #60A5FA; font-weight: 800; margin-bottom: 20px; position: relative;"><i class="fas fa-receipt me-2"></i> Meal Breakdown</h5>
+                                <div class="d-flex justify-content-between mb-3 position-relative">
+                                    <span style="color: #9CA3AF;">Est. Cost Saved</span>
+                                    <span style="font-weight: 800; color: #34D399;">₹300+</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3 position-relative">
+                                    <span style="color: #9CA3AF;">Cooking Time</span>
+                                    <span style="font-weight: 800; color: #F9FAFB;" id="completion-time">25 mins</span>
+                                </div>
+                                <div class="d-flex justify-content-between pt-3 position-relative" style="border-top: 1px dashed rgba(255,255,255,0.1);">
+                                    <span style="color: #9CA3AF;">Total Calories</span>
+                                    <span style="font-weight: 800; color: #FBBF24;" id="completion-cals">450 kcal</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- AI Plating Tip -->
+                        <div class="col-md-6">
+                            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 30px; height: 100%; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                                <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(245, 158, 11, 0.2); filter: blur(40px); border-radius: 50%;"></div>
+                                <h5 style="color: #FBBF24; font-weight: 800; margin-bottom: 20px; position: relative;"><i class="fas fa-star me-2"></i> The Chef's Touch</h5>
+                                <p style="color: #E5E7EB; line-height: 1.6; font-size: 0.95rem; margin: 0; position: relative;" id="completion-tip">
+                                    Great job finishing! For a restaurant-quality finish, plate carefully and wipe the edges.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Snap & Share -->
+                    <button onclick="triggerCameraShare()" class="btn w-100" style="background: linear-gradient(135deg, #EC4899, #8B5CF6); color: white; border: none; border-radius: 20px; padding: 20px; font-weight: 800; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(236, 72, 153, 0.4); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <i class="fas fa-camera me-2"></i> Snap & Save to Cookbook
+                    </button>
+                </div>
+                
+                <button onclick="closeCookingMode()" class="btn mt-4" style="color: #9CA3AF; text-decoration: underline; background: transparent; border: none;">Close to Dashboard</button>
+
+            </div>
+
+        </div>
+    </div> <!-- END MAIN ROW CONTAINER -->
 </div>
+
+<style>
+@keyframes pulseRing {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.3); opacity: 0; }
+}
+.timeline-dot {
+    width: 14px; height: 14px; border-radius: 50%; background: #374151; position: absolute; left: 0; top: 4px; z-index: 2; border: 2px solid #111827; transition: all 0.3s;
+}
+.timeline-dot.active {
+    background: #10B981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.8); transform: scale(1.3);
+}
+.timeline-dot.completed {
+    background: #059669; border-color: #059669;
+}
+.timeline-line {
+    position: absolute; left: 6px; top: 18px; bottom: -8px; width: 2px; background: #374151; z-index: 1; transition: background 0.3s;
+}
+.timeline-line.active { background: #059669; }
+</style>
 
 <!-- Fridge Scanner Overlay -->
 <style>

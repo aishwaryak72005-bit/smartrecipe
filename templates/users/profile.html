@@ -1,5 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+  .dark-mode .profile-stat-value {
+    color: #10B981 !important;
+  }
+  .dark-mode .profile-xp-value {
+    color: #F59E0B !important;
+  }
+  .dark-mode .profile-theme-text {
+    color: #A78BFA !important;
+  }
+</style>
 <div class="row justify-content-center mt-2">
   <div class="col-lg-8">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -30,7 +41,7 @@
               </div>
               <div>
                 <p class="mb-0 text-muted" style="font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Saved Recipes</p>
-                <h3 class="fw-bold mb-0" style="color: #064E3B;">{{ saved_recipes_count }}</h3>
+                <h3 class="fw-bold mb-0 profile-stat-value" style="color: #064E3B;">{{ saved_recipes_count }}</h3>
               </div>
             </div>
           </div>
@@ -43,7 +54,7 @@
               </div>
               <div>
                 <p class="mb-0 text-muted" style="font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Experience (XP)</p>
-                <h3 class="fw-bold mb-0" style="color: #92400E;" id="profileXPDisplay">0 XP</h3>
+                <h3 class="fw-bold mb-0 profile-xp-value" style="color: #92400E;" id="profileXPDisplay">0 XP</h3>
               </div>
             </div>
           </div>
@@ -57,7 +68,7 @@
             <i class="fas fa-moon" id="themeIcon"></i>
           </div>
           <div>
-            <h6 class="fw-bold mb-1" style="color: #4C1D95;" id="themeText">Dark Mode</h6>
+            <h6 class="fw-bold mb-1 profile-theme-text" style="color: #4C1D95;" id="themeText">Dark Mode</h6>
             <p class="mb-0 text-muted" style="font-size: 0.85rem;">Toggle between dark and light themes</p>
           </div>
         </div>
@@ -107,12 +118,14 @@
             themeIcon.className = 'fas fa-moon';
             themeText.textContent = 'Dark Mode';
             htmlEl.setAttribute('data-bs-theme', 'dark');
+            htmlEl.classList.add('dark-mode');
             bodyEl.classList.remove('light-mode');
         } else {
             localStorage.setItem('theme', 'light');
             themeIcon.className = 'fas fa-sun';
             themeText.textContent = 'Light Mode';
             htmlEl.setAttribute('data-bs-theme', 'light');
+            htmlEl.classList.remove('dark-mode');
             bodyEl.classList.add('light-mode');
         }
     });

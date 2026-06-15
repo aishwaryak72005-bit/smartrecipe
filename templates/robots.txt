@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+Allow: /generate/
+Allow: /suggest/
+Allow: /meal-planner/
+Allow: /cooking-tips/
+Allow: /saved-recipes/
+
+# Block private/auth areas from indexing
+Disallow: /admin/
+Disallow: /login/
+Disallow: /register/
+Disallow: /save-recipe/
+Disallow: /delete-recipe/
+Disallow: /api/
+Disallow: /meal-planner/save/
+Disallow: /meal-planner/delete/
+
+# Block static files that aren't useful for SEO
+Disallow: /static/
+
+# Sitemap location
+Sitemap: https://smartrecipe-okjh.onrender.com/sitemap.xml

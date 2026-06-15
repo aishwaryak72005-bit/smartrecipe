@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://smartrecipe-okjh.onrender.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Recipe Generator -->
+  <url>
+    <loc>https://smartrecipe-okjh.onrender.com/generate/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Recipe Suggestion -->
+  <url>
+    <loc>https://smartrecipe-okjh.onrender.com/suggest/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Meal Planner -->
+  <url>
+    <loc>https://smartrecipe-okjh.onrender.com/meal-planner/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Cooking Tips -->
+  <url>
+    <loc>https://smartrecipe-okjh.onrender.com/cooking-tips/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Saved Recipes -->
+  <url>
+    <loc>https://smartrecipe-okjh.onrender.com/saved-recipes/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>

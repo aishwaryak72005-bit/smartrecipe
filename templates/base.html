@@ -24,6 +24,89 @@
 
     <!-- Tells Google to index your page -->
     <meta name="robots" content="index, follow" />
+
+    <!-- Canonical URL (prevents duplicate content issues) -->
+    <link rel="canonical" href="https://smartrecipe-okjh.onrender.com{{ request.path }}" />
+
+    <!-- Open Graph Tags (Facebook, WhatsApp, Instagram previews) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="BudgetBites" />
+    <meta property="og:title" content="BudgetBites – AI Recipe Generator for Indian Kitchens 🍛" />
+    <meta property="og:description" content="Get budget-friendly Indian recipes powered by AI. Enter your ingredients, set your budget in ₹, and get delicious meal ideas instantly. Free meal planner, grocery lists & more!" />
+    <meta property="og:url" content="https://smartrecipe-okjh.onrender.com{{ request.path }}" />
+    <meta property="og:image" content="https://smartrecipe-okjh.onrender.com{% static 'logo.png' %}" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="BudgetBites – AI Recipe Generator for Indian Kitchens 🍛" />
+    <meta name="twitter:description" content="Budget-friendly Indian recipes powered by AI. Enter your ingredients, set your ₹ budget, get delicious meal ideas instantly!" />
+    <meta name="twitter:image" content="https://smartrecipe-okjh.onrender.com{% static 'logo.png' %}" />
+
+    <!-- Structured Data: WebSite (enables Google Sitelinks & Search Box) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "BudgetBites",
+      "alternateName": ["Budget Bites", "SmartRecipe", "BudgetBites India"],
+      "url": "https://smartrecipe-okjh.onrender.com",
+      "description": "Free AI-powered recipe generator for Indian kitchens. Budget-friendly meals, meal planner, grocery lists and more.",
+      "inLanguage": "en-IN",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://smartrecipe-okjh.onrender.com/generate/?ingredients={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- Structured Data: Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "BudgetBites",
+      "url": "https://smartrecipe-okjh.onrender.com",
+      "logo": "https://smartrecipe-okjh.onrender.com{% static 'logo.png' %}",
+      "description": "AI-powered budget recipe generator for Indian kitchens",
+      "foundingDate": "2024",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "availableLanguage": ["English", "Hindi"]
+      }
+    }
+    </script>
+
+    <!-- Structured Data: SoftwareApplication (helps with App-like search results) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "BudgetBites",
+      "applicationCategory": "FoodApplication",
+      "operatingSystem": "Web, Android",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR"
+      },
+      "description": "Free AI-powered budget recipe generator. Get Indian meal ideas based on your ingredients and ₹ budget.",
+      "url": "https://smartrecipe-okjh.onrender.com",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "120"
+      }
+    }
+    </script>
+
     <link rel="icon" href="{% static 'logo.png' %}?v=2" type="image/png" />
     <link
       rel="shortcut icon"

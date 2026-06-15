@@ -571,7 +571,7 @@
         <a class="navbar-brand d-flex align-items-center gap-2" href="/" style="padding: 0; text-decoration: none;">
           <img src="{% static 'logo.png' %}?v=2" alt="BudgetBites Logo" style="height: 40px; width: auto; object-fit: contain;">
           <div class="d-flex flex-column justify-content-center" style="line-height: 1;">
-            <span style="font-weight: 900; font-size: 1.4rem; color: #F8FAFC; letter-spacing: -0.5px;">Budget<span style="color: #10B981;">Bites</span></span>
+            <span style="font-weight: 900; font-size: 1.4rem; letter-spacing: -0.5px;">Budget<span style="color: #10B981;">Bites</span></span>
             <span style="font-size: 0.65rem; color: #10B981; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px;">Cook Smart. Spend Less. Eat Better.</span>
           </div>
         </a>
@@ -587,19 +587,19 @@
         <div class="collapse navbar-collapse" id="navbarNav" style="visibility: visible !important;">
           <div class="navbar-nav ms-auto align-items-center">
             {% if user.is_authenticated %}
-            <a class="nav-link text-white" href="/">
+            <a class="nav-link" href="/">
               <i class="fas fa-home me-1"></i> Home
             </a>
-            <a class="nav-link text-white" href="{% url 'suggest' %}">
+            <a class="nav-link" href="{% url 'suggest' %}">
               <i class="fas fa-lightbulb me-1"></i> Suggest
             </a>
-            <a class="nav-link text-white" href="{% url 'generate' %}">
+            <a class="nav-link" href="{% url 'generate' %}">
               <i class="fas fa-magic me-1"></i> Generate
             </a>
-            <a class="nav-link text-white" href="{% url 'saved_recipes' %}">
+            <a class="nav-link" href="{% url 'saved_recipes' %}">
               <i class="fas fa-heart me-1"></i> Saved
             </a>
-            <a class="nav-link text-white" href="{% url 'meal_planner' %}">
+            <a class="nav-link" href="{% url 'meal_planner' %}">
               <i class="fas fa-calendar-week me-1"></i> Meal Plan
             </a>
 
@@ -617,19 +617,19 @@
             </div>
 
             {% if user.is_staff %}
-            <a class="nav-link text-white me-1" href="{% url 'admin_dashboard' %}">
+            <a class="nav-link me-1" href="{% url 'admin_dashboard' %}">
               <i class="fas fa-user-shield me-1"></i> Admin
             </a>
             {% endif %}
 
-            <a class="nav-link nav-user-badge ms-2 text-white" href="{% url 'profile' %}">
+            <a class="nav-link nav-user-badge ms-2" href="{% url 'profile' %}">
               <i class="fas fa-user-circle me-1"></i> {{ user.username }}
             </a>
             <a class="nav-link nav-btn-white ms-2" href="{% url 'logout' %}">
               <i class="fas fa-sign-out-alt me-1"></i> Logout
             </a>
             {% else %}
-            <a class="nav-link text-white" href="{% url 'login' %}">
+            <a class="nav-link" href="{% url 'login' %}">
               <i class="fas fa-sign-in-alt me-1"></i> Login
             </a>
             <a class="nav-link nav-btn-white" href="{% url 'register' %}">

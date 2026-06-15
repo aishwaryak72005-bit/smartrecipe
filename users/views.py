@@ -62,6 +62,23 @@ def profile_view(request):
     }
     return render(request, 'users/profile.html', context)
 
+
+@login_required
+def update_email_view(request):
+    """Allow existing users to add or update their email address."""
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        if not email:
+            messages.error(request, 'Please enter a valid email address.')
+        elif User.objects.filter(email=email).exclude(pk=request.user.pk).exists():
+            messages.error(request, 'That email is already used by another account.')
+        else:
+            request.user.email = email
+            request.user.save()
+            messages.success(request, '✅ Email updated successfully! You can now use Forgot Password.')
+    return redirect('profile')
+
+
 # ==========================================
 # CUSTOM ADMIN USER DASHBOARD
 # ==========================================

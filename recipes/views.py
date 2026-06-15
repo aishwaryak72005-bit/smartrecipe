@@ -419,6 +419,33 @@ def parse_recipes(ai_response):
                     recipe['image_url'] = get_wiki_image(recipe['name'])
                 except:
                     recipe['image_url'] = ''
+
+                # Clean up cost
+                cost_str = recipe.get('cost', '')
+                cost_clean = re.sub(r'[^\d]', '', cost_str)
+                if cost_clean:
+                    recipe['cost'] = cost_clean
+                else:
+                    recipe['cost'] = cost_str.replace('₹', '').replace('Rs.', '').replace('Rs', '').replace('INR', '').strip()
+
+                # Clean up restaurant price
+                rest_str = recipe.get('restaurant_price', '')
+                rest_clean = re.sub(r'[^\d]', '', rest_str)
+                if rest_clean:
+                    recipe['restaurant_price'] = rest_clean
+                else:
+                    recipe['restaurant_price'] = rest_str.replace('₹', '').replace('Rs.', '').replace('Rs', '').replace('INR', '').strip()
+
+                # Calculate a fallback restaurant price in Python if not present
+                try:
+                    cost_val = int(recipe['cost'])
+                except ValueError:
+                    digits = re.findall(r'\d+', recipe['cost'])
+                    cost_val = int(digits[0]) if digits else 0
+
+                if (not recipe['restaurant_price'] or recipe['restaurant_price'] == '') and cost_val > 0:
+                    recipe['restaurant_price'] = str(cost_val + 50)
+
                 recipes.append(recipe)
         except Exception as e:
             print(f"Error parsing recipe {i}: {e}")

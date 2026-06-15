@@ -3,6 +3,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
+    darkMode: ['class', '.dark-mode'],
     corePlugins: {
       preflight: false,
     },
@@ -28,17 +29,17 @@
     <div class="row align-items-center mb-5 mt-4">
       <div class="col-lg-6 mb-5 mb-lg-0 pr-lg-5">
         <span class="badge-pill" style="background: rgba(16, 185, 129, 0.1); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 8px 16px; border-radius: 30px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; margin-bottom: 20px; display: inline-block;">🤖 AI Powered Kitchen</span>
-        <h1 class="fw-bold mb-4" style="color: #F8FAFC; font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -1px; line-height: 1.1;">
+        <h1 class="fw-bold mb-4 page-hero-title" style="font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -1px; line-height: 1.1;">
           Cook Delicious Meals Within <span style="color: #10B981;">Your Budget</span>
         </h1>
-        <p class="mb-5" style="color: #9CA3AF; font-size: 1.25rem; max-width: 550px; line-height: 1.6;">
+        <p class="mb-5 page-hero-desc" style="font-size: 1.25rem; max-width: 550px; line-height: 1.6;">
           Generate affordable, restaurant-quality AI-powered recipes using the ingredients you already have at home.
         </p>
         <div class="d-flex flex-wrap gap-3">
           <button onclick="document.getElementById('recipeForm').scrollIntoView({behavior: 'smooth'})" class="btn" style="background: #10B981; color: white; border-radius: 14px; padding: 14px 32px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3); transition: all 0.3s; border: none;">
             Generate Recipes <i class="fas fa-magic ms-2"></i>
           </button>
-          <a href="{% url 'home' %}" class="btn" style="background: rgba(255,255,255,0.05); color: #F8FAFC; border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px 32px; font-weight: 700; font-size: 1.1rem; transition: all 0.3s;">
+          <a href="{% url 'home' %}" class="btn page-hero-btn" style="border-radius: 14px; padding: 14px 32px; font-weight: 700; font-size: 1.1rem; transition: all 0.3s;">
             Explore Recipes
           </a>
         </div>

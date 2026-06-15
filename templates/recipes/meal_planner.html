@@ -94,6 +94,26 @@
     background: rgba(255, 255, 255, 0.1);
     color: #F9FAFB;
   }
+  .dark-mode h2[style*="color:#1F2937"] {
+    color: #F9FAFB !important;
+  }
+  .dark-mode div[style*="color:#1F2937"] {
+    color: #F9FAFB !important;
+  }
+  .dark-mode .card[style*="border:2px solid #1F2937"] {
+    border-color: #10B981 !important;
+  }
+  .dark-mode .card[style*="border: 2px solid #1F2937"] {
+    border-color: #10B981 !important;
+  }
+  .dark-mode .planner-slot.filled div[style*="color:#1F2937"],
+  .dark-mode .planner-slot.filled p[style*="color:#1F2937"] {
+    color: #F9FAFB !important;
+  }
+  .dark-mode #weeklySummary div[style*="color:#1F2937"],
+  .dark-mode #weeklySummary div[style*="color: #1F2937"] {
+    color: #F9FAFB !important;
+  }
   .summary-badge {
     background: #ecfdf5;
     color: #1F2937; border-radius: 20px;
@@ -266,7 +286,7 @@
         style="border-radius:12px; border:2px solid #d1fae5; padding:12px 14px;">
     </div>
 
-    <button onclick="saveMeal()" class="btn w-100" style="background:#1F2937; color:white; border-radius:14px; padding:14px;">
+    <button onclick="saveMeal()" class="btn btn-purple w-100">
       Save Meal
     </button>
   </div>

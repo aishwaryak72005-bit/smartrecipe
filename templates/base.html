@@ -3,10 +3,30 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="google-site-verification" content="hMARXpSMRjyUTV4DIZMTfXsOpJFQBj2GOPdZAkXJk54" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BudgetBites - Cook Smart. Spend Less. Eat Better.</title>
-    <link rel="icon" href="{% static 'logo.png' %}?v=2" type="image/png">
-    <link rel="shortcut icon" href="{% static 'logo.png' %}?v=2" type="image/png">
+    <!-- Page Title -->
+    <!-- Description Google shows under your link -->
+    <meta
+      name="description"
+      content="BudgetBites is a free AI-powered recipe generator for Indian kitchens. Get budget-friendly recipes in ₹, meal planning, grocery lists and more."
+    />
+
+    <!-- Keywords -->
+    <meta
+      name="keywords"
+      content="BudgetBites, AI recipe generator, Indian recipes, budget meals, meal planner India"
+    />
+
+    <!-- Tells Google to index your page -->
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="{% static 'logo.png' %}?v=2" type="image/png" />
+    <link
+      rel="shortcut icon"
+      href="{% static 'logo.png' %}?v=2"
+      type="image/png"
+    />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -26,27 +46,27 @@
       }
       /* Light Theme (Default) */
       body {
-        background: #F8FAFC; 
+        background: #f8fafc;
         min-height: 100vh;
         padding-top: 80px;
-        color: #1E293B;
+        color: #1e293b;
       }
       .navbar {
         background: rgba(255, 255, 255, 0.95) !important;
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         padding: 10px 0;
       }
       .navbar-brand {
-        color: #0F172A !important;
+        color: #0f172a !important;
         font-size: 1.5rem;
         font-weight: 800;
         letter-spacing: -0.5px;
       }
       .brand-highlight {
-        color: #22C55E;
+        color: #22c55e;
       }
       .nav-link {
         color: rgba(15, 23, 42, 0.8) !important;
@@ -61,8 +81,8 @@
         color: #000000 !important;
       }
       .nav-btn-white {
-        background: #22C55E !important;
-        color: #FFFFFF !important;
+        background: #22c55e !important;
+        color: #ffffff !important;
         font-weight: 600 !important;
         padding: 8px 24px !important;
         border-radius: 12px !important;
@@ -72,22 +92,22 @@
       }
       .nav-btn-white:hover {
         transform: translateY(-1px);
-        background: #16A34A !important;
+        background: #16a34a !important;
         box-shadow: 0 6px 16px rgba(34, 197, 94, 0.35);
       }
       .nav-user-badge {
-        background: #F0FDF4;
-        color: #15803D !important;
+        background: #f0fdf4;
+        color: #15803d !important;
         border-radius: 12px;
         padding: 8px 16px !important;
         font-weight: 600 !important;
-        border: 1px solid #BBF7D0;
+        border: 1px solid #bbf7d0;
       }
 
       /* ── BUTTONS ── */
       .btn-primary-brand {
-        background: #22C55E;
-        color: #FFFFFF;
+        background: #22c55e;
+        color: #ffffff;
         border: none;
         border-radius: 14px;
         padding: 14px 32px;
@@ -98,13 +118,13 @@
       }
       .btn-primary-brand:hover {
         transform: translateY(-2px);
-        background: #16A34A;
-        color: #FFFFFF;
+        background: #16a34a;
+        color: #ffffff;
         box-shadow: 0 12px 24px rgba(34, 197, 94, 0.35);
       }
       .btn-accent {
-        background: #F97316;
-        color: #FFFFFF;
+        background: #f97316;
+        color: #ffffff;
         border: none;
         border-radius: 14px;
         padding: 14px 32px;
@@ -115,22 +135,22 @@
       }
       .btn-accent:hover {
         transform: translateY(-2px);
-        background: #EA580C;
-        color: #FFFFFF;
+        background: #ea580c;
+        color: #ffffff;
         box-shadow: 0 12px 24px rgba(249, 115, 22, 0.35);
       }
       .btn-outline-purple {
         background: transparent;
-        color: #1F2937;
-        border: 2px solid #1F2937;
+        color: #1f2937;
+        border: 2px solid #1f2937;
         border-radius: 14px;
         padding: 11px 30px;
         font-weight: 700;
         transition: all 0.3s;
       }
       .btn-outline-purple:hover {
-        background: #1F2937;
-        color: #FFFFFF;
+        background: #1f2937;
+        color: #ffffff;
         transform: translateY(-3px);
       }
 
@@ -138,7 +158,7 @@
       .card {
         border: none;
         border-radius: 22px;
-        background: #FFFFFF;
+        background: #ffffff;
         box-shadow: 0 4px 24px rgba(6, 78, 59, 0.07);
       }
 
@@ -149,8 +169,8 @@
         font-weight: 500;
       }
       .alert-success {
-        background: linear-gradient(135deg, #E2E8F0, #E2E8F0);
-        color: #1F2937;
+        background: linear-gradient(135deg, #e2e8f0, #e2e8f0);
+        color: #1f2937;
         border-left: 4px solid #059669;
       }
 
@@ -165,12 +185,14 @@
         border-color: #059669 !important;
       }
       .custom-switch {
-        transition: background-color 0.2s, border-color 0.2s;
+        transition:
+          background-color 0.2s,
+          border-color 0.2s;
       }
 
       /* ── FOOD CARDS ── */
       .food-card {
-        background: #FFFFFF;
+        background: #ffffff;
         border-radius: 20px;
         text-align: center;
         transition: all 0.35s;
@@ -196,8 +218,8 @@
 
       /* ── BADGE PILL ── */
       .badge-pill {
-        background: linear-gradient(135deg, #E2E8F0, #E2E8F0);
-        color: #1F2937;
+        background: linear-gradient(135deg, #e2e8f0, #e2e8f0);
+        color: #1f2937;
         padding: 6px 16px;
         border-radius: 30px;
         font-size: 0.82rem;
@@ -209,7 +231,7 @@
 
       /* ── STEP CARDS ── */
       .step-card {
-        background: #FFFFFF;
+        background: #ffffff;
         border-radius: 18px;
         padding: 28px 20px;
         text-align: center;
@@ -237,7 +259,7 @@
 
       /* ── FOOTER ── */
       .footer {
-        background: #1F2937;
+        background: #1f2937;
         color: rgba(248, 249, 250, 0.8);
         padding: 40px 0;
         margin-top: 70px;
@@ -277,7 +299,7 @@
         flex: 1;
         text-align: center;
         padding: 12px 0;
-        color: #64748B;
+        color: #64748b;
         text-decoration: none;
         font-size: 0.75rem;
         font-weight: 600;
@@ -292,7 +314,7 @@
         color: #059669;
       }
       .mobile-nav-item:hover {
-        color: #0F172A;
+        color: #0f172a;
       }
 
       @media (max-width: 991px) {
@@ -303,14 +325,14 @@
           padding-bottom: 80px;
         }
         .navbar-collapse {
-          background: #FFFFFF;
+          background: #ffffff;
           padding: 15px;
           border-radius: 12px;
           margin-top: 10px;
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
         .navbar-collapse .nav-link {
-          color: #1E293B !important;
+          color: #1e293b !important;
           padding: 12px 16px !important;
           margin-bottom: 8px;
           border-radius: 12px;
@@ -378,8 +400,8 @@
         }
       }
       .chatbot-header {
-        background: linear-gradient(135deg, #1F2937, #1F2937);
-        color: #FFFFFF;
+        background: linear-gradient(135deg, #1f2937, #1f2937);
+        color: #ffffff;
         padding: 15px 20px;
         font-weight: 700;
         display: flex;
@@ -390,7 +412,7 @@
         flex: 1;
         padding: 15px;
         overflow-y: auto;
-        background: #FFFFFF;
+        background: #ffffff;
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -404,7 +426,7 @@
       }
       .chat-msg.bot {
         background: white;
-        color: #1F2937;
+        color: #1f2937;
         align-self: flex-start;
         border: 1px solid rgba(6, 78, 59, 0.15);
         border-bottom-left-radius: 4px;
@@ -429,7 +451,7 @@
         padding: 8px 16px;
         font-size: 0.85rem;
         outline: none;
-        background: #FFFFFF;
+        background: #ffffff;
       }
       .chat-send-btn {
         background: #059669;
@@ -446,64 +468,107 @@
 
       /* ── PROGRESS / MISC ── */
       .progress-bar {
-        background: linear-gradient(135deg, #059669, #1F2937) !important;
+        background: linear-gradient(135deg, #059669, #1f2937) !important;
       }
+
+      /* ── PREMIUM BUTTONS ── */
+      .btn-purple {
+        background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+        color: #ffffff !important;
+        border: none !important;
+        font-weight: 700 !important;
+        border-radius: 14px !important;
+        padding: 12px 24px !important;
+        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.25) !important;
+        transition: all 0.25s ease !important;
+      }
+      .btn-purple:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35) !important;
+        filter: brightness(1.1) !important;
+      }
+      .btn-pink {
+        background: linear-gradient(135deg, #ec4899, #d946ef) !important;
+        color: #ffffff !important;
+        border: none !important;
+        font-weight: 700 !important;
+        border-radius: 14px !important;
+        padding: 12px 24px !important;
+        box-shadow: 0 4px 15px rgba(236, 72, 153, 0.25) !important;
+        transition: all 0.25s ease !important;
+      }
+      .btn-pink:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 20px rgba(236, 72, 153, 0.35) !important;
+        filter: brightness(1.1) !important;
+      }
+
       /* ── DARK MODE ── */
       .dark-mode body {
         background: #111827 !important;
-        color: #F9FAFB !important;
+        color: #f9fafb !important;
       }
       .dark-mode .navbar {
-        background: #1F2937 !important;
-        border-bottom: 1px solid #374151 !important;
+        background: rgba(17, 24, 39, 0.95) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
         box-shadow: none !important;
       }
       .dark-mode .navbar-brand {
-        color: #F8FAFC !important;
+        color: #f8fafc !important;
       }
       .dark-mode .nav-link {
-        color: #D1D5DB !important;
+        color: #d1d5db !important;
       }
       .dark-mode .nav-link:hover {
-        color: #10B981 !important;
+        color: #10b981 !important;
         background: rgba(16, 185, 129, 0.1) !important;
       }
       .dark-mode .nav-user-badge {
-        color: #10B981 !important;
-        border-color: #10B981 !important;
+        color: #10b981 !important;
+        border-color: #10b981 !important;
         background: rgba(16, 185, 129, 0.1) !important;
       }
       .dark-mode .card {
-        background: #1F2937 !important;
+        background: #1f2937 !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
       }
-      .dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode h4, .dark-mode h5, .dark-mode h6 {
-        color: #F9FAFB !important;
+      .dark-mode h1,
+      .dark-mode h2,
+      .dark-mode h3,
+      .dark-mode h4,
+      .dark-mode h5,
+      .dark-mode h6 {
+        color: #f9fafb !important;
       }
       .dark-mode p {
-        color: #D1D5DB;
+        color: #d1d5db;
       }
       .dark-mode .text-muted {
-        color: #9CA3AF !important;
+        color: #9ca3af !important;
+      }
+      .dark-mode .text-dark,
+      .dark-mode .text-black {
+        color: #f9fafb !important;
       }
       .dark-mode hr {
         border-color: #374151 !important;
       }
-      .dark-mode .form-control, .dark-mode .form-select {
+      .dark-mode .form-control,
+      .dark-mode .form-select {
         background: #374151 !important;
-        border-color: #4B5563 !important;
-        color: #F9FAFB !important;
+        border-color: #4b5563 !important;
+        color: #f9fafb !important;
       }
       .dark-mode .modal-content {
-        background: #1F2937 !important;
+        background: #1f2937 !important;
       }
       .dark-mode .accordion-item {
-        background: #1F2937 !important;
+        background: #1f2937 !important;
         border-color: #374151 !important;
       }
       .dark-mode .accordion-button {
-        background: #1F2937 !important;
-        color: #F9FAFB !important;
+        background: #1f2937 !important;
+        color: #f9fafb !important;
       }
       .dark-mode .accordion-button:not(.collapsed) {
         background: rgba(16, 185, 129, 0.1) !important;
@@ -516,7 +581,7 @@
       }
       .dark-mode .alert-success {
         background: rgba(16, 185, 129, 0.15) !important;
-        color: #A7F3D0 !important;
+        color: #a7f3d0 !important;
         border: 1px solid rgba(16, 185, 129, 0.3) !important;
       }
       .dark-mode .mobile-bottom-nav {
@@ -524,55 +589,229 @@
         border-top: 1px solid #374151 !important;
       }
       .dark-mode .mobile-nav-item {
-        color: #9CA3AF !important;
+        color: #9ca3af !important;
       }
       .dark-mode .mobile-nav-item.active {
-        color: #10B981 !important;
+        color: #10b981 !important;
       }
       @media (max-width: 991px) {
         .dark-mode .navbar-collapse {
-          background: #1F2937 !important;
+          background: #1f2937 !important;
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
         }
         .dark-mode .navbar-collapse .nav-link {
           color: rgba(248, 249, 250, 0.88) !important;
           background: rgba(248, 249, 250, 0.08) !important;
         }
+        /* ── CONTRAST & RESPONSIVE THEME OVERRIDES ── */
+        .page-hero-title {
+          color: #0f172a !important;
+        }
+        .page-hero-desc {
+          color: #475569 !important;
+        }
+        .page-hero-btn {
+          background: #f1f5f9 !important;
+          color: #334155 !important;
+          border: 1px solid #e2e8f0 !important;
+        }
+        .page-hero-btn:hover {
+          background: #e2e8f0 !important;
+          color: #1e293b !important;
+        }
+        html:not(.dark-mode) .text-white:not(.btn):not(.badge) {
+          color: #0f172a !important;
+        }
+        html:not(.dark-mode) .text-slate-400 {
+          color: #475569 !important;
+        }
+
+        .dark-mode .page-hero-title {
+          color: #f8fafc !important;
+        }
+        .dark-mode .page-hero-desc {
+          color: #9ca3af !important;
+        }
+        .dark-mode .page-hero-btn {
+          background: rgba(255, 255, 255, 0.05) !important;
+          color: #f8fafc !important;
+          border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+        .dark-mode .page-hero-btn:hover {
+          background: rgba(255, 255, 255, 0.1) !important;
+          color: #ffffff !important;
+        }
+
+        /* Dark mode inline override selectors */
+        .dark-mode [style*="color: #064E3B"],
+        .dark-mode [style*="color:#064E3B"] {
+          color: #10b981 !important;
+        }
+        .dark-mode [style*="color: #065F46"],
+        .dark-mode [style*="color:#065F46"] {
+          color: #a7f3d0 !important;
+        }
+        .dark-mode [style*="color:#1F2937"],
+        .dark-mode [style*="color: #1F2937"],
+        .dark-mode [style*="color:#1a1a1a"],
+        .dark-mode [style*="color: #1a1a1a"],
+        .dark-mode [style*="color:#1A1A1A"],
+        .dark-mode [style*="color: #1A1A1A"] {
+          color: #f9fafb !important;
+        }
+        .dark-mode [style*="color:#374151"],
+        .dark-mode [style*="color: #374151"] {
+          color: #f9fafb !important;
+        }
+        .dark-mode [style*="color:#111827"],
+        .dark-mode [style*="color: #111827"] {
+          color: #f9fafb !important;
+        }
+        .dark-mode .logo-text {
+          color: #f8fafc !important;
+        }
+        .dark-mode #scannerBtn,
+        .dark-mode #voiceBtn {
+          background: rgba(16, 185, 129, 0.1) !important;
+          color: #10b981 !important;
+          border: 1px solid rgba(16, 185, 129, 0.2) !important;
+        }
+        .dark-mode #recipeSuggestions {
+          background: #374151 !important;
+          border-color: #4b5563 !important;
+        }
+        .dark-mode #recipeSuggestions div {
+          color: #f9fafb !important;
+          border-bottom-color: #4b5563 !important;
+        }
+        .dark-mode #mealModal > div,
+        .dark-mode #shoppingModal > div {
+          background: #1f2937 !important;
+        }
+        .dark-mode #mealModal h5,
+        .dark-mode #mealModal label,
+        .dark-mode #shoppingModal h5 {
+          color: #f9fafb !important;
+        }
+        .dark-mode #mealModal button[onclick="closeMealModal()"],
+        .dark-mode #shoppingModal button[onclick="closeShoppingModal()"] {
+          background: #374151 !important;
+          color: #f9fafb !important;
+        }
+        .dark-mode #mealModal button[onclick="saveMeal()"] {
+          background: #10b981 !important;
+          color: #ffffff !important;
+        }
+        .dark-mode #shoppingListContent span,
+        .dark-mode #shoppingListContent p {
+          color: #f9fafb !important;
+        }
+
+        .dark-mode .card[style*="background:#FFFFFF"],
+        .dark-mode .card[style*="background: #FFFFFF"] {
+          background: #1f2937 !important;
+        }
+        .dark-mode .list-group-item[style*="background:#FFFFFF"],
+        .dark-mode .list-group-item[style*="background: #FFFFFF"] {
+          background: #1f2937 !important;
+          color: #f9fafb !important;
+          border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+        .dark-mode div[style*="background:#F8FAFC"],
+        .dark-mode div[style*="background: #F8FAFC"],
+        .dark-mode div[style*="background:#f9fafb"],
+        .dark-mode div[style*="background: #f9fafb"],
+        .dark-mode div[style*="background:#f8fafc"],
+        .dark-mode div[style*="background: #f8fafc"] {
+          background: #374151 !important;
+          border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+        .dark-mode div[style*="color:rgba(17,24,39,0.85)"],
+        .dark-mode div[style*="color: rgba(17,24,39,0.85)"] {
+          color: #d1d5db !important;
+        }
+        .dark-mode .btn-outline-dark {
+          color: #f9fafb !important;
+          border-color: #f9fafb !important;
+        }
+        .dark-mode .btn-outline-dark:hover {
+          background: #f9fafb !important;
+          color: #111827 !important;
+        }
       }
     </style>
     <!-- Web App Manifest -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#059669">
-    <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/cooking-book.png">
-    
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#059669" />
+    <link
+      rel="apple-touch-icon"
+      href="https://img.icons8.com/color/192/cooking-book.png"
+    />
+
     <script>
       // Immediately apply theme before rendering to prevent white flash
-      const theme = localStorage.getItem('theme') || 'dark';
-      if (theme === 'light') {
-        document.documentElement.classList.remove('dark-mode');
-        document.documentElement.setAttribute('data-bs-theme', 'light');
+      const theme = localStorage.getItem("theme") || "dark";
+      if (theme === "light") {
+        document.documentElement.classList.remove("dark-mode");
+        document.documentElement.setAttribute("data-bs-theme", "light");
       } else {
-        document.documentElement.classList.add('dark-mode');
-        document.documentElement.setAttribute('data-bs-theme', 'dark');
+        document.documentElement.classList.add("dark-mode");
+        document.documentElement.setAttribute("data-bs-theme", "dark");
       }
       // Register PWA Service Worker
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('Service Worker registered successfully!', reg.scope))
-            .catch(err => console.log('Service Worker registration failed:', err));
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) =>
+              console.log("Service Worker registered successfully!", reg.scope),
+            )
+            .catch((err) =>
+              console.log("Service Worker registration failed:", err),
+            );
         });
       }
     </script>
   </head>
   <body>
-    <nav class="navbar navbar-expand-sm navbar-dark fixed-top" style="z-index: 1030; min-height: 70px; background: rgba(17, 24, 39, 0.95) !important; border-bottom: 1px solid rgba(255,255,255,0.1);">
-      <div class="container" style="max-width: 1400px; width: 95%;">
-        <a class="navbar-brand d-flex align-items-center gap-2" href="/" style="padding: 0; text-decoration: none;">
-          <img src="{% static 'logo.png' %}?v=2" alt="BudgetBites Logo" style="height: 40px; width: auto; object-fit: contain;">
-          <div class="d-flex flex-column justify-content-center" style="line-height: 1;">
-            <span style="font-weight: 900; font-size: 1.4rem; letter-spacing: -0.5px;">Budget<span style="color: #10B981;">Bites</span></span>
-            <span style="font-size: 0.65rem; color: #10B981; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px;">Cook Smart. Spend Less. Eat Better.</span>
+    <nav
+      class="navbar navbar-expand-sm navbar-dark fixed-top"
+      style="z-index: 1030; min-height: 70px"
+    >
+      <div class="container" style="max-width: 1400px; width: 95%">
+        <a
+          class="navbar-brand d-flex align-items-center gap-2"
+          href="/"
+          style="padding: 0; text-decoration: none"
+        >
+          <img
+            src="{% static 'logo.png' %}?v=2"
+            alt="BudgetBites Logo"
+            style="height: 40px; width: auto; object-fit: contain"
+          />
+          <div
+            class="d-flex flex-column justify-content-center"
+            style="line-height: 1"
+          >
+            <span
+              style="
+                font-weight: 900;
+                font-size: 1.4rem;
+                letter-spacing: -0.5px;
+              "
+              >Budget<span style="color: #10b981">Bites</span></span
+            >
+            <span
+              style="
+                font-size: 0.65rem;
+                color: #10b981;
+                font-weight: 700;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                margin-top: 2px;
+              "
+              >Cook Smart. Spend Less. Eat Better.</span
+            >
           </div>
         </a>
         <button
@@ -580,11 +819,21 @@
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
-          style="background: rgba(16, 185, 129, 0.1); border-radius: 8px; padding: 6px 10px;"
+          style="
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 8px;
+            padding: 6px 10px;
+          "
         >
-          <span style="color: #10B981; font-size: 1.2rem"><i class="fas fa-bars"></i></span>
+          <span style="color: #10b981; font-size: 1.2rem"
+            ><i class="fas fa-bars"></i
+          ></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav" style="visibility: visible !important;">
+        <div
+          class="collapse navbar-collapse"
+          id="navbarNav"
+          style="visibility: visible !important"
+        >
           <div class="navbar-nav ms-auto align-items-center">
             {% if user.is_authenticated %}
             <a class="nav-link" href="/">
@@ -604,16 +853,23 @@
             </a>
 
             <div
-              class="nav-link nav-user-badge ms-2 text-white"
+              class="nav-link nav-user-badge ms-2"
               style="
                 cursor: pointer;
                 background: linear-gradient(135deg, #059669, #059669);
                 border: none;
+                color: #ffffff !important;
+                font-weight: 700;
               "
               onclick="showXPModal()"
             >
-              <i class="fas fa-star text-white"></i>
-              <span id="userXPDisplay">0 XP</span>
+              <i
+                class="fas fa-star text-white"
+                style="color: #ffffff !important"
+              ></i>
+              <span id="userXPDisplay" style="color: #ffffff !important"
+                >0 XP</span
+              >
             </div>
 
             {% if user.is_staff %}
@@ -646,7 +902,9 @@
       <div
         class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show d-flex align-items-center"
       >
-        <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} me-2" style="color: {% if message.tags == 'error' %}#DC2626{% else %}#059669{% endif %}"></i>
+        <i
+          class="fas {% if message.tags == 'error' %}fa-exclamation-circle text-danger{% else %}fa-check-circle text-success{% endif %} me-2"
+        ></i>
         <span>{{ message }}</span>
         <button
           type="button"
@@ -695,14 +953,15 @@
     </div>
     {% endif %}
 
-
     <!-- ═══════════════════════════════════════════════════════
          AI FRIDGE SCANNER MODAL
          Opens camera → captures image → sends to Groq Vision AI
          → detected ingredients are appended to the textarea
     ═══════════════════════════════════════════════════════ -->
     {% if user.is_authenticated %}
-    <div id="fridgeScannerModal" style="
+    <div
+      id="fridgeScannerModal"
+      style="
         display: none;
         position: fixed;
         inset: 0;
@@ -712,133 +971,371 @@
         align-items: center;
         justify-content: center;
         padding: 20px;
-    ">
-      <div style="
-          background: #FFFFFF;
+      "
+    >
+      <div
+        style="
+          background: #ffffff;
           border-radius: 24px;
           width: 100%;
           max-width: 480px;
           overflow: hidden;
-          box-shadow: 0 24px 64px rgba(0,0,0,0.3);
-      ">
+          box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+        "
+      >
         <!-- Header -->
-        <div style="background: linear-gradient(135deg, #1F2937, #1F2937); padding: 18px 24px; display:flex; align-items:center; justify-content:space-between;">
+        <div
+          style="
+            background: linear-gradient(135deg, #1f2937, #1f2937);
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
           <div>
-            <h5 style="color:#FFFFFF; margin:0; font-weight:800; font-size:1.1rem;">🧊 AI Ingredients Scanner</h5>
-            <p style="color:rgba(250,248,245,0.7); margin:0; font-size:0.78rem;">Point camera at ingredients — AI detects them!</p>
+            <h5
+              style="
+                color: #ffffff;
+                margin: 0;
+                font-weight: 800;
+                font-size: 1.1rem;
+              "
+            >
+              🧊 AI Ingredients Scanner
+            </h5>
+            <p
+              style="
+                color: rgba(250, 248, 245, 0.7);
+                margin: 0;
+                font-size: 0.78rem;
+              "
+            >
+              Point camera at ingredients — AI detects them!
+            </p>
           </div>
-          <button onclick="closeScanner()" style="background:rgba(255,255,255,0.15); border:none; border-radius:50%; width:36px; height:36px; color:white; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+          <button
+            onclick="closeScanner()"
+            style="
+              background: rgba(255, 255, 255, 0.15);
+              border: none;
+              border-radius: 50%;
+              width: 36px;
+              height: 36px;
+              color: white;
+              font-size: 1.1rem;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
             <i class="fas fa-times"></i>
           </button>
         </div>
 
         <!-- Camera View -->
-        <div style="background:#0F0F10; position:relative; min-height:260px; display:flex; align-items:center; justify-content:center;">
-          <video id="fridgeCamera" autoplay playsinline style="width:100%; max-height:300px; object-fit:cover; display:none;"></video>
-          <canvas id="fridgeCanvas" style="display:none;"></canvas>
+        <div
+          style="
+            background: #0f0f10;
+            position: relative;
+            min-height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          <video
+            id="fridgeCamera"
+            autoplay
+            playsinline
+            style="
+              width: 100%;
+              max-height: 300px;
+              object-fit: cover;
+              display: none;
+            "
+          ></video>
+          <canvas id="fridgeCanvas" style="display: none"></canvas>
 
           <!-- Placeholder when camera not started -->
-          <div id="cameraPlaceholder" style="text-align:center; padding:40px 20px;">
-            <div style="font-size:3.5rem; margin-bottom:12px;">📷</div>
-            <p style="color:rgba(255,255,255,0.6); margin:0; font-size:0.9rem;">Camera will appear here</p>
-            <p style="color:rgba(255,255,255,0.4); margin:4px 0 0; font-size:0.78rem;">Allow camera access when prompted</p>
+          <div
+            id="cameraPlaceholder"
+            style="text-align: center; padding: 40px 20px"
+          >
+            <div style="font-size: 3.5rem; margin-bottom: 12px">📷</div>
+            <p
+              style="
+                color: rgba(255, 255, 255, 0.6);
+                margin: 0;
+                font-size: 0.9rem;
+              "
+            >
+              Camera will appear here
+            </p>
+            <p
+              style="
+                color: rgba(255, 255, 255, 0.4);
+                margin: 4px 0 0;
+                font-size: 0.78rem;
+              "
+            >
+              Allow camera access when prompted
+            </p>
           </div>
 
           <!-- Captured image preview -->
-          <img id="capturedPreview" style="display:none; width:100%; max-height:300px; object-fit:cover;" alt="Captured" />
+          <img
+            id="capturedPreview"
+            style="
+              display: none;
+              width: 100%;
+              max-height: 300px;
+              object-fit: cover;
+            "
+            alt="Captured"
+          />
 
           <!-- Scanning overlay animation -->
-          <div id="scanningOverlay" style="display:none; position:absolute; inset:0; background:rgba(27,67,50,0.65); display:none; align-items:center; justify-content:center; flex-direction:column;">
-            <div style="width:56px; height:56px; border:4px solid #059669; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
-            <p style="color:white; margin-top:14px; font-weight:700; font-size:0.95rem;">🤖 AI is detecting ingredients...</p>
+          <div
+            id="scanningOverlay"
+            style="
+              display: none;
+              position: absolute;
+              inset: 0;
+              background: rgba(27, 67, 50, 0.65);
+              display: none;
+              align-items: center;
+              justify-content: center;
+              flex-direction: column;
+            "
+          >
+            <div
+              style="
+                width: 56px;
+                height: 56px;
+                border: 4px solid #059669;
+                border-top-color: transparent;
+                border-radius: 50%;
+                animation: spin 0.8s linear infinite;
+              "
+            ></div>
+            <p
+              style="
+                color: white;
+                margin-top: 14px;
+                font-weight: 700;
+                font-size: 0.95rem;
+              "
+            >
+              🤖 AI is detecting ingredients...
+            </p>
           </div>
         </div>
 
         <!-- Controls -->
-        <div style="padding:20px 24px; background:#FFFFFF;">
-
+        <div style="padding: 20px 24px; background: #ffffff">
           <!-- Step 1: Start camera -->
           <div id="scanStep1">
-            <button onclick="startFridgeCamera()" style="
-                width:100%; background:linear-gradient(135deg,#1F2937,#1F2937);
-                color:white; border:none; border-radius:14px; padding:13px;
-                font-size:1rem; font-weight:700; cursor:pointer;
-                box-shadow:0 4px 16px rgba(27,67,50,0.3); transition:all 0.3s;
-            " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+            <button
+              onclick="startFridgeCamera()"
+              style="
+                width: 100%;
+                background: linear-gradient(135deg, #1f2937, #1f2937);
+                color: white;
+                border: none;
+                border-radius: 14px;
+                padding: 13px;
+                font-size: 1rem;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: 0 4px 16px rgba(27, 67, 50, 0.3);
+                transition: all 0.3s;
+              "
+              onmouseover="this.style.transform = 'translateY(-2px)'"
+              onmouseout="this.style.transform = 'translateY(0)'"
+            >
               <i class="fas fa-camera me-2"></i> Open Camera
             </button>
-            <p style="text-align:center; color:#9ca3af; font-size:0.78rem; margin-top:10px; margin-bottom:0;">
+            <p
+              style="
+                text-align: center;
+                color: #9ca3af;
+                font-size: 0.78rem;
+                margin-top: 10px;
+                margin-bottom: 0;
+              "
+            >
               Or upload a photo of your fridge / ingredients
             </p>
-            <input type="file" id="fridgeFileInput" accept="image/*" capture="environment"
+            <input
+              type="file"
+              id="fridgeFileInput"
+              accept="image/*"
+              capture="environment"
               onchange="handleFridgeFile(event)"
-              style="display:none;" />
-            <button onclick="document.getElementById('fridgeFileInput').click()" style="
-                width:100%; background:#FFFFFF; color:#1F2937;
-                border:2px solid rgba(27,67,50,0.2); border-radius:14px;
-                padding:10px; font-size:0.88rem; font-weight:700;
-                cursor:pointer; margin-top:8px; transition:all 0.3s;
-            ">
+              style="display: none"
+            />
+            <button
+              onclick="document.getElementById('fridgeFileInput').click()"
+              style="
+                width: 100%;
+                background: #ffffff;
+                color: #1f2937;
+                border: 2px solid rgba(27, 67, 50, 0.2);
+                border-radius: 14px;
+                padding: 10px;
+                font-size: 0.88rem;
+                font-weight: 700;
+                cursor: pointer;
+                margin-top: 8px;
+                transition: all 0.3s;
+              "
+            >
               <i class="fas fa-upload me-2"></i> Upload Photo
             </button>
           </div>
 
           <!-- Step 2: Capture & scan (shown after camera starts) -->
-          <div id="scanStep2" style="display:none;">
-            <button onclick="captureAndScan()" style="
-                width:100%; background:linear-gradient(135deg,#059669,#059669);
-                color:white; border:none; border-radius:14px; padding:13px;
-                font-size:1rem; font-weight:700; cursor:pointer;
-                box-shadow:0 4px 16px rgba(224,122,95,0.4); transition:all 0.3s;
-            " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <div id="scanStep2" style="display: none">
+            <button
+              onclick="captureAndScan()"
+              style="
+                width: 100%;
+                background: linear-gradient(135deg, #059669, #059669);
+                color: white;
+                border: none;
+                border-radius: 14px;
+                padding: 13px;
+                font-size: 1rem;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: 0 4px 16px rgba(224, 122, 95, 0.4);
+                transition: all 0.3s;
+              "
+              onmouseover="this.style.transform = 'translateY(-2px)'"
+              onmouseout="this.style.transform = 'translateY(0)'"
+            >
               <i class="fas fa-bolt me-2"></i> Capture & Scan with AI
             </button>
-            <button onclick="retakePhoto()" style="
-                width:100%; background:transparent; color:#1F2937;
-                border:2px solid rgba(27,67,50,0.2); border-radius:14px;
-                padding:9px; font-size:0.85rem; font-weight:600;
-                cursor:pointer; margin-top:8px;
-            ">
+            <button
+              onclick="retakePhoto()"
+              style="
+                width: 100%;
+                background: transparent;
+                color: #1f2937;
+                border: 2px solid rgba(27, 67, 50, 0.2);
+                border-radius: 14px;
+                padding: 9px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                cursor: pointer;
+                margin-top: 8px;
+              "
+            >
               <i class="fas fa-redo me-2"></i> Retake
             </button>
           </div>
 
           <!-- Step 3: Results (shown after scan) -->
-          <div id="scanStep3" style="display:none;">
-            <div style="background:#E2E8F0; border-radius:14px; padding:14px; margin-bottom:14px; border:1px solid rgba(27,67,50,0.15);">
-              <p style="color:#1F2937; font-size:0.85rem; font-weight:700; margin-bottom:8px;">
+          <div id="scanStep3" style="display: none">
+            <div
+              style="
+                background: #e2e8f0;
+                border-radius: 14px;
+                padding: 14px;
+                margin-bottom: 14px;
+                border: 1px solid rgba(27, 67, 50, 0.15);
+              "
+            >
+              <p
+                style="
+                  color: #1f2937;
+                  font-size: 0.85rem;
+                  font-weight: 700;
+                  margin-bottom: 8px;
+                "
+              >
                 ✅ <span id="detectedCount">0</span> ingredients detected:
               </p>
-              <div id="detectedIngredientChips" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+              <div
+                id="detectedIngredientChips"
+                style="display: flex; flex-wrap: wrap; gap: 6px"
+              ></div>
             </div>
-            <button onclick="addAllDetected()" style="
-                width:100%; background:linear-gradient(135deg,#1F2937,#1F2937);
-                color:white; border:none; border-radius:14px; padding:13px;
-                font-size:1rem; font-weight:700; cursor:pointer;
-                box-shadow:0 4px 16px rgba(27,67,50,0.3);
-            ">
+            <button
+              onclick="addAllDetected()"
+              style="
+                width: 100%;
+                background: linear-gradient(135deg, #1f2937, #1f2937);
+                color: white;
+                border: none;
+                border-radius: 14px;
+                padding: 13px;
+                font-size: 1rem;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: 0 4px 16px rgba(27, 67, 50, 0.3);
+              "
+            >
               <i class="fas fa-plus-circle me-2"></i> Add All to My Ingredients
             </button>
-            <button onclick="resetScanner()" style="
-                width:100%; background:transparent; color:#9ca3af;
-                border:none; padding:8px; font-size:0.82rem;
-                cursor:pointer; margin-top:6px;
-            ">
+            <button
+              onclick="resetScanner()"
+              style="
+                width: 100%;
+                background: transparent;
+                color: #9ca3af;
+                border: none;
+                padding: 8px;
+                font-size: 0.82rem;
+                cursor: pointer;
+                margin-top: 6px;
+              "
+            >
               Scan Again
             </button>
           </div>
 
           <!-- Error state -->
-          <div id="scanError" style="display:none; text-align:center; padding:8px;">
-            <p id="scanErrorMsg" style="color:#059669; font-weight:600; font-size:0.88rem; margin:0;"></p>
-            <button onclick="resetScanner()" style="background:transparent; border:none; color:#1F2937; font-weight:600; cursor:pointer; margin-top:6px; font-size:0.85rem;">Try Again</button>
+          <div
+            id="scanError"
+            style="display: none; text-align: center; padding: 8px"
+          >
+            <p
+              id="scanErrorMsg"
+              style="
+                color: #059669;
+                font-weight: 600;
+                font-size: 0.88rem;
+                margin: 0;
+              "
+            ></p>
+            <button
+              onclick="resetScanner()"
+              style="
+                background: transparent;
+                border: none;
+                color: #1f2937;
+                font-weight: 600;
+                cursor: pointer;
+                margin-top: 6px;
+                font-size: 0.85rem;
+              "
+            >
+              Try Again
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <style>
-      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
     </style>
 
     <script>
@@ -846,70 +1343,76 @@
       let detectedIngredients = [];
 
       function openScanner() {
-        document.getElementById('fridgeScannerModal').style.display = 'flex';
+        document.getElementById("fridgeScannerModal").style.display = "flex";
         resetScanner();
       }
 
       function closeScanner() {
-        document.getElementById('fridgeScannerModal').style.display = 'none';
+        document.getElementById("fridgeScannerModal").style.display = "none";
         stopFridgeCamera();
       }
 
       function stopFridgeCamera() {
         if (fridgeStream) {
-          fridgeStream.getTracks().forEach(t => t.stop());
+          fridgeStream.getTracks().forEach((t) => t.stop());
           fridgeStream = null;
         }
       }
 
       function resetScanner() {
         stopFridgeCamera();
-        document.getElementById('fridgeCamera').style.display = 'none';
-        document.getElementById('capturedPreview').style.display = 'none';
-        document.getElementById('cameraPlaceholder').style.display = 'block';
-        document.getElementById('scanningOverlay').style.display = 'none';
-        document.getElementById('scanStep1').style.display = 'block';
-        document.getElementById('scanStep2').style.display = 'none';
-        document.getElementById('scanStep3').style.display = 'none';
-        document.getElementById('scanError').style.display = 'none';
+        document.getElementById("fridgeCamera").style.display = "none";
+        document.getElementById("capturedPreview").style.display = "none";
+        document.getElementById("cameraPlaceholder").style.display = "block";
+        document.getElementById("scanningOverlay").style.display = "none";
+        document.getElementById("scanStep1").style.display = "block";
+        document.getElementById("scanStep2").style.display = "none";
+        document.getElementById("scanStep3").style.display = "none";
+        document.getElementById("scanError").style.display = "none";
         detectedIngredients = [];
       }
 
       async function startFridgeCamera() {
         try {
           fridgeStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+            video: {
+              facingMode: "environment",
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+            },
           });
-          const video = document.getElementById('fridgeCamera');
+          const video = document.getElementById("fridgeCamera");
           video.srcObject = fridgeStream;
-          video.style.display = 'block';
-          document.getElementById('cameraPlaceholder').style.display = 'none';
-          document.getElementById('scanStep1').style.display = 'none';
-          document.getElementById('scanStep2').style.display = 'block';
+          video.style.display = "block";
+          document.getElementById("cameraPlaceholder").style.display = "none";
+          document.getElementById("scanStep1").style.display = "none";
+          document.getElementById("scanStep2").style.display = "block";
         } catch (err) {
-          showScanError('Camera access denied. Please allow camera permission or upload a photo instead.');
+          showScanError(
+            "Camera access denied. Please allow camera permission or upload a photo instead.",
+          );
         }
       }
 
       function captureAndScan() {
-        const video = document.getElementById('fridgeCamera');
-        const canvas = document.getElementById('fridgeCanvas');
+        const video = document.getElementById("fridgeCamera");
+        const canvas = document.getElementById("fridgeCanvas");
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        const imageData = canvas.toDataURL('image/jpeg', 0.85);
+        canvas.getContext("2d").drawImage(video, 0, 0);
+        const imageData = canvas.toDataURL("image/jpeg", 0.85);
         stopFridgeCamera();
 
         // Show preview of captured photo
-        const preview = document.getElementById('capturedPreview');
+        const preview = document.getElementById("capturedPreview");
         preview.src = imageData;
-        preview.style.display = 'block';
-        video.style.display = 'none';
+        preview.style.display = "block";
+        video.style.display = "none";
 
         // Show scanning animation
-        const overlay = document.getElementById('scanningOverlay');
-        overlay.style.display = 'flex';
-        document.getElementById('scanStep2').style.display = 'none';
+        const overlay = document.getElementById("scanningOverlay");
+        overlay.style.display = "flex";
+        document.getElementById("scanStep2").style.display = "none";
 
         runAIScan(imageData);
       }
@@ -918,72 +1421,84 @@
         const file = event.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
           const imageData = e.target.result;
-          document.getElementById('cameraPlaceholder').style.display = 'none';
-          const preview = document.getElementById('capturedPreview');
+          document.getElementById("cameraPlaceholder").style.display = "none";
+          const preview = document.getElementById("capturedPreview");
           preview.src = imageData;
-          preview.style.display = 'block';
-          document.getElementById('scanStep1').style.display = 'none';
-          const overlay = document.getElementById('scanningOverlay');
-          overlay.style.display = 'flex';
+          preview.style.display = "block";
+          document.getElementById("scanStep1").style.display = "none";
+          const overlay = document.getElementById("scanningOverlay");
+          overlay.style.display = "flex";
           runAIScan(imageData);
         };
         reader.readAsDataURL(file);
       }
 
       function retakePhoto() {
-        document.getElementById('capturedPreview').style.display = 'none';
+        document.getElementById("capturedPreview").style.display = "none";
         startFridgeCamera();
       }
 
       async function runAIScan(imageData) {
         try {
-          const response = await fetch('/api/scan-fridge/', {
-            method: 'POST',
+          const response = await fetch("/api/scan-fridge/", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': '{{ csrf_token }}',
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}",
             },
             body: JSON.stringify({ image: imageData }),
           });
           const result = await response.json();
 
-          document.getElementById('scanningOverlay').style.display = 'none';
+          document.getElementById("scanningOverlay").style.display = "none";
 
-          if (result.status === 'success' && result.ingredients && result.ingredients.length > 0) {
+          if (
+            result.status === "success" &&
+            result.ingredients &&
+            result.ingredients.length > 0
+          ) {
             detectedIngredients = result.ingredients;
             showDetectedIngredients(result.ingredients);
-          } else if (result.status === 'success' && (!result.ingredients || result.ingredients.length === 0)) {
-            showScanError('No food ingredients detected. Try a clearer photo closer to the items.');
+          } else if (
+            result.status === "success" &&
+            (!result.ingredients || result.ingredients.length === 0)
+          ) {
+            showScanError(
+              "No food ingredients detected. Try a clearer photo closer to the items.",
+            );
           } else {
-            showScanError(result.message || 'Scan failed. Please try again.');
+            showScanError(result.message || "Scan failed. Please try again.");
           }
         } catch (err) {
-          document.getElementById('scanningOverlay').style.display = 'none';
-          showScanError('Network error. Please check your connection.');
+          document.getElementById("scanningOverlay").style.display = "none";
+          showScanError("Network error. Please check your connection.");
         }
       }
 
       function showDetectedIngredients(ingredients) {
-        document.getElementById('detectedCount').textContent = ingredients.length;
-        const container = document.getElementById('detectedIngredientChips');
-        container.innerHTML = '';
-        ingredients.forEach(ing => {
-          const chip = document.createElement('span');
+        document.getElementById("detectedCount").textContent =
+          ingredients.length;
+        const container = document.getElementById("detectedIngredientChips");
+        container.innerHTML = "";
+        ingredients.forEach((ing) => {
+          const chip = document.createElement("span");
           chip.textContent = ing;
-          chip.style.cssText = 'background:#1F2937; color:#FFFFFF; padding:5px 13px; border-radius:20px; font-size:0.78rem; font-weight:600; cursor:pointer;';
-          chip.title = 'Click to remove';
-          chip.onclick = function() {
-            detectedIngredients = detectedIngredients.filter(i => i !== ing);
+          chip.style.cssText =
+            "background:#1F2937; color:#FFFFFF; padding:5px 13px; border-radius:20px; font-size:0.78rem; font-weight:600; cursor:pointer;";
+          chip.title = "Click to remove";
+          chip.onclick = function () {
+            detectedIngredients = detectedIngredients.filter((i) => i !== ing);
             chip.remove();
-            document.getElementById('detectedCount').textContent = detectedIngredients.length;
+            document.getElementById("detectedCount").textContent =
+              detectedIngredients.length;
           };
           container.appendChild(chip);
         });
-        document.getElementById('scanStep3').style.display = 'block';
+        document.getElementById("scanStep3").style.display = "block";
         // XP reward
-        if (typeof addXP === 'function') addXP(5, 'Fridge Scanned!');
+        if (typeof addXP === "function") addXP(5, "Fridge Scanned!");
       }
 
       function addAllDetected() {
@@ -991,8 +1506,8 @@
         const textarea = document.querySelector('textarea[name="ingredients"]');
         if (textarea && detectedIngredients.length > 0) {
           const existing = textarea.value.trim();
-          const newItems = detectedIngredients.join(', ');
-          textarea.value = existing ? existing + ', ' + newItems : newItems;
+          const newItems = detectedIngredients.join(", ");
+          textarea.value = existing ? existing + ", " + newItems : newItems;
           textarea.focus();
           closeScanner();
         } else {
@@ -1001,17 +1516,19 @@
       }
 
       function showScanError(msg) {
-        document.getElementById('scanErrorMsg').textContent = msg;
-        document.getElementById('scanError').style.display = 'block';
-        document.getElementById('scanStep1').style.display = 'none';
-        document.getElementById('scanStep2').style.display = 'none';
-        document.getElementById('scanStep3').style.display = 'none';
+        document.getElementById("scanErrorMsg").textContent = msg;
+        document.getElementById("scanError").style.display = "block";
+        document.getElementById("scanStep1").style.display = "none";
+        document.getElementById("scanStep2").style.display = "none";
+        document.getElementById("scanStep3").style.display = "none";
       }
 
       // Close on backdrop click
-      document.getElementById('fridgeScannerModal').addEventListener('click', function(e) {
-        if (e.target === this) closeScanner();
-      });
+      document
+        .getElementById("fridgeScannerModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) closeScanner();
+        });
     </script>
     {% endif %}
 
@@ -1111,7 +1628,7 @@
           <div
             class="modal-header"
             style="
-              background: linear-gradient(135deg, #1F2937, #2C1E18);
+              background: linear-gradient(135deg, #1f2937, #2c1e18);
               color: white;
               border: none;
             "
@@ -1127,7 +1644,7 @@
           </div>
           <div class="modal-body text-center p-4">
             <h1 style="font-size: 3rem; margin-bottom: 0">👨‍🍳</h1>
-            <h4 class="fw-bold mt-2" style="color: #A7F3D0">
+            <h4 class="fw-bold mt-2" style="color: #a7f3d0">
               Level <span id="userLevelDisplay">1</span> Chef
             </h4>
             <p class="text-muted mb-4">
@@ -1136,16 +1653,23 @@
 
             <div
               class="progress"
-              style="height: 12px; border-radius: 10px; background: rgba(224, 122, 95, 0.1)"
+              style="
+                height: 12px;
+                border-radius: 10px;
+                background: rgba(224, 122, 95, 0.1);
+              "
             >
               <div
                 id="xpProgressBar"
                 class="progress-bar progress-bar-striped progress-bar-animated"
                 role="progressbar"
-                style="width: 0%; background: linear-gradient(135deg, #A7F3D0, #1F2937);"
+                style="
+                  width: 0%;
+                  background: linear-gradient(135deg, #a7f3d0, #1f2937);
+                "
               ></div>
             </div>
-            <p class="mt-2 fw-bold" style="font-size: 0.9rem; color: #A7F3D0">
+            <p class="mt-2 fw-bold" style="font-size: 0.9rem; color: #a7f3d0">
               <span id="xpProgressText">0</span> /
               <span id="xpNextLevel">100</span> XP to next level
             </p>
@@ -1197,107 +1721,126 @@
 
       // Global Recipe Sharing Helper Functions
       function executeShare(name, description, shareId, btn) {
-        const shareUrl = window.location.origin + '/share/' + shareId + '/';
+        const shareUrl = window.location.origin + "/share/" + shareId + "/";
         const title = name;
-        const text = 'Check out this delicious recipe: ' + name + '\n\n' + shareUrl;
+        const text =
+          "Check out this delicious recipe: " + name + "\n\n" + shareUrl;
 
         if (navigator.share && window.isSecureContext) {
-          navigator.share({
-            title: title,
-            text: text,
-            url: shareUrl
-          }).catch(err => {
-            console.log('Share failed:', err);
-          });
+          navigator
+            .share({
+              title: title,
+              text: text,
+              url: shareUrl,
+            })
+            .catch((err) => {
+              console.log("Share failed:", err);
+            });
         } else {
           // Fallback to WhatsApp
-          const waUrl = 'https://wa.me/?text=' + encodeURIComponent('Check out this recipe: *' + name + '*\n' + shareUrl);
-          window.open(waUrl, '_blank');
+          const waUrl =
+            "https://wa.me/?text=" +
+            encodeURIComponent(
+              "Check out this recipe: *" + name + "*\n" + shareUrl,
+            );
+          window.open(waUrl, "_blank");
         }
       }
 
       function shareRecipe(name, description, shareId, btn) {
-        const cardGroup = btn.closest('.group');
-        const existingShareId = cardGroup ? cardGroup.getAttribute('data-share-id') : shareId;
+        const cardGroup = btn.closest(".group");
+        const existingShareId = cardGroup
+          ? cardGroup.getAttribute("data-share-id")
+          : shareId;
 
         if (existingShareId) {
           executeShare(name, description, existingShareId, btn);
         } else {
-          const saveBtn = cardGroup ? cardGroup.querySelector('button[onclick^="saveRecipe"]') : null;
+          const saveBtn = cardGroup
+            ? cardGroup.querySelector('button[onclick^="saveRecipe"]')
+            : null;
           if (saveBtn) {
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             btn.disabled = true;
 
-            if (typeof saveRecipe === 'function') {
+            if (typeof saveRecipe === "function") {
               saveRecipe(name, description, saveBtn)
-                .then(data => {
+                .then((data) => {
                   btn.disabled = false;
                   btn.innerHTML = originalHTML;
                   if (data && data.share_id) {
                     executeShare(name, description, data.share_id, btn);
                   } else {
-                    alert('Could not save recipe to generate share link.');
+                    alert("Could not save recipe to generate share link.");
                   }
                 })
-                .catch(err => {
+                .catch((err) => {
                   btn.disabled = false;
                   btn.innerHTML = originalHTML;
-                  alert('Error saving recipe for sharing. Please try again.');
+                  alert("Error saving recipe for sharing. Please try again.");
                 });
             } else {
               btn.disabled = false;
               btn.innerHTML = originalHTML;
-              alert('Save function not available on this page.');
+              alert("Save function not available on this page.");
             }
           } else {
-            alert('Recipe must be saved before sharing.');
+            alert("Recipe must be saved before sharing.");
           }
         }
       }
 
       function executePinterestShare(name, shareId) {
-        const shareUrl = window.location.origin + '/share/' + shareId + '/';
-        const pinUrl = 'https://pinterest.com/pin/create/button/?url=' + encodeURIComponent(shareUrl) + '&description=' + encodeURIComponent(name);
-        window.open(pinUrl, '_blank');
+        const shareUrl = window.location.origin + "/share/" + shareId + "/";
+        const pinUrl =
+          "https://pinterest.com/pin/create/button/?url=" +
+          encodeURIComponent(shareUrl) +
+          "&description=" +
+          encodeURIComponent(name);
+        window.open(pinUrl, "_blank");
       }
 
       function pinterestShareRecipe(name, shareId, btn) {
-        const cardGroup = btn.closest('.group');
-        const existingShareId = cardGroup ? cardGroup.getAttribute('data-share-id') : shareId;
+        const cardGroup = btn.closest(".group");
+        const existingShareId = cardGroup
+          ? cardGroup.getAttribute("data-share-id")
+          : shareId;
 
         if (existingShareId) {
           executePinterestShare(name, existingShareId);
         } else {
-          const saveBtn = cardGroup ? cardGroup.querySelector('button[onclick^="saveRecipe"]') : null;
+          const saveBtn = cardGroup
+            ? cardGroup.querySelector('button[onclick^="saveRecipe"]')
+            : null;
           if (saveBtn) {
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             btn.disabled = true;
 
-            if (typeof saveRecipe === 'function') {
-              saveRecipe(name, '', saveBtn)
-                .then(data => {
+            if (typeof saveRecipe === "function") {
+              saveRecipe(name, "", saveBtn)
+                .then((data) => {
                   btn.disabled = false;
                   btn.innerHTML = originalHTML;
                   if (data && data.share_id) {
                     executePinterestShare(name, data.share_id);
                   } else {
-                    alert('Could not save recipe to generate share link.');
+                    alert("Could not save recipe to generate share link.");
                   }
                 })
-                .catch(err => {
+                .catch((err) => {
                   btn.disabled = false;
                   btn.innerHTML = originalHTML;
-                  alert('Error saving recipe. Please try again.');
+                  alert("Error saving recipe. Please try again.");
                 });
             } else {
               btn.disabled = false;
               btn.innerHTML = originalHTML;
-              alert('Save function not available on this page.');
+              alert("Save function not available on this page.");
             }
           } else {
-            alert('Recipe must be saved before pinning.');
+            alert("Recipe must be saved before pinning.");
           }
         }
       }
@@ -1315,19 +1858,23 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Service Worker Registration -->
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/static/service-worker.js')
-        .then(registration => {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        })
-        .catch(err => {
-          console.log('ServiceWorker registration failed: ', err);
+    <!-- Service Worker Registration -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/static/service-worker.js")
+            .then((registration) => {
+              console.log(
+                "ServiceWorker registration successful with scope: ",
+                registration.scope,
+              );
+            })
+            .catch((err) => {
+              console.log("ServiceWorker registration failed: ", err);
+            });
         });
-    });
-  }
-</script>
-</body>
+      }
+    </script>
+  </body>
 </html>

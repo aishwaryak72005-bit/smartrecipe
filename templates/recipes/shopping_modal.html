@@ -1,19 +1,84 @@
 <!-- Shopping Modal -->
+<style>
+  .shopping-modal-content {
+    background: white !important;
+    color: #1f2937;
+  }
+  .dark-mode .shopping-modal-content {
+    background: #1f2937 !important;
+    color: #f9fafb;
+  }
+  
+  .shopping-bonus-banner {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border: 2px dashed #f59e0b;
+    color: #b45309;
+  }
+  .dark-mode .shopping-bonus-banner {
+    background: rgba(245, 158, 11, 0.1) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+    color: #fbbf24 !important;
+  }
+  
+  .shopping-ing-list {
+    background: #FFFFFF;
+    border: 2px solid #E9ECEF;
+  }
+  .dark-mode .shopping-ing-list {
+    background: #374151 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  
+  /* Online store card overrides in dark mode */
+  .dark-mode .store-card-green {
+    background: rgba(16, 185, 129, 0.1) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+  }
+  .dark-mode .store-card-blue {
+    background: rgba(59, 130, 246, 0.1) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+  }
+  .dark-mode .store-card-orange {
+    background: rgba(249, 115, 22, 0.1) !important;
+    border-color: rgba(249, 115, 22, 0.3) !important;
+  }
+  
+  .shopping-checklist-item {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+  }
+  .dark-mode .shopping-checklist-item {
+    background: #374151 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  .shopping-checklist-text {
+    color: #1f2937;
+  }
+  .dark-mode .shopping-checklist-text {
+    color: #f9fafb !important;
+  }
+  
+  .dark-mode .shopping-close-btn {
+    background: #374151 !important;
+    color: #f9fafb !important;
+  }
+</style>
+
 <div id="shoppingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; backdrop-filter: blur(4px);">
-  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 550px; background: white; border-radius: 24px; padding: 32px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3); max-height: 90vh; overflow-y: auto;">
+  <div class="shopping-modal-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 550px; border-radius: 24px; padding: 32px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3); max-height: 90vh; overflow-y: auto;">
     <div class="d-flex align-items-center justify-content-between mb-4">
       <div>
-        <h4 class="fw-bold mb-0" style="color: #064E3B">🛒 Missing Ingredients</h4>
+        <h4 class="fw-bold mb-0" style="color: #059669">🛒 Missing Ingredients</h4>
         <p class="text-muted mb-0" style="font-size: 0.88rem">How would you like to shop?</p>
       </div>
-      <button onclick="closeShoppingModal()" style="background: #f3f4f6; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 1.2rem; cursor: pointer;">✕</button>
+      <button onclick="closeShoppingModal()" class="shopping-close-btn" style="background: #f3f4f6; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 1.2rem; cursor: pointer;">✕</button>
     </div>
 
     <!-- View 1: Choice -->
     <div id="shoppingModalChoice">
-      <div class="mb-3 p-3" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px dashed #f59e0b; border-radius: 16px; text-align: center;">
+      <div class="mb-3 p-3 shopping-bonus-banner" style="border-radius: 16px; text-align: center;">
         <div style="font-size: 1.2rem; margin-bottom: 4px;">🎁</div>
-        <div style="font-weight: 700; color: #b45309; font-size: 0.95rem;">Complete your pantry to unlock 1 Bonus Premium Recipe!</div>
+        <div style="font-weight: 700; font-size: 0.95rem;">Complete your pantry to unlock 1 Bonus Premium Recipe!</div>
       </div>
       <div class="d-flex flex-column gap-3">
         <button onclick="handleLocalStoreChoice()" class="btn" style="background: linear-gradient(135deg, #00C9A7, #008B74); color: white; padding: 20px; border-radius: 16px; text-align: left; border: none;">
@@ -29,14 +94,14 @@
 
     <!-- View 2: Online Stores -->
     <div id="shoppingModalStores" style="display: none;">
-      <div class="mb-4 p-3" style="background: linear-gradient(135deg, #FFFFFF, #FFFFFF); border-radius: 14px; border: 2px solid #E9ECEF;">
-        <p class="fw-bold mb-1" style="color: #064E3B; font-size: 0.88rem">🥬 Buying these ingredients:</p>
+      <div class="mb-4 p-3 shopping-ing-list" style="border-radius: 14px;">
+        <p class="fw-bold mb-1" style="color: #059669; font-size: 0.88rem">🥬 Buying these ingredients:</p>
         <p id="modalIngredients" class="mb-0 text-muted" style="font-size: 0.85rem"></p>
       </div>
       <div class="row g-3">
         <div class="col-6">
           <a id="blinkitLink" href="#" target="_blank" style="text-decoration: none" onclick="closeShoppingModal()">
-            <div style="background: linear-gradient(135deg, #FFFFFF, #fae8ff); border: 2px solid #059669; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
+            <div class="store-card-green" style="background: linear-gradient(135deg, #FFFFFF, #fae8ff); border: 2px solid #059669; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
               <div style="font-size: 2.2rem; margin-bottom: 8px">⚡</div>
               <div style="font-weight: 800; color: #10B981">Blinkit</div>
               <div style="font-size: 0.75rem; color: #10B981; font-weight: 600; margin-top: 4px;">10 min delivery</div>
@@ -45,7 +110,7 @@
         </div>
         <div class="col-6">
           <a id="zeptoLink" href="#" target="_blank" style="text-decoration: none" onclick="closeShoppingModal()">
-            <div style="background: linear-gradient(135deg, #FFFFFF, #fae8ff); border: 2px solid #059669; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
+            <div class="store-card-green" style="background: linear-gradient(135deg, #FFFFFF, #fae8ff); border: 2px solid #059669; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
               <div style="font-size: 2.2rem; margin-bottom: 8px">🟣</div>
               <div style="font-weight: 800; color: #10B981">Zepto</div>
               <div style="font-size: 0.75rem; color: #10B981; font-weight: 600; margin-top: 4px;">10 min delivery</div>
@@ -54,7 +119,7 @@
         </div>
         <div class="col-6">
           <a id="jiomartLink" href="#" target="_blank" style="text-decoration: none" onclick="closeShoppingModal()">
-            <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 2px solid #60a5fa; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
+            <div class="store-card-blue" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 2px solid #60a5fa; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
               <div style="font-size: 2.2rem; margin-bottom: 8px">🔵</div>
               <div style="font-weight: 800; color: #1d4ed8">JioMart</div>
               <div style="font-size: 0.75rem; color: #1e40af; font-weight: 600; margin-top: 4px;">Express delivery</div>
@@ -63,7 +128,7 @@
         </div>
         <div class="col-6">
           <a id="flipkartLink" href="#" target="_blank" style="text-decoration: none" onclick="closeShoppingModal()">
-            <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 2px solid #2563eb; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
+            <div class="store-card-blue" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 2px solid #2563eb; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
               <div style="font-size: 2.2rem; margin-bottom: 8px">🛍️</div>
               <div style="font-weight: 800; color: #1d4ed8">Flipkart Fresh</div>
               <div style="font-size: 0.75rem; color: #1e40af; font-weight: 600; margin-top: 4px;">Same day delivery</div>
@@ -72,7 +137,7 @@
         </div>
         <div class="col-6">
           <a id="bigbasketLink" href="#" target="_blank" style="text-decoration: none" onclick="closeShoppingModal()">
-            <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 2px solid #4ade80; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
+            <div class="store-card-green" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 2px solid #4ade80; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
               <div style="font-size: 2.2rem; margin-bottom: 8px">🧺</div>
               <div style="font-weight: 800; color: #166534">BigBasket</div>
               <div style="font-size: 0.75rem; color: #14532d; font-weight: 600; margin-top: 4px;">Scheduled delivery</div>
@@ -81,7 +146,7 @@
         </div>
         <div class="col-6">
           <a id="swiggyLink" href="#" target="_blank" style="text-decoration: none" onclick="closeShoppingModal()">
-            <div style="background: linear-gradient(135deg, #fff7ed, #ffedd5); border: 2px solid #fb923c; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
+            <div class="store-card-orange" style="background: linear-gradient(135deg, #fff7ed, #ffedd5); border: 2px solid #fb923c; border-radius: 18px; padding: 18px; text-align: center; transition: all 0.3s;" onmouseover="this.style.transform = 'translateY(-4px)'" onmouseout="this.style.transform = 'translateY(0)'">
               <div style="font-size: 2.2rem; margin-bottom: 8px">🟠</div>
               <div style="font-weight: 800; color: #c2410c">Instamart</div>
               <div style="font-size: 0.75rem; color: #9a3412; font-weight: 600; margin-top: 4px;">15 min delivery</div>
@@ -178,9 +243,9 @@
       const items = currentShoppingIngredients.split(',').map(i => i.trim()).filter(i => i !== '');
       const container = document.getElementById('checklistItems');
       container.innerHTML = items.map((item, i) => `
-        <label class="d-flex align-items-center p-3" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; cursor: pointer;">
+        <label class="d-flex align-items-center p-3 shopping-checklist-item" style="border-radius: 12px; cursor: pointer;">
           <input type="checkbox" class="form-check-input me-3" style="width: 24px; height: 24px;" onchange="checkAllBought()">
-          <span style="font-weight: 600; font-size: 1.05rem; color: #1f2937;">${item}</span>
+          <span class="shopping-checklist-text" style="font-weight: 600; font-size: 1.05rem;">${item}</span>
         </label>
       `).join('');
       

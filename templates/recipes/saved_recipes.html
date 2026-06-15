@@ -3,6 +3,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
+    darkMode: ['class', '.dark-mode'],
     corePlugins: { preflight: false },
     theme: { extend: {} }
   }
@@ -14,8 +15,8 @@
       <span class="inline-flex items-center rounded-full bg-rose-500/10 px-4 py-1.5 text-xs font-bold text-rose-400 shadow-lg tracking-wider uppercase mb-3 border border-rose-500/20">
         <i class="fas fa-heart mr-2"></i> My Collection
       </span>
-      <h2 class="text-4xl font-extrabold text-white tracking-tight mb-2">Saved Recipes</h2>
-      <p class="text-slate-400 text-lg">Your favourite recipes all in one place!</p>
+      <h2 class="text-4xl font-extrabold page-hero-title tracking-tight mb-2">Saved Recipes</h2>
+      <p class="page-hero-desc text-lg">Your favourite recipes all in one place!</p>
     </div>
 
     {% if saved_recipes %}

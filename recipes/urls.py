@@ -19,4 +19,9 @@ urlpatterns = [
     path('api/bonus-recipe/', views.bonus_recipe_api, name='bonus_recipe_api'),
     # AI Fridge Scanner
     path('api/scan-fridge/', views.scan_fridge_api, name='scan_fridge_api'),
+    # Craving Mode (Premium)
+    path('cravings/', views.craving_view, name='cravings'),
+    path('api/cravings/checklist/', views.api_cravings_checklist, name='api_cravings_checklist'),
+    path('api/cravings/instructions/', views.api_cravings_instructions, name='api_cravings_instructions'),
+    path('upgrade/', views.upgrade_premium_view, name='upgrade_premium'),
 ]

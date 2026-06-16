@@ -1414,3 +1414,81 @@ def scan_fridge_api(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': f'Vision AI error: {str(e)}'}, status=500)
+
+# ─── Premium Features & Craving Mode ─────────────────────────────────────────
+
+def upgrade_premium_view(request):
+    return render(request, 'recipes/upgrade.html')
+
+@login_required(login_url='/login/')
+def craving_view(request):
+    # The Bouncer: Only allow Admins (Superusers) for now, as payment isn't integrated
+    if not request.user.is_superuser:
+        return redirect('upgrade_premium')
+    return render(request, 'recipes/cravings.html')
+
+@login_required(login_url='/login/')
+def api_cravings_checklist(request):
+    if not request.user.is_superuser:
+        return JsonResponse({'error': 'Premium required'}, status=403)
+        
+    if request.method == 'POST':
+        import json
+        data = json.loads(request.body)
+        craving = data.get('craving', '')
+        serving = data.get('serving', '2')
+        
+        prompt = f"""
+        The user wants to cook: {craving}
+        Serving size: {serving} people.
+        
+        Act as a professional chef. What exact ingredients and measurements are required?
+        Respond STRICTLY with a JSON list of objects containing 'name' and 'amount'.
+        Do NOT include any markdown, backticks, or extra text. Just the raw JSON array.
+        Example:
+        [
+          {{"name": "Garlic", "amount": "4 cloves"}},
+          {{"name": "Butter", "amount": "20g"}}
+        ]
+        """
+        
+        ai_response = call_gemini_api(prompt, "You are a chef. Output strictly valid JSON without markdown.", temperature=0.2)
+        try:
+            # Clean possible markdown block
+            clean_json = ai_response.replace('```json', '').replace('```', '').strip()
+            ingredients = json.loads(clean_json)
+            return JsonResponse({'ingredients': ingredients})
+        except Exception as e:
+            return JsonResponse({'error': 'Failed to parse AI checklist.', 'raw': ai_response}, status=500)
+            
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required(login_url='/login/')
+def api_cravings_instructions(request):
+    if not request.user.is_superuser:
+        return JsonResponse({'error': 'Premium required'}, status=403)
+        
+    if request.method == 'POST':
+        import json
+        data = json.loads(request.body)
+        craving = data.get('craving', '')
+        serving = data.get('serving', '2')
+        substitutions = data.get('substitutions', [])
+        
+        sub_text = "\\n".join(substitutions) if substitutions else "No substitutions needed. User has all ingredients."
+        
+        prompt = f"""
+        The user wants to cook: {craving} for {serving} people.
+        
+        Here are the user's ingredient substitutions/omissions:
+        {sub_text}
+        
+        Act as an interactive, highly-skilled Chef. Write a step-by-step recipe for {craving} that seamlessly incorporates their substitutions or omissions.
+        Make it sound encouraging and professional!
+        Use Markdown formatting for bolding, bullet points, and numbered lists.
+        """
+        
+        ai_response = call_gemini_api(prompt, "You are an encouraging Chef writing recipes in Markdown.")
+        return JsonResponse({'instructions': ai_response})
+        
+    return JsonResponse({'error': 'Invalid request'}, status=400)

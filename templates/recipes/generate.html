@@ -383,7 +383,7 @@
           type="submit"
           class="btn btn-purple w-100 btn-lg"
           style="font-size: 1.1rem; padding: 16px; background: linear-gradient(135deg, #10B981, #059669); border: none;"
-          onclick="document.getElementById('hidden_user_xp').value = parseInt(localStorage.getItem('budgetbites_xp') || '0'); showLoading();"
+          onclick="if(this.dataset.clicked) return false; this.dataset.clicked='true'; document.getElementById('hidden_user_xp').value = parseInt(localStorage.getItem('budgetbites_xp') || '0'); showLoading(this);"
         >
           <i class="fas fa-magic me-2"></i> Generate My Recipes with AI ✨
         </button>
@@ -1225,7 +1225,12 @@
       document.querySelector('input[name="budget"]').value = amount;
   }
 
-  function showLoading() {
+  function showLoading(btn) {
+      if(btn) {
+          btn.style.pointerEvents = 'none';
+          btn.style.opacity = '0.7';
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Generating...';
+      }
       setTimeout(() => {
           document.getElementById('loadingSection').style.display = 'block';
       }, 100);

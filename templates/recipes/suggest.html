@@ -343,7 +343,7 @@
 
 
         <!-- Submit -->
-        <button type="submit" class="btn w-100 btn-lg" style="background: #10B981; color: white; border: none; font-size: 1.1rem; padding: 16px; font-weight: bold; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);" onclick="showLoading('AI is thinking of dishes...')">
+        <button type="submit" class="btn w-100 btn-lg" style="background: #10B981; color: white; border: none; font-size: 1.1rem; padding: 16px; font-weight: bold; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);" onclick="if(this.dataset.clicked) return false; this.dataset.clicked='true'; showLoading('AI is thinking of dishes...'); this.style.opacity='0.7';">
           <i class="fas fa-lightbulb me-2"></i> Suggest Dishes for Me ✨
         </button>
       </form>
@@ -395,7 +395,7 @@
             <input type="hidden" name="selected_dish" value="{{ dish.name }}" />
             <input type="hidden" name="user_xp" class="hidden_user_xp" value="0" />
 
-            <button type="submit" class="w-100 text-start border-0 bg-transparent p-0" onclick="this.parentElement.querySelector('.hidden_user_xp').value = parseInt(localStorage.getItem('budgetbites_xp') || '0'); showLoading('AI is writing your recipe...')">
+            <button type="submit" class="w-100 text-start border-0 bg-transparent p-0" onclick="if(this.dataset.clicked) return false; this.dataset.clicked='true'; this.parentElement.querySelector('.hidden_user_xp').value = parseInt(localStorage.getItem('budgetbites_xp') || '0'); showLoading('AI is writing your recipe...'); this.style.opacity='0.5';">
               <div
                 class="card overflow-hidden"
                 style="transition: all 0.3s; cursor: pointer"

@@ -782,8 +782,8 @@ def generate_view(request):
 
 
     if request.method == 'POST':
-        from datetime import date
-        log, created = DailyRequestLog.objects.get_or_create(user=request.user, date=date.today())
+        from django.utils import timezone
+        log, created = DailyRequestLog.objects.get_or_create(user=request.user, date=timezone.localdate())
         
         ingredients = request.POST.get('ingredients', '')
         budget = request.POST.get('budget', '')
@@ -992,7 +992,8 @@ You must return the response strictly in the following format:
             })
 
     from datetime import date
-    log, _ = DailyRequestLog.objects.get_or_create(user=request.user, date=date.today())
+    from django.utils import timezone
+    log, _ = DailyRequestLog.objects.get_or_create(user=request.user, date=timezone.localdate())
     return render(request, 'recipes/generate.html', {
         'quick_ingredients': quick_ingredients,
         'quick_budgets': quick_budgets,

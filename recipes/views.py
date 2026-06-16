@@ -783,8 +783,17 @@ def generate_view(request):
 
     if request.method == 'POST':
         from django.utils import timezone
-        log, created = DailyRequestLog.objects.get_or_create(user=request.user, date=timezone.localdate())
-        
+        today = timezone.localdate()
+        log = DailyRequestLog.objects.filter(user=request.user).order_by('-date').first()
+        if not log:
+            log = DailyRequestLog.objects.create(user=request.user)
+            log.date = today
+            log.save()
+        elif log.date != today:
+            # It's a new day! Reset the quota.
+            log.date = today
+            log.request_count = 0
+            log.save()
         ingredients = request.POST.get('ingredients', '')
         budget = request.POST.get('budget', '')
         serving_size = request.POST.get('serving_size', '2')
@@ -995,7 +1004,16 @@ You must return the response strictly in the following format:
 
     from datetime import date
     from django.utils import timezone
-    log, _ = DailyRequestLog.objects.get_or_create(user=request.user, date=timezone.localdate())
+    today = timezone.localdate()
+    log = DailyRequestLog.objects.filter(user=request.user).order_by('-date').first()
+    if not log:
+        log = DailyRequestLog.objects.create(user=request.user)
+        log.date = today
+        log.save()
+    elif log.date != today:
+        log.date = today
+        log.request_count = 0
+        log.save()
     
     quota_count = 0 if request.user.is_superuser else log.request_count
     quota_limit = "∞" if request.user.is_superuser else 5

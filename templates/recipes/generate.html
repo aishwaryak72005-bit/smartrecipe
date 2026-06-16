@@ -1520,8 +1520,20 @@
     .then(data => {
         if (data.status === 'saved' || data.status === 'exists') {
             const shareUrl = window.location.origin + '/share/' + data.share_id + '/';
-            const text = encodeURIComponent('Check out this delicious recipe I generated on BudgetBites! 🍲🍳\n\n*' + name + '*\n' + description + '\n\n' + shareUrl);
-            window.open(`https://wa.me/?text=${text}`, '_blank');
+            const shareText = 'Check out this delicious recipe I generated on BudgetBites! 🍲🍳\n\n*' + name + '*\n' + description + '\n\n' + shareUrl;
+
+            // Try Web Share API first (works on mobile browsers & PWAs)
+            if (navigator.share && window.isSecureContext) {
+                navigator.share({
+                    title: name + ' — BudgetBites',
+                    text: shareText,
+                    url: shareUrl,
+                }).catch(() => {});
+            } else {
+                // Fallback: open WhatsApp via api.whatsapp.com (works in WebView)
+                window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(shareText), '_blank');
+            }
+
             btn.innerHTML = '✅ Shared!';
             setTimeout(() => {
                 btn.innerHTML = originalText;

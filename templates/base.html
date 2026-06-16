@@ -1825,7 +1825,7 @@
         } else {
           // Fallback to WhatsApp
           const waUrl =
-            "https://wa.me/?text=" +
+            "https://api.whatsapp.com/send?text=" +
             encodeURIComponent(
               "Check out this recipe: *" + name + "*\n" + shareUrl,
             );
@@ -1880,11 +1880,11 @@
       function executePinterestShare(name, shareId) {
         const shareUrl = window.location.origin + "/share/" + shareId + "/";
         const pinUrl =
-          "https://pinterest.com/pin/create/button/?url=" +
+          "https://www.pinterest.com/pin/create/button/?url=" +
           encodeURIComponent(shareUrl) +
           "&description=" +
-          encodeURIComponent(name);
-        window.open(pinUrl, "_blank");
+          encodeURIComponent(name + " — BudgetBites Recipe 🍲");
+        window.open(pinUrl, "_blank", "noopener,noreferrer");
       }
 
       function pinterestShareRecipe(name, shareId, btn) {

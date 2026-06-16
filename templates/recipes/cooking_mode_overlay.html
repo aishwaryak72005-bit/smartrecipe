@@ -172,6 +172,80 @@
     position: absolute; left: 6px; top: 18px; bottom: -8px; width: 2px; background: #374151; z-index: 1; transition: background 0.3s;
 }
 .timeline-line.active { background: #059669; }
+
+/* ── MOBILE RESPONSIVE ────────────────────────────────────── */
+@media (max-width: 768px) {
+    #cooking-overlay > div:nth-child(2) {
+        flex-direction: column !important;
+    }
+    #cooking-overlay > div:nth-child(2) > div:first-child {
+        width: 100% !important;
+        max-height: 180px !important;
+        padding: 16px !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255,255,255,0.15) !important;
+    }
+    #cooking-overlay > div:nth-child(2) > div:first-child .mb-4 {
+        margin-bottom: 8px !important;
+    }
+    #cooking-overlay > div:nth-child(2) > div:first-child h5 {
+        font-size: 1.1rem !important;
+    }
+    #cooking-overlay > div:nth-child(2) > div:last-child {
+        padding: 20px 16px !important;
+    }
+    #cooking-step-text {
+        font-size: 1.4rem !important;
+        margin-bottom: 20px !important;
+    }
+    #cooking-step-number {
+        padding: 5px 14px !important;
+        font-size: 0.75rem !important;
+        margin-bottom: 16px !important;
+    }
+    .d-flex.justify-content-center.align-items-center.gap-4.mt-5 {
+        margin-top: 16px !important;
+        gap: 12px !important;
+    }
+    .d-flex.justify-content-center.align-items-center.gap-4.mt-5 .btn {
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 1rem !important;
+    }
+    #cooking-needed-now {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        width: 100% !important;
+        margin-top: 16px;
+    }
+    #cooking-smart-timer {
+        margin-bottom: 16px !important;
+    }
+    #cooking-timer-btn {
+        width: 100px !important;
+        height: 100px !important;
+    }
+    #cooking-timer-btn i { font-size: 1.4rem !important; }
+    #cooking-timer-btn span { font-size: 0.85rem !important; }
+
+    /* Completion screen */
+    #cooking-completion-screen h2 {
+        font-size: 1.8rem !important;
+    }
+    #cooking-completion-screen .row.g-4 {
+        margin-bottom: 20px !important;
+    }
+
+    /* Top navbar on mobile */
+    #cooking-overlay > div:first-child {
+        height: 56px !important;
+        padding: 0 14px !important;
+    }
+    #cooking-overlay > div:first-child span {
+        font-size: 1.1rem !important;
+    }
+}
 </style>
 
 <script>

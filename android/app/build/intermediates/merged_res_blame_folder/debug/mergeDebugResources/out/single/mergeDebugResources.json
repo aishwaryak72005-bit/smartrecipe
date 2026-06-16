@@ -1,10 +1,14 @@
 [
     {
+        "merged": "C:\\Users\\Admin\\.gradle\\daemon\\8.13\\com.budgetbites.app-debug-35:\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\Admin\\.gradle\\daemon\\8.13\\com.budgetbites.app-main-37:\\layout\\activity_main.xml"
+    },
+    {
         "merged": "com.budgetbites.app-debug-35:/drawable_app_logo.png.flat",
         "source": "com.budgetbites.app-main-37:/drawable/app_logo.png"
     },
     {
-        "merged": "com.budgetbites.app-debug-35:/layout_activity_main.xml.flat",
-        "source": "com.budgetbites.app-main-37:/layout/activity_main.xml"
+        "merged": "C:\\Users\\Admin\\.gradle\\daemon\\8.13\\com.budgetbites.app-debug-35:\\drawable_app_logo.png.flat",
+        "source": "C:\\Users\\Admin\\.gradle\\daemon\\8.13\\com.budgetbites.app-main-37:\\drawable\\app_logo.png"
     }
 ]

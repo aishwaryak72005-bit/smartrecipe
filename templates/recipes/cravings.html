@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+
+{% block title %}Craving Mode - BudgetBites Pro{% endblock %}
+
+{% block content %}
+<style>
+  /* Premium Dark Glassmorphism UI */
+  .premium-bg {
+    background: radial-gradient(circle at top right, #1E1B4B, #0F172A, #000000);
+    min-height: calc(100vh - 70px);
+    color: white;
+    font-family: 'Inter', sans-serif;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  .premium-gradient-text {
+    background: linear-gradient(135deg, #FBBF24, #F59E0B, #D97706);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .pro-badge {
+    background: linear-gradient(135deg, #FBBF24, #D97706);
+    color: #000;
+    font-weight: 900;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .input-glass {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-size: 1.1rem;
+    transition: all 0.3s;
+  }
+  .input-glass:focus {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #FBBF24;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.1);
+    color: white;
+  }
+  .input-glass::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .btn-premium {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    color: white;
+    font-weight: 800;
+    border: none;
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 1.1rem;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+  }
+  .ingredient-item {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+  }
+  .ingredient-item:hover {
+    background: rgba(255,255,255,0.05);
+  }
+  .sub-input {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+  
+  /* Loader */
+  .pro-loader {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(251, 191, 36, 0.2);
+    border-top-color: #FBBF24;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+  }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+</style>
+
+<div class="premium-bg py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        
+        <div class="text-center mb-4">
+          <span class="pro-badge mb-2 d-inline-block">Pro Feature</span>
+          <h1 class="fw-bolder mb-2 premium-gradient-text" style="font-size: 2.5rem;">Craving Mode</h1>
+          <p class="text-white-50" style="font-size: 1.1rem;">Tell the AI Chef exactly what you want to eat, and it will help you cook it with whatever you have.</p>
+        </div>
+
+        <div class="glass-card p-4 p-md-5 mb-4" id="step1-card">
+          <form id="cravingsForm">
+            {% csrf_token %}
+            <div class="mb-4">
+              <label class="form-label text-white-50 fw-bold mb-2">What are you craving?</label>
+              <input type="text" id="cravingInput" class="form-control input-glass" placeholder="e.g. Garlic Bread, Butter Chicken..." required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label text-white-50 fw-bold mb-2">How many people are eating?</label>
+              <select id="servingInput" class="form-select input-glass" style="appearance: none;">
+                <option value="1" style="color: black;">1 Person</option>
+                <option value="2" style="color: black;" selected>2 People</option>
+                <option value="4" style="color: black;">4 People</option>
+                <option value="6" style="color: black;">6+ People</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-premium w-100 d-flex align-items-center justify-content-center gap-2">
+              <i class="fas fa-magic"></i> Generate Checklist
+            </button>
+          </form>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-5" style="display: none;">
+          <div class="pro-loader mb-3"></div>
+          <h5 class="fw-bold premium-gradient-text" id="loadingText">Analyzing your craving...</h5>
+        </div>
+
+        <!-- Step 2: The Checklist -->
+        <div class="glass-card p-4 p-md-5 mb-4" id="step2-card" style="display: none;">
+          <h3 class="fw-bold mb-1">Your Checklist</h3>
+          <p class="text-white-50 mb-4">Select what you have. If you're missing something, type what you have instead!</p>
+          
+          <div id="checklistContainer"></div>
+          
+          <button id="cookBtn" class="btn btn-premium w-100 mt-4 d-flex align-items-center justify-content-center gap-2">
+            <i class="fas fa-fire"></i> Start Cooking
+          </button>
+        </div>
+
+        <!-- Step 3: Final Instructions -->
+        <div class="glass-card p-4 p-md-5 mb-4" id="step3-card" style="display: none;">
+          <h3 class="fw-bold mb-3 premium-gradient-text" id="finalTitle">Let's Cook!</h3>
+          <div id="finalInstructions" class="text-white-50" style="line-height: 1.8;"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('cravingsForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const craving = document.getElementById('cravingInput').value;
+  const serving = document.getElementById('servingInput').value;
+  
+  document.getElementById('step1-card').style.display = 'none';
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('loadingText').innerText = 'Gathering ingredients for ' + craving + '...';
+
+  fetch('/api/cravings/checklist/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+    },
+    body: JSON.stringify({ craving: craving, serving: serving })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('loadingState').style.display = 'none';
+    const container = document.getElementById('checklistContainer');
+    container.innerHTML = '';
+    
+    data.ingredients.forEach((ing, index) => {
+      container.innerHTML += `
+        <div class="ingredient-item">
+          <div class="d-flex align-items-center gap-3">
+            <input class="form-check-input mt-0" type="checkbox" id="check_${index}" value="" style="transform: scale(1.3);" checked onchange="toggleSub(this, ${index})">
+            <label class="form-check-label fw-bold" for="check_${index}">${ing.amount} ${ing.name}</label>
+          </div>
+          <input type="text" id="sub_${index}" class="sub-input" placeholder="Substitute with..." style="display: none; width: 45%;">
+        </div>
+      `;
+    });
+    
+    // Store data globally
+    window.cravingData = data;
+    document.getElementById('step2-card').style.display = 'block';
+  });
+});
+
+function toggleSub(checkbox, index) {
+  const subInput = document.getElementById('sub_' + index);
+  if (checkbox.checked) {
+    subInput.style.display = 'none';
+    subInput.value = '';
+  } else {
+    subInput.style.display = 'block';
+    subInput.focus();
+  }
+}
+
+document.getElementById('cookBtn').addEventListener('click', function() {
+  const ingredients = window.cravingData.ingredients;
+  const substitutions = [];
+  
+  ingredients.forEach((ing, index) => {
+    const isChecked = document.getElementById('check_' + index).checked;
+    if (!isChecked) {
+      const subVal = document.getElementById('sub_' + index).value;
+      if (subVal) {
+        substitutions.push(`Substitute ${ing.name} with ${subVal}`);
+      } else {
+        substitutions.push(`Omit ${ing.name}`);
+      }
+    }
+  });
+
+  document.getElementById('step2-card').style.display = 'none';
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('loadingText').innerText = 'Adapting recipe for your ingredients...';
+
+  fetch('/api/cravings/instructions/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+    },
+    body: JSON.stringify({ 
+      craving: document.getElementById('cravingInput').value,
+      serving: document.getElementById('servingInput').value,
+      substitutions: substitutions 
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('step3-card').style.display = 'block';
+    document.getElementById('finalTitle').innerText = document.getElementById('cravingInput').value;
+    
+    let html = data.instructions.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b class="text-white">$1</b>');
+    document.getElementById('finalInstructions').innerHTML = html;
+  });
+});
+</script>
+{% endblock %}

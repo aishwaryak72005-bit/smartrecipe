@@ -953,7 +953,7 @@ CRITICAL RULES:
 {pantry_rule_gen}
 4. MISSING INGREDIENTS: Only list ingredients the user DOES NOT have in the 'Missing Ingredients' section. If they have everything needed, write 'None'.
 5. PRICING: Be realistic with Indian grocery prices.
-6. EXACT MACROS: If the user provides specific quantities in 'Available Ingredients' (e.g. '250g chicken'), you MUST accurately calculate the Nutritional Info based strictly on those exact measurements.
+6. EXACT MACROS: You are acting as a Certified Clinical Nutritionist. If the user provides quantities (e.g. '250g chicken'), you MUST calculate the EXACT Calories, Protein, Carbs, and Fats using standard USDA database values. DO NOT guess. Sum up the exact macros of all ingredients used.
 
 Provide EXACTLY {recipe_count} recipe options.
 You must return the response strictly in the following format:

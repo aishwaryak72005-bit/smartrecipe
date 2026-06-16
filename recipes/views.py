@@ -986,8 +986,8 @@ You must return the response strictly in the following format:
                 'cuisine': cuisine,
                 'youtube_videos': youtube_videos,
                 'selected_dish': selected_dish,
-                'quota_count': log.request_count,
-                'quota_limit': 5,
+                'quota_count': 0 if request.user.is_superuser else log.request_count,
+                'quota_limit': "∞" if request.user.is_superuser else 5,
             })
 
         except Exception as e:

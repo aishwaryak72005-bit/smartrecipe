@@ -8,6 +8,7 @@
       content="hMARXpSMRjyUTV4DIZMTfXsOpJFQBj2GOPdZAkXJk54"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light">
     <title>BudgetBites - Cook Smart. Spend Less. Eat Better.</title>
     <!-- Page Title -->
     <!-- Description Google shows under your link -->
@@ -109,7 +110,36 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       rel="stylesheet"
     />
+    
+    <!-- html2pdf for saving PDFs (Bug 2 Fix) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
+      /* --- Bug 4 Dark Mode Fixes --- */
+      .recipe-card,
+      .recipe-card *,
+      .ingredient-card,
+      .instruction-step,
+      .nutrition-card,
+      .budget-breakdown {
+          color: #1a1a1a !important;
+          background-color: inherit;
+      }
+
+      .recipe-card {
+          background-color: #ffffff !important;
+      }
+
+      .dark-card {
+          background-color: #1e3a2f !important;
+          color: #ffffff !important;
+      }
+
+      .dark-card * {
+          color: #ffffff !important;
+      }
+      /* ----------------------------- */
+
       * {
         font-family: "Poppins", sans-serif;
         box-sizing: border-box;

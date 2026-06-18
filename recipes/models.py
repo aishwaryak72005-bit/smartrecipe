@@ -70,9 +70,9 @@ class MacroLog(models.Model):
     date = models.DateField(auto_now_add=True)
     recipe_name = models.CharField(max_length=200)
     calories = models.IntegerField(default=0)
-    protein_g = models.IntegerField(default=0)
-    carbs_g = models.IntegerField(default=0)
-    fats_g = models.IntegerField(default=0)
+    protein = models.IntegerField(default=0)
+    carbs = models.IntegerField(default=0)
+    fats = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

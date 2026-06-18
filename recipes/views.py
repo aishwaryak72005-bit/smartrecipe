@@ -1354,39 +1354,58 @@ def delete_meal_view(request):
 @login_required(login_url='/login/')
 def cooking_tips_view(request):
     """Return AI-generated quick tips for a recipe name (AJAX)."""
-    recipe_name = request.GET.get('recipe', '')
+    import json
+    recipe_name = ''
+    ingredients = ''
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            recipe_name = data.get('recipe', '')
+            ingredients = data.get('ingredients', '')
+        except:
+            pass
+    else:
+        recipe_name = request.GET.get('recipe', '')
+        ingredients = request.GET.get('ingredients', '')
+
+    fallback_tips = [
+        "Use fresh ingredients", 
+        "Cook on medium heat", 
+        "Taste and adjust seasoning", 
+        "Prep all ingredients before cooking", 
+        "Let the dish rest before serving"
+    ]
+
     if not recipe_name:
-        return JsonResponse({'tips': []})
+        return JsonResponse({'tips': fallback_tips})
+
     try:
+        prompt = (
+            f"Give exactly 5 practical pro cooking tips for making {recipe_name} "
+            f"with these ingredients: {ingredients}. Return as JSON array with key 'tips'. "
+            "Each tip should be one clear sentence."
+        )
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
-                {"role": "system", "content": "You are an expert Indian chef. Give practical, short tips."},
-                {"role": "user", "content": (
-                    f"Give exactly 4 quick pro cooking tips for making '{recipe_name}' perfectly. "
-                    "Each tip must be one short sentence. Reply ONLY as a numbered list:\n"
-                    "1. tip\n2. tip\n3. tip\n4. tip"
-                )},
+                {"role": "system", "content": "You are an expert chef. Output strictly valid JSON without markdown."},
+                {"role": "user", "content": prompt},
             ],
             max_tokens=250,
             temperature=0.6,
         )
         text = response.choices[0].message.content.strip()
-        tips = []
-        for line in text.split('\n'):
-            line = line.strip()
-            if line.startswith(('- ', '* ')):
-                tips.append(line[2:].strip())
-            elif line and line[0].isdigit() and '.' in line:
-                tips.append(line.split('.', 1)[1].strip())
-            elif len(line) > 10 and not line.endswith(':'):
-                tips.append(line)
-        # Filter empty
-        tips = [t for t in tips if t][:4]
-        return JsonResponse({'tips': tips})
+        
+        # Clean markdown if present
+        clean_json = text.replace('```json', '').replace('```', '').strip()
+        data = json.loads(clean_json)
+        
+        tips = data.get('tips', fallback_tips)
+        return JsonResponse({'tips': tips[:5]})
     except Exception as e:
         print("Cooking tips error:", e)
-        return JsonResponse({'tips': []})
+        return JsonResponse({'tips': fallback_tips})
 
 # ─── Chatbot API ────────────────────────────────────────────────────────
 
@@ -1677,19 +1696,21 @@ def macros_view(request):
     if not is_user_premium(request.user):
         return redirect('upgrade_premium')
         
-    from django.utils import timezone
-    today = timezone.localdate()
+    from datetime import date
     
-    logs = MacroLog.objects.filter(user=request.user, date=today)
+    today_logs = MacroLog.objects.filter(
+        user=request.user,
+        date=date.today()
+    )
     
-    total_cals = sum(log.calories for log in logs)
-    total_protein = sum(log.protein_g for log in logs)
-    total_carbs = sum(log.carbs_g for log in logs)
-    total_fats = sum(log.fats_g for log in logs)
+    total_calories = sum(log.calories for log in today_logs)
+    total_protein = sum(log.protein for log in today_logs)
+    total_carbs = sum(log.carbs for log in today_logs)
+    total_fats = sum(log.fats for log in today_logs)
     
     return render(request, 'recipes/macros.html', {
-        'logs': logs,
-        'total_cals': total_cals,
+        'logs': today_logs,
+        'total_cals': total_calories,
         'total_protein': total_protein,
         'total_carbs': total_carbs,
         'total_fats': total_fats,
@@ -1702,15 +1723,17 @@ def log_macro_api(request):
         return JsonResponse({'error': 'Premium required'}, status=403)
         
     import json
+    from datetime import date
     try:
         data = json.loads(request.body)
         MacroLog.objects.create(
             user=request.user,
+            date=date.today(),
             recipe_name=data.get('recipe_name', 'Unknown Recipe'),
-            calories=int(data.get('calories', 0)),
-            protein_g=int(data.get('protein', 0)),
-            carbs_g=int(data.get('carbs', 0)),
-            fats_g=int(data.get('fats', 0))
+            calories=int(float(data.get('calories', 0))),
+            protein=int(float(data.get('protein', 0))),
+            carbs=int(float(data.get('carbs', 0))),
+            fats=int(float(data.get('fats', 0)))
         )
         return JsonResponse({'status': 'success'})
     except Exception as e:

@@ -1,4 +1,4 @@
-<div id="recipe-card-content-{{ forloop.counter }}" class="rounded-3xl bg-[#064E3B] text-emerald-50 shadow-2xl ring-1 ring-emerald-800 mb-10 overflow-hidden group" style="font-family: 'Poppins', sans-serif;" data-share-id="{% if saved_recipe_obj %}{{ saved_recipe_obj.share_id }}{% endif %}">
+<div id="recipe-card" class="rounded-3xl bg-[#064E3B] text-emerald-50 shadow-2xl ring-1 ring-emerald-800 mb-10 overflow-hidden group recipe-card dark-card" style="font-family: 'Poppins', sans-serif;" data-share-id="{% if saved_recipe_obj %}{{ saved_recipe_obj.share_id }}{% endif %}">
   
   <!-- Header Section (Green Background) -->
   <div class="p-6 sm:p-8">
@@ -111,10 +111,10 @@
     <button onclick="shareRecipeLink('{{ recipe.name|escapejs }}', '{{ recipe.description|escapejs }}', this)" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
       <i class="fas fa-share-nodes text-orange-400"></i> Share
     </button>
-    <button onclick="fetchCookingTips('{{ recipe.name|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
+    <button onclick="fetchCookingTips('{{ recipe.name|escapejs }}', '{{ ingredients|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
       <i class="fas fa-lightbulb text-yellow-400"></i> Cooking Tips
     </button>
-    <button onclick="downloadPDF('recipe-card-content-{{ forloop.counter }}', '{{ recipe.name|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
+    <button onclick="savePDF()" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
       <i class="fas fa-file-pdf text-red-500"></i> Save PDF <span class="text-[0.6rem] bg-orange-500 text-white px-1.5 py-0.5 rounded ml-1">PRO</span>
     </button>
     <button onclick="logMacros('{{ recipe.name|escapejs }}', '{{ recipe.nutrition.calories|default:'0' }}', '{{ recipe.nutrition.protein|default:'0' }}', '{{ recipe.nutrition.carbs|default:'0' }}', '{{ recipe.nutrition.fat|default:'0' }}', this)" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
@@ -228,7 +228,31 @@ function startCookingModeFallback(element, recipeName) {
     }
 }
 
-function fetchCookingTips(recipeName) {
+function savePDF() {
+    const recipeCard = document.getElementById('recipe-card');
+    const recipeName = document.querySelector('.recipe-title').innerText || 'Recipe';
+    
+    const opt = {
+        margin: [10, 10, 10, 10],
+        filename: recipeName + '_BudgetBites.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            allowTaint: true
+        },
+        jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait' 
+        },
+        pagebreak: { mode: 'avoid-all' }
+    };
+    
+    html2pdf().set(opt).from(recipeCard).save();
+}
+
+function fetchCookingTips(recipeName, ingredients) {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
             title: 'Chef AI is thinking...',
@@ -236,7 +260,14 @@ function fetchCookingTips(recipeName) {
             didOpen: () => { Swal.showLoading(); }
         });
     }
-    fetch('/cooking-tips/?recipe=' + encodeURIComponent(recipeName))
+    fetch('/cooking-tips/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+        },
+        body: JSON.stringify({recipe: recipeName, ingredients: ingredients})
+    })
     .then(r => r.json())
     .then(data => {
         if(data.tips && data.tips.length > 0) {

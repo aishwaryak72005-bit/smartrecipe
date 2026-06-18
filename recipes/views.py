@@ -1269,10 +1269,17 @@ def cooking_tips_view(request):
         tips = []
         for line in text.split('\n'):
             line = line.strip()
-            if line and line[0].isdigit() and '.' in line:
+            if line.startswith(('- ', '* ')):
+                tips.append(line[2:].strip())
+            elif line and line[0].isdigit() and '.' in line:
                 tips.append(line.split('.', 1)[1].strip())
-        return JsonResponse({'tips': tips[:4]})
-    except Exception:
+            elif len(line) > 10 and not line.endswith(':'):
+                tips.append(line)
+        # Filter empty
+        tips = [t for t in tips if t][:4]
+        return JsonResponse({'tips': tips})
+    except Exception as e:
+        print("Cooking tips error:", e)
         return JsonResponse({'tips': []})
 
 # ─── Chatbot API ────────────────────────────────────────────────────────

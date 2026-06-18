@@ -2483,6 +2483,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 function switchTab(recipeId, tabName) {
@@ -2511,6 +2512,21 @@ function switchTab(recipeId, tabName) {
 
 // Premium Features Logic
 function downloadPDF(recipeId, recipeName) {
+    const isPremium = {{ premium|yesno:"true,false" }};
+    if(!isPremium) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'PRO Feature 👑',
+            text: 'Saving as a beautifully formatted PDF is a premium feature! Upgrade to print your recipes.',
+            confirmButtonText: 'Upgrade Now',
+            confirmButtonColor: '#f97316',
+            showCancelButton: true,
+            cancelButtonText: 'Maybe Later'
+        }).then((result) => {
+            if(result.isConfirmed) window.location.href = '/premium/';
+        });
+        return;
+    }
     const element = document.getElementById(`recipe-card-content-${recipeId}`);
     if (!element) return;
     
@@ -2567,8 +2583,29 @@ function logMacros(recipeName, calories, protein, carbs, fats, btnElement) {
         })
     }).then(res => res.json()).then(data => {
         if(data.error) {
-            alert("Error: " + data.error);
+            if(data.error === 'Premium required') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'PRO Feature 👑',
+                    text: 'Logging macros is a premium feature. Upgrade to track your daily nutrition!',
+                    confirmButtonText: 'Upgrade Now',
+                    confirmButtonColor: '#10B981',
+                    showCancelButton: true,
+                    cancelButtonText: 'Maybe Later'
+                }).then((result) => {
+                    if(result.isConfirmed) window.location.href = '/premium/';
+                });
+            } else {
+                Swal.fire('Error', data.error, 'error');
+            }
         } else {
+            Swal.fire({
+                icon: 'success',
+                title: 'Logged!',
+                text: 'Macros have been saved to your daily tracker.',
+                timer: 1500,
+                showConfirmButton: false
+            });
             btnElement.innerHTML = '<i class="fas fa-check text-green-400"></i> Logged!';
             btnElement.disabled = true;
             btnElement.classList.add('bg-emerald-900', 'border-emerald-600');
@@ -2577,8 +2614,25 @@ function logMacros(recipeName, calories, protein, carbs, fats, btnElement) {
             }, 1000);
         }
     }).catch(err => {
-        alert("Failed to log macros.");
+        Swal.fire('Error', 'Failed to log macros. Please try again.', 'error');
     });
 }
+
+// Auto-Trigger for "Use Again" feature
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if(urlParams.get('auto') === '1') {
+        const form = document.querySelector('form');
+        if(form) {
+            // Show a nice loading state while it auto-submits
+            const btn = form.querySelector('button[type="submit"]');
+            if(btn) {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+                btn.classList.add('opacity-75');
+            }
+            form.submit();
+        }
+    }
+});
 </script>
 {% endblock %}

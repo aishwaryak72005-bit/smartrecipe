@@ -227,8 +227,10 @@ function startCookingModeFallback(element, recipeName) {
 function fetchCookingTips(recipeName, ingredients) {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
-            title: 'Chef AI is thinking...',
+            title: '<span style="color:#ffffff;">Chef AI is thinking...</span>',
             allowOutsideClick: false,
+            background: '#064E3B',
+            color: '#ffffff',
             didOpen: () => { Swal.showLoading(); }
         });
     }
@@ -243,25 +245,30 @@ function fetchCookingTips(recipeName, ingredients) {
     .then(r => r.json())
     .then(data => {
         if(data.tips && data.tips.length > 0) {
-            let listHtml = '<ul style="text-align:left; margin-top:1rem;">';
-            data.tips.forEach(t => { listHtml += '<li style="margin-bottom:0.5rem;">🍳 ' + t + '</li>'; });
+            let listHtml = '<ul style="text-align:left; margin-top:1rem; color: #d1fae5;">';
+            data.tips.forEach(t => { listHtml += '<li style="margin-bottom:0.75rem;"><span style="color:#f97316; font-weight:bold;">&bull;</span> ' + t + '</li>'; });
             listHtml += '</ul>';
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
-                    title: '👨‍🍳 Pro Cooking Tips',
+                    title: '<span style="color:#ffffff;">👨‍🍳 Pro Cooking Tips</span>',
                     html: listHtml,
-                    icon: 'info'
+                    icon: 'info',
+                    background: '#064E3B',
+                    color: '#ffffff',
+                    iconColor: '#10B981',
+                    confirmButtonColor: '#f97316',
+                    customClass: { popup: 'rounded-3xl border border-emerald-700/50 shadow-2xl' }
                 });
             } else {
                 alert("Pro Cooking Tips:\n\n" + data.tips.join("\n\n"));
             }
         } else {
-            if (typeof Swal !== 'undefined') Swal.fire('Oops', 'No tips available right now.', 'error');
+            if (typeof Swal !== 'undefined') Swal.fire({title: 'Oops', text: 'No tips available right now.', icon: 'error', background: '#064E3B', color: '#ffffff', confirmButtonColor: '#f97316'});
             else alert('No tips available right now.');
         }
     })
     .catch(() => {
-        if (typeof Swal !== 'undefined') Swal.fire('Error', 'Failed to load tips.', 'error');
+        if (typeof Swal !== 'undefined') Swal.fire({title: 'Error', text: 'Failed to load tips.', icon: 'error', background: '#064E3B', color: '#ffffff', confirmButtonColor: '#f97316'});
         else alert('Failed to load tips.');
     });
 }

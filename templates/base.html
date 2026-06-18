@@ -602,6 +602,52 @@
         background: #1f2937 !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
       }
+
+      /* ── RECIPE CARD WHITE PANEL - ALWAYS dark text, never inherit dark mode ── */
+      .recipe-white-panel,
+      .recipe-white-panel * {
+        color: #1e293b !important;
+      }
+      .recipe-white-panel .text-white,
+      .recipe-white-panel [class*="text-white"] {
+        color: #1e293b !important;
+      }
+      /* Exception: step number circles should stay white text */
+      .recipe-white-panel div[style*="background:#064E3B"],
+      .recipe-white-panel div[style*="background: #064E3B"] {
+        color: #ffffff !important;
+      }
+      .tab-content.bg-white,
+      .tab-content.bg-white * {
+        color: #1e293b;
+      }
+      .tab-content.bg-white [style*="background:#f8fafc"],
+      .tab-content.bg-white [style*="background: #f8fafc"],
+      .tab-content.bg-white [style*="background:#f8f"],
+      .tab-content.bg-white div[style] {
+        color: #1e293b !important;
+      }
+      /* Force ingredient and instruction text always visible */
+      .tab-content div[style*="color:#0f172a"],
+      .tab-content div[style*="color: #0f172a"],
+      .tab-content div[style*="color:#1e293b"],
+      .tab-content div[style*="color: #1e293b"],
+      .tab-content div[style*="color:#475569"],
+      .tab-content div[style*="color: #475569"] {
+        color: inherit !important;
+      }
+      .dark-mode .tab-content div[style*="color:#0f172a"],
+      .dark-mode .tab-content div[style*="color: #0f172a"] {
+        color: #0f172a !important;
+      }
+      .dark-mode .tab-content div[style*="color:#1e293b"],
+      .dark-mode .tab-content div[style*="color: #1e293b"] {
+        color: #1e293b !important;
+      }
+      .dark-mode .tab-content div[style*="color:#475569"],
+      .dark-mode .tab-content div[style*="color: #475569"] {
+        color: #475569 !important;
+      }
       .dark-mode h1,
       .dark-mode h2,
       .dark-mode h3,

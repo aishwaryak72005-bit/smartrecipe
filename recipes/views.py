@@ -17,9 +17,6 @@ def is_user_premium(user):
 import os
 import requests
 import urllib.parse as _urlparse
-from bs4 import BeautifulSoup
-from functools import lru_cache
-from math import log, exp
 import urllib.request
 import json
 import re

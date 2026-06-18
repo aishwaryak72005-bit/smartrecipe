@@ -383,7 +383,6 @@ def parse_recipes(ai_response):
                             if clean_name.startswith('-'):
                                 clean_name = clean_name[1:].strip()
                                 
-                        import re
                         if clean_name and re.search(r'^[A-Za-z]+[0-9]+$', clean_name):
                             clean_name = re.sub(r'[0-9]+$', '', clean_name).strip()
                             if clean_name.lower() == 'egg' and measurement and measurement != '1':

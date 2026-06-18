@@ -730,6 +730,8 @@ Reply ONLY with this exact format — nothing else:
     })
 
 
+from concurrent.futures import ThreadPoolExecutor
+
 @login_required(login_url='/login/')
 def calculate_recipe_nutrition(ingredients_list, servings):
     total = {
@@ -739,22 +741,26 @@ def calculate_recipe_nutrition(ingredients_list, servings):
     
     ingredient_details = []
     
-    for ing in ingredients_list:
-        # ing is dict with 'text' and 'measurement'
+    def fetch_ing(ing):
         name = ing.get('text', '')
         measure = ing.get('measurement', '')
         full_str = f"{measure} {name}".strip()
         grams = parse_quantity_to_grams(full_str)
         
         nutri = get_nutrition_for_ingredient(name, grams)
-        
-        ingredient_details.append({
+        return {
             'name': name,
             'quantity': full_str,
             'grams': grams,
             'nutrition': nutri
-        })
+        }
         
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        results = list(executor.map(fetch_ing, ingredients_list))
+        
+    for detail in results:
+        ingredient_details.append(detail)
+        nutri = detail['nutrition']
         for k in total.keys():
             total[k] += nutri.get(k, 0.0)
             
@@ -866,6 +872,17 @@ def generate_view(request):
         ],
     }
     quick_budgets = [50, 100, 150, 200, 500]
+    if request.method == 'GET':
+        ingredients = request.GET.get('ingredients', '')
+        budget = request.GET.get('budget', '')
+        cuisine = request.GET.get('cuisine', '')
+        return render(request, 'recipes/generate.html', {
+            'quick_ingredients': quick_ingredients,
+            'quick_budgets': quick_budgets,
+            'ingredients': ingredients,
+            'budget': budget,
+            'cuisine': cuisine,
+        })
 
 
     if request.method == 'POST':

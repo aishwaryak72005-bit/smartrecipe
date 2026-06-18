@@ -35,6 +35,8 @@ USDA_NUTRIENT_IDS = {
 
 groq_client = Groq(api_key=os.getenv('GROQ_API_KEY'))
 
+_NUTRITION_CACHE_100G = {}
+
 def get_nutrition_for_ingredient(ingredient_name, quantity_grams):
     """
     Fetches nutrition info from USDA FoodData Central.
@@ -50,6 +52,16 @@ def get_nutrition_for_ingredient(ingredient_name, quantity_grams):
     
     if not api_key:
         return _fallback_groq_nutrition(ingredient_name, quantity_grams, result)
+
+    cache_key = ingredient_name.lower().strip()
+    
+    # Use cache if available
+    if cache_key in _NUTRITION_CACHE_100G:
+        food_nutrients = _NUTRITION_CACHE_100G[cache_key]
+        for key, n_id in USDA_NUTRIENT_IDS.items():
+            per_100g = food_nutrients.get(n_id, 0.0)
+            result[key] = round((float(per_100g) / 100.0) * float(quantity_grams), 1)
+        return result
 
     try:
         url = "https://api.nal.usda.gov/fdc/v1/foods/search"
@@ -67,10 +79,10 @@ def get_nutrition_for_ingredient(ingredient_name, quantity_grams):
             
         food = data['foods'][0]
         food_nutrients = {n['nutrientId']: n['value'] for n in food.get('foodNutrients', [])}
+        _NUTRITION_CACHE_100G[cache_key] = food_nutrients
         
         for key, n_id in USDA_NUTRIENT_IDS.items():
             per_100g = food_nutrients.get(n_id, 0.0)
-            # Formula: (per_100g / 100) * quantity_grams
             result[key] = round((float(per_100g) / 100.0) * float(quantity_grams), 1)
             
         return result
@@ -98,14 +110,21 @@ def _fallback_groq_nutrition(ingredient_name, quantity_grams, default_result):
         if "{" in content:
             content = content[content.find("{"):content.rfind("}")+1]
         
-        data_100g = json.loads(content)
+        parsed = json.loads(content)
+        
+        # Save to cache
+        cache_key = ingredient_name.lower().strip()
+        fake_food_nutrients = {}
+        for key, n_id in USDA_NUTRIENT_IDS.items():
+            fake_food_nutrients[n_id] = float(parsed.get(key, 0.0))
+        _NUTRITION_CACHE_100G[cache_key] = fake_food_nutrients
         
         for key in USDA_NUTRIENT_IDS.keys():
-            val_100g = float(data_100g.get(key, 0.0))
-            default_result[key] = round((val_100g / 100.0) * float(quantity_grams), 1)
-            
+            per_100g = parsed.get(key, 0.0)
+            default_result[key] = round((float(per_100g) / 100.0) * float(quantity_grams), 1)
+        return default_result
     except Exception as e:
-        print(f"Groq Fallback error for {ingredient_name}: {e}")
+        print(f"Groq API error for {ingredient_name}: {e}")
         
     return default_result
 

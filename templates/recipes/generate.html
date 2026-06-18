@@ -2515,11 +2515,11 @@ function downloadPDF(recipeId, recipeName) {
     const isPremium = {{ premium|yesno:"true,false" }};
     if(!isPremium) {
         Swal.fire({
-            icon: 'warning',
-            title: 'PRO Feature 👑',
-            text: 'Saving as a beautifully formatted PDF is a premium feature! Upgrade to print your recipes.',
-            confirmButtonText: 'Upgrade Now',
-            confirmButtonColor: '#f97316',
+            icon: 'info',
+            title: 'Unlock PDF Saving! 🌟',
+            text: 'You\'ve discovered a premium feature! Upgrade to BudgetBites Pro to save your recipes as beautiful PDFs.',
+            confirmButtonText: 'View Pro Features',
+            confirmButtonColor: '#10B981',
             showCancelButton: true,
             cancelButtonText: 'Maybe Later'
         }).then((result) => {
@@ -2585,10 +2585,10 @@ function logMacros(recipeName, calories, protein, carbs, fats, btnElement) {
         if(data.error) {
             if(data.error === 'Premium required') {
                 Swal.fire({
-                    icon: 'warning',
-                    title: 'PRO Feature 👑',
-                    text: 'Logging macros is a premium feature. Upgrade to track your daily nutrition!',
-                    confirmButtonText: 'Upgrade Now',
+                    icon: 'info',
+                    title: 'Unlock Macro Tracking! 🌟',
+                    text: 'You\'ve discovered a premium feature! Upgrade to BudgetBites Pro to automatically track your daily nutrition.',
+                    confirmButtonText: 'View Pro Features',
                     confirmButtonColor: '#10B981',
                     showCancelButton: true,
                     cancelButtonText: 'Maybe Later'

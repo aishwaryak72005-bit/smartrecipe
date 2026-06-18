@@ -111,6 +111,9 @@
     <button onclick="shareRecipeLink('{{ recipe.name|escapejs }}', '{{ recipe.description|escapejs }}', this)" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
       <i class="fas fa-share-nodes text-orange-400"></i> Share
     </button>
+    <button onclick="fetchCookingTips('{{ recipe.name|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
+      <i class="fas fa-lightbulb text-yellow-400"></i> Cooking Tips
+    </button>
     <button onclick="downloadPDF('recipe-card-content-{{ forloop.counter }}', '{{ recipe.name|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
       <i class="fas fa-file-pdf text-red-500"></i> Save PDF <span class="text-[0.6rem] bg-orange-500 text-white px-1.5 py-0.5 rounded ml-1">PRO</span>
     </button>
@@ -227,6 +230,41 @@ function startCookingModeFallback(element, recipeName) {
     } else {
         alert("Start cooking mode initialized for: " + recipeName);
     }
+}
+
+function fetchCookingTips(recipeName) {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Chef AI is thinking...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+    }
+    fetch('/cooking-tips/?recipe=' + encodeURIComponent(recipeName))
+    .then(r => r.json())
+    .then(data => {
+        if(data.tips && data.tips.length > 0) {
+            let listHtml = '<ul style="text-align:left; margin-top:1rem;">';
+            data.tips.forEach(t => { listHtml += '<li style="margin-bottom:0.5rem;">🍳 ' + t + '</li>'; });
+            listHtml += '</ul>';
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: '👨‍🍳 Pro Cooking Tips',
+                    html: listHtml,
+                    icon: 'info'
+                });
+            } else {
+                alert("Pro Cooking Tips:\n\n" + data.tips.join("\n\n"));
+            }
+        } else {
+            if (typeof Swal !== 'undefined') Swal.fire('Oops', 'No tips available right now.', 'error');
+            else alert('No tips available right now.');
+        }
+    })
+    .catch(() => {
+        if (typeof Swal !== 'undefined') Swal.fire('Error', 'Failed to load tips.', 'error');
+        else alert('Failed to load tips.');
+    });
 }
 </script>
 {% endif %}

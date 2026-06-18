@@ -259,4 +259,17 @@ function fetchCookingTips(recipeName, ingredients) {
                     icon: 'info'
                 });
             } else {
-                alert("P
+                alert("Pro Cooking Tips:\n\n" + data.tips.join("\n\n"));
+            }
+        } else {
+            if (typeof Swal !== 'undefined') Swal.fire('Oops', 'No tips available right now.', 'error');
+            else alert('No tips available right now.');
+        }
+    })
+    .catch(() => {
+        if (typeof Swal !== 'undefined') Swal.fire('Error', 'Failed to load tips.', 'error');
+        else alert('Failed to load tips.');
+    });
+}
+</script>
+{% endif %}

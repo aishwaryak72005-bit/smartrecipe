@@ -610,7 +610,14 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
       }
 
-
+      /* Force text color in white panels against ALL extensions */
+      .recipe-white-panel *, .nutrition-card * {
+        -webkit-text-fill-color: #0f172a !important;
+      }
+      .recipe-white-panel i, .nutrition-card i {
+        -webkit-text-fill-color: initial !important; /* Let icons keep their colors */
+      }
+      
       .dark-mode h1,
       .dark-mode h2,
       .dark-mode h3,

@@ -1731,9 +1731,9 @@ def log_macro_api(request):
             date=date.today(),
             recipe_name=data.get('recipe_name', 'Unknown Recipe'),
             calories=int(float(data.get('calories', 0))),
-            protein_g=int(float(data.get('protein', 0))),
-            carbs_g=int(float(data.get('carbs', 0))),
-            fats_g=int(float(data.get('fats', 0)))
+            protein=int(float(data.get('protein', 0))),
+            carbs=int(float(data.get('carbs', 0))),
+            fats=int(float(data.get('fats', 0)))
         )
         return JsonResponse({'status': 'success'})
     except Exception as e:

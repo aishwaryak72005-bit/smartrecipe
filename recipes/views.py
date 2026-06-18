@@ -733,6 +733,11 @@ Reply ONLY with this exact format — nothing else:
 from concurrent.futures import ThreadPoolExecutor
 
 def calculate_recipe_nutrition(ingredients_list, servings):
+    try:
+        servings = int(servings)
+    except:
+        servings = 1
+
     total = {
         'calories': 0.0, 'protein': 0.0, 'fat': 0.0, 'carbs': 0.0,
         'fiber': 0.0, 'sugar': 0.0, 'sodium': 0.0, 'cholesterol': 0.0, 'saturated_fat': 0.0
@@ -761,7 +766,10 @@ def calculate_recipe_nutrition(ingredients_list, servings):
         ingredient_details.append(detail)
         nutri = detail['nutrition']
         for k in total.keys():
-            total[k] += nutri.get(k, 0.0)
+            try:
+                total[k] += float(str(nutri.get(k, 0.0)).replace(',',''))
+            except:
+                total[k] += 0.0
             
     # Per serving
     per_serving = {k: round(v / max(1, servings), 1) for k, v in total.items()}
@@ -904,14 +912,14 @@ def generate_view(request):
         leftover_mode = request.POST.get('leftover_mode', False)
         selected_dish = request.POST.get('selected_dish', '')
         
-        if log.request_count >= 5 and not is_user_premium(request.user):
+        if log.request_count >= 50 and not is_user_premium(request.user):
             return render(request, 'recipes/generate.html', {
                 'quick_ingredients': quick_ingredients,
                 'quick_budgets': quick_budgets,
-                'error_message': "You have reached your daily limit of 5 recipe generations. Check back tomorrow! ⏰",
+                'error_message': "You have reached your daily limit of 50 recipe generations. Check back tomorrow! ⏰",
                 'quota_exceeded': True,
                 'quota_count': log.request_count,
-                'quota_limit': 5,
+                'quota_limit': 50,
                 'ingredients': ingredients,
                 'budget': budget,
                 'serving_size': serving_size,
@@ -1151,13 +1159,13 @@ You must return the response strictly in the following format:
                 'youtube_videos': youtube_videos,
                 'selected_dish': selected_dish,
                 'quota_count': 0 if is_user_premium(request.user) else log.request_count,
-                'quota_limit': "\u221e" if is_user_premium(request.user) else 5,
+                'quota_limit': "\u221e" if is_user_premium(request.user) else 50,
             })
 
         except Exception as e:
             error_message = f"AI Error: {str(e)}"
             quota_count = 0 if is_user_premium(request.user) else log.request_count
-            quota_limit = "∞" if is_user_premium(request.user) else 5
+            quota_limit = "∞" if is_user_premium(request.user) else 50
             return render(request, 'recipes/generate.html', {
                 'quick_ingredients': quick_ingredients,
                 'quick_budgets': quick_budgets,
@@ -1180,7 +1188,7 @@ You must return the response strictly in the following format:
         log.save()
     
     quota_count = 0 if is_user_premium(request.user) else log.request_count
-    quota_limit = "∞" if is_user_premium(request.user) else 5
+    quota_limit = "∞" if is_user_premium(request.user) else 50
     
     return render(request, 'recipes/generate.html', {
         'quick_ingredients': quick_ingredients,

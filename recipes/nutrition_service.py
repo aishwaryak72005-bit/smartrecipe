@@ -97,7 +97,7 @@ def _fallback_groq_nutrition(ingredient_name, quantity_grams, default_result):
         prompt = (
             f"Give exact nutrition per 100g for '{ingredient_name}' in JSON format with keys: "
             "calories, protein, fat, carbs, fiber, sugar, sodium, cholesterol, saturated_fat. "
-            "Only return valid JSON, nothing else."
+            "All values must be plain numbers (no units). Only return valid JSON, nothing else."
         )
         response = groq_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -112,19 +112,25 @@ def _fallback_groq_nutrition(ingredient_name, quantity_grams, default_result):
         
         parsed = json.loads(content)
         
-        # Save to cache
+        # Save to cache — force all values to float
         cache_key = ingredient_name.lower().strip()
         fake_food_nutrients = {}
         for key, n_id in USDA_NUTRIENT_IDS.items():
-            fake_food_nutrients[n_id] = float(parsed.get(key, 0.0))
+            try:
+                fake_food_nutrients[n_id] = float(str(parsed.get(key, 0.0)).replace(',',''))
+            except:
+                fake_food_nutrients[n_id] = 0.0
         _NUTRITION_CACHE_100G[cache_key] = fake_food_nutrients
         
         for key in USDA_NUTRIENT_IDS.keys():
-            per_100g = parsed.get(key, 0.0)
-            default_result[key] = round((float(per_100g) / 100.0) * float(quantity_grams), 1)
+            try:
+                per_100g = float(str(parsed.get(key, 0.0)).replace(',',''))
+            except:
+                per_100g = 0.0
+            default_result[key] = round((per_100g / 100.0) * float(quantity_grams), 1)
         return default_result
     except Exception as e:
-        print(f"Groq API error for {ingredient_name}: {e}")
+        print(f"Groq fallback error for {ingredient_name}: {e}")
         
     return default_result
 

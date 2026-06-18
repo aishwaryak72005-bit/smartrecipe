@@ -2546,6 +2546,13 @@ function downloadPDF(recipeId, recipeName) {
     // Remove fixed heights and overflow constraints to allow full rendering
     clone.style.height = 'auto';
     clone.style.overflow = 'visible';
+    
+    // CRITICAL: html2canvas crashes if -webkit-text-fill-color is present. Strip it!
+    clone.querySelectorAll('*').forEach(el => {
+        el.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
+        el.style.setProperty('color', '#0f172a', 'important'); // Fallback to dark slate
+    });
+
     document.body.appendChild(clone);
     
     const opt = {

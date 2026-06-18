@@ -1157,6 +1157,7 @@ You must return the response strictly in the following format:
                 'selected_dish': selected_dish,
                 'quota_count': 0 if is_user_premium(request.user) else log.request_count,
                 'quota_limit': "\u221e" if is_user_premium(request.user) else 50,
+                'premium': is_user_premium(request.user),
             })
 
         except Exception as e:

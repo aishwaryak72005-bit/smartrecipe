@@ -111,7 +111,7 @@
     <button onclick="shareRecipeLink('{{ recipe.name|escapejs }}', '{{ recipe.description|escapejs }}', this)" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
       <i class="fas fa-share-nodes text-orange-400"></i> Share
     </button>
-    <button onclick="downloadPDF('{{ forloop.counter }}', '{{ recipe.name|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
+    <button onclick="downloadPDF('recipe-card-content-{{ forloop.counter }}', '{{ recipe.name|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
       <i class="fas fa-file-pdf text-red-500"></i> Save PDF <span class="text-[0.6rem] bg-orange-500 text-white px-1.5 py-0.5 rounded ml-1">PRO</span>
     </button>
     <button onclick="logMacros('{{ recipe.name|escapejs }}', '{{ recipe.nutrition.calories|default:'0' }}', '{{ recipe.nutrition.protein|default:'0' }}', '{{ recipe.nutrition.carbs|default:'0' }}', '{{ recipe.nutrition.fat|default:'0' }}', this)" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
@@ -184,19 +184,19 @@
     </h6>
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
       <div class="bg-orange-50 border border-orange-100 rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
-        <div class="text-2xl font-black text-orange-600">{{ recipe.nutrition.calories|default:"-" }}</div>
+        <div class="text-2xl font-black text-orange-600">{{ recipe.nutrition.calories|default:"-" }}{% if recipe.nutrition.calories %} kcal{% endif %}</div>
         <div class="text-[10px] font-black text-orange-400/80 uppercase tracking-widest mt-1" style="color: #F6AD55 !important;">Calories</div>
       </div>
       <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
-        <div class="text-2xl font-black text-emerald-600">{{ recipe.nutrition.protein|default:"-" }}</div>
+        <div class="text-2xl font-black text-emerald-600">{{ recipe.nutrition.protein|default:"-" }}{% if recipe.nutrition.protein %}g{% endif %}</div>
         <div class="text-[10px] font-black text-emerald-400/80 uppercase tracking-widest mt-1" style="color: #34D399 !important;">Protein</div>
       </div>
       <div class="bg-sky-50 border border-sky-100 rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
-        <div class="text-2xl font-black text-sky-600">{{ recipe.nutrition.carbs|default:"-" }}</div>
+        <div class="text-2xl font-black text-sky-600">{{ recipe.nutrition.carbs|default:"-" }}{% if recipe.nutrition.carbs %}g{% endif %}</div>
         <div class="text-[10px] font-black text-sky-400/80 uppercase tracking-widest mt-1" style="color: #38BDF8 !important;">Carbs</div>
       </div>
       <div class="bg-rose-50 border border-rose-100 rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
-        <div class="text-2xl font-black text-rose-600">{{ recipe.nutrition.fat|default:"-" }}</div>
+        <div class="text-2xl font-black text-rose-600">{{ recipe.nutrition.fat|default:"-" }}{% if recipe.nutrition.fat %}g{% endif %}</div>
         <div class="text-[10px] font-black text-rose-400/80 uppercase tracking-widest mt-1" style="color: #FB7185 !important;">Fat</div>
       </div>
     </div>

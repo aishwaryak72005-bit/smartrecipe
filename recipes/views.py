@@ -403,15 +403,22 @@ def parse_recipes(ai_response):
                         except Exception:
                             display = raw
                         recipe['missing'].append(display)
-                elif 'Nutritional Info:' in line:
+                elif 'Nutritional Info' in line:
                     try:
-                        # Format: Nutritional Info: 450 kcal | 12g P | 45g C | 15g F
-                        nutri_parts = line.split('Nutritional Info:')[1].split('|')
+                        import re
+                        # Split by the first colon to get the data part
+                        data_part = line.split(':', 1)[1]
+                        nutri_parts = data_part.split('|')
+                        
+                        def extract_num(text):
+                            nums = re.findall(r'\d+', text)
+                            return nums[0] if nums else '0'
+
                         recipe['nutrition'] = {
-                            'calories': nutri_parts[0].strip() if len(nutri_parts) > 0 else '',
-                            'protein': nutri_parts[1].strip() if len(nutri_parts) > 1 else '',
-                            'carbs': nutri_parts[2].strip() if len(nutri_parts) > 2 else '',
-                            'fat': nutri_parts[3].strip() if len(nutri_parts) > 3 else '',
+                            'calories': extract_num(nutri_parts[0]) if len(nutri_parts) > 0 else '0',
+                            'protein': extract_num(nutri_parts[1]) if len(nutri_parts) > 1 else '0',
+                            'carbs': extract_num(nutri_parts[2]) if len(nutri_parts) > 2 else '0',
+                            'fat': extract_num(nutri_parts[3]) if len(nutri_parts) > 3 else '0',
                         }
                     except:
                         recipe['nutrition'] = None
@@ -916,7 +923,7 @@ RECIPE {i}:
 Name: [Recipe name]
 Description: [One line description]
 AI Taste Score: [Score]/10
-Nutritional Info: [Calories] kcal | [Protein]g P | [Carbs]g C | [Fat]g F
+Nutritional Info (Per 1 Serving): [Calories] kcal | [Protein]g P | [Carbs]g C | [Fat]g F
 Estimated Cost: ₹[cost]
 Restaurant Price: ₹[cost]
 Budget Score: [Score between 1-10]
@@ -964,7 +971,7 @@ CRITICAL RULES:
 {pantry_rule_gen}
 4. MISSING INGREDIENTS: Only list ingredients the user DOES NOT have in the 'Missing Ingredients' section. If they have everything needed, write 'None'.
 5. PRICING: Be realistic with Indian grocery prices.
-6. EXACT MACROS: You are acting as a Certified Clinical Nutritionist. If the user provides quantities (e.g. '250g chicken'), you MUST calculate the EXACT Calories, Protein, Carbs, and Fats using standard USDA database values. DO NOT guess. Sum up the exact macros of all ingredients used.
+6. EXACT MACROS (PER SERVING): You are acting as a Certified Clinical Nutritionist. You MUST calculate the EXACT Calories, Protein, Carbs, and Fats PER 1 SERVING of the dish. Do not calculate for the entire batch if the serving size is >1. Be highly accurate using standard USDA database values.
 
 Provide EXACTLY {recipe_count} recipe options.
 You must return the response strictly in the following format:

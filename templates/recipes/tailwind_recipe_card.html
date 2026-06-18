@@ -108,19 +108,19 @@
       <i class="far fa-bookmark text-emerald-400"></i> Save
     </button>
     {% endif %}
-    <button onclick="shareRecipeLink('{{ recipe.name|escapejs }}', '{{ recipe.description|escapejs }}', this)" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm" style="color: white !important;">
+    <button onclick="shareRecipeLink('{{ recipe.name|escapejs }}', '{{ recipe.description|escapejs }}', this)" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm darkreader-ignore" style="color: white !important; -webkit-text-fill-color: white !important;">
       <i class="fas fa-share-nodes text-orange-400"></i> Share
     </button>
-    <button onclick="fetchCookingTips('{{ recipe.name|escapejs }}', '{{ ingredients|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm" style="color: white !important;">
+    <button onclick="fetchCookingTips('{{ recipe.name|escapejs }}', '{{ ingredients|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm darkreader-ignore" style="color: white !important; -webkit-text-fill-color: white !important;">
       <i class="fas fa-lightbulb text-yellow-400"></i> Cooking Tips
     </button>
-    <button onclick="downloadPDF('{{ forloop.counter }}', '{{ recipe.name|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm" style="color: white !important;">
-      <i class="fas fa-file-pdf text-red-500"></i> Save PDF <span class="text-[0.6rem] bg-orange-500 text-white px-1.5 py-0.5 rounded ml-1">PRO</span>
+    <button onclick="downloadPDF('{{ forloop.counter }}', '{{ recipe.name|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm darkreader-ignore" style="color: white !important; -webkit-text-fill-color: white !important;">
+      <i class="fas fa-file-pdf text-red-500"></i> Save PDF <span class="text-[0.6rem] bg-orange-500 px-1.5 py-0.5 rounded ml-1" style="color: white !important; -webkit-text-fill-color: white !important;">PRO</span>
     </button>
-    <button onclick="logMacros('{{ recipe.name|escapejs }}', '{{ recipe.nutrition.calories|default:'0' }}', '{{ recipe.nutrition.protein|default:'0' }}', '{{ recipe.nutrition.carbs|default:'0' }}', '{{ recipe.nutrition.fat|default:'0' }}', this)" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm" style="color: white !important;">
-      <i class="fas fa-fire text-yellow-400"></i> Log Macros <span class="text-[0.6rem] bg-orange-500 text-white px-1.5 py-0.5 rounded ml-1">PRO</span>
+    <button onclick="logMacros('{{ recipe.name|escapejs }}', '{{ recipe.nutrition.calories|default:'0' }}', '{{ recipe.nutrition.protein|default:'0' }}', '{{ recipe.nutrition.carbs|default:'0' }}', '{{ recipe.nutrition.fat|default:'0' }}', this)" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm darkreader-ignore" style="color: white !important; -webkit-text-fill-color: white !important;">
+      <i class="fas fa-fire text-yellow-400"></i> Log Macros <span class="text-[0.6rem] bg-orange-500 px-1.5 py-0.5 rounded ml-1" style="color: white !important; -webkit-text-fill-color: white !important;">PRO</span>
     </button>
-    <a href="https://www.youtube.com/results?search_query={{ recipe.name|urlencode }}+recipe" target="_blank" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm" style="color: white !important; text-decoration:none;">
+    <a href="https://www.youtube.com/results?search_query={{ recipe.name|urlencode }}+recipe" target="_blank" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm darkreader-ignore" style="color: white !important; -webkit-text-fill-color: white !important; text-decoration:none;">
       <i class="fab fa-youtube text-red-400"></i> Video
     </a>
     {% if saved_recipe_obj %}

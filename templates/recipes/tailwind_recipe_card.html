@@ -114,9 +114,6 @@
     <button onclick="fetchCookingTips('{{ recipe.name|escapejs }}', '{{ ingredients|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm" style="color: white !important; -webkit-text-fill-color: white !important;">
       <i class="fas fa-lightbulb text-yellow-400"></i> Cooking Tips
     </button>
-    <button onclick="downloadPDF('{{ forloop.counter }}', '{{ recipe.name|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm" style="color: white !important; -webkit-text-fill-color: white !important;">
-      <i class="fas fa-file-pdf text-red-500"></i> Save PDF <span class="text-[0.6rem] bg-orange-500 px-1.5 py-0.5 rounded ml-1" style="color: white !important; -webkit-text-fill-color: white !important;">PRO</span>
-    </button>
     <a href="https://www.youtube.com/results?search_query={{ recipe.name|urlencode }}+recipe" target="_blank" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm" style="color: white !important; -webkit-text-fill-color: white !important; text-decoration:none;">
       <i class="fab fa-youtube text-red-400"></i> Video
     </a>

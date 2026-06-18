@@ -155,17 +155,19 @@
       </h5>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for ing in recipe.ingredients %}
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
-          <div class="w-8 h-8 rounded-full {% if ing.have %}bg-emerald-100 text-emerald-600{% else %}bg-orange-100 text-orange-500{% endif %} flex items-center justify-center shrink-0 border border-white shadow-sm">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow" style="border:1px solid #e2e8f0;">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-white shadow-sm" style="background:{% if ing.have %}#dcfce7{% else %}#ffedd5{% endif %}; min-width:2rem;">
             {% if ing.have %}
-            <i class="fas fa-check text-xs"></i>
+            <i class="fas fa-check text-xs" style="color:#16a34a;"></i>
             {% else %}
-            <i class="fas fa-times text-xs"></i>
+            <i class="fas fa-times text-xs" style="color:#ea580c;"></i>
             {% endif %}
           </div>
           <div>
-            <div class="text-sm font-bold text-slate-900 leading-tight ingredient-text" style="color: #0F172A !important;">{% if ing.text %}{{ ing.text }}{% else %}{{ ing }}{% endif %}</div>
-            <div class="text-xs text-slate-500 font-semibold mt-1" style="color: #64748B !important;">{% if ing.measurement %}{{ ing.measurement }}{% endif %}</div>
+            <div style="color:#0f172a; font-size:0.9rem; font-weight:700; line-height:1.3;">{% if ing.text %}{{ ing.text }}{% else %}{{ ing }}{% endif %}</div>
+            {% if ing.measurement %}
+            <div style="color:#475569; font-size:0.78rem; font-weight:600; margin-top:3px;">{{ ing.measurement }}</div>
+            {% endif %}
           </div>
         </div>
         {% endfor %}
@@ -178,13 +180,9 @@
       </h5>
       <div class="flex flex-col gap-4">
         {% for step in recipe.instructions %}
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex gap-4 shadow-sm">
-          <div class="w-8 h-8 rounded-full bg-[#064E3B] text-white font-black flex items-center justify-center shrink-0 text-sm shadow-md border-2 border-emerald-100 mt-0.5">
-            {{ forloop.counter }}
-          </div>
-          <div class="text-sm font-semibold text-slate-800 leading-relaxed pt-1 instruction-text" style="color: #1E293B !important;">
-            {{ step }}
-          </div>
+        <div class="flex gap-4 p-5 rounded-2xl" style="background:#f8fafc; border:1px solid #e2e8f0;">
+          <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-white shadow-md mt-0.5" style="background:#064E3B; min-width:2rem;">{{ forloop.counter }}</div>
+          <div style="color:#1e293b; font-size:0.95rem; font-weight:600; line-height:1.7; padding-top:2px;">{{ step }}</div>
         </div>
         {% endfor %}
       </div>

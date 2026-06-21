@@ -935,14 +935,14 @@ def generate_view(request):
         leftover_mode = request.POST.get('leftover_mode', False)
         selected_dish = request.POST.get('selected_dish', '')
         
-        if log.request_count >= 50 and not is_user_premium(request.user):
+        if log.request_count >= 5 and not is_user_premium(request.user):
             return render(request, 'recipes/generate.html', {
                 'quick_ingredients': quick_ingredients,
                 'quick_budgets': quick_budgets,
-                'error_message': "You have reached your daily limit of 50 recipe generations. Check back tomorrow! ⏰",
+                'error_message': "You have reached your daily limit of 5 recipe generations. Check back tomorrow! ⏰",
                 'quota_exceeded': True,
                 'quota_count': log.request_count,
-                'quota_limit': 50,
+                'quota_limit': 5,
                 'ingredients': ingredients,
                 'budget': budget,
                 'serving_size': serving_size,
@@ -1182,14 +1182,14 @@ You must return the response strictly in the following format:
                 'youtube_videos': youtube_videos,
                 'selected_dish': selected_dish,
                 'quota_count': 0 if is_user_premium(request.user) else log.request_count,
-                'quota_limit': "\u221e" if is_user_premium(request.user) else 50,
+                'quota_limit': "\u221e" if is_user_premium(request.user) else 5,
                 'premium': is_user_premium(request.user),
             })
 
         except Exception as e:
             error_message = f"AI Error: {str(e)}"
             quota_count = 0 if is_user_premium(request.user) else log.request_count
-            quota_limit = "∞" if is_user_premium(request.user) else 50
+            quota_limit = "∞" if is_user_premium(request.user) else 5
             return render(request, 'recipes/generate.html', {
                 'quick_ingredients': quick_ingredients,
                 'quick_budgets': quick_budgets,

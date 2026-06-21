@@ -25,6 +25,12 @@ urlpatterns = [
     path('api/cravings/instructions/', views.api_cravings_instructions, name='api_cravings_instructions'),
     path('upgrade/', views.upgrade_premium_view, name='upgrade_premium'),
     
+    # Razorpay Payment endpoints
+    path('create-order/', views.create_order_view, name='create_order'),
+    path('payment-success/', views.payment_success_page_view, name='payment_success_page'),
+    path('api/payment-success/', views.payment_success_view, name='payment_success'),
+    path('payment-failed/', views.payment_failed_view, name='payment_failed'),
+    
     # Premium: Macros
     path('macros/', views.macros_view, name='macros'),
     path('api/macros/log/', views.log_macro_api, name='log_macro_api'),

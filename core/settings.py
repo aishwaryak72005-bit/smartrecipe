@@ -29,6 +29,10 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-qt&c6ve2qi$wjh0%q5wyu!_a7*
 # USDA FoodData Central API Key
 USDA_API_KEY = os.getenv('USDA_API_KEY', '')
 
+# Razorpay Keys
+RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'rzp_test_T4HHAtKZqgaTph')
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'G8p6QNCYW541mTxD3xfMrLjo')
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 

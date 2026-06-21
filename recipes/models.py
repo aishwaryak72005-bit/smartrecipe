@@ -61,6 +61,9 @@ class DailyRequestLog(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     is_premium = models.BooleanField(default=False)
+    premium_start_date = models.DateTimeField(null=True, blank=True)
+    premium_end_date = models.DateTimeField(null=True, blank=True)
+    razorpay_subscription_id = models.CharField(max_length=100, null=True, blank=True)
     
     def __str__(self):
         return f"{self.user.username} Profile (Premium: {self.is_premium})"

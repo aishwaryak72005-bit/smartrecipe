@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}BudgetBites Pro{% endblock %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  
+  .upgrade-page { font-family: 'Inter', sans-serif; min-height: 80vh; background: #0a0f1a; padding: 3rem 1rem 4rem; display: flex; flex-direction: column; align-items: center; }
+  
+  .pricing-card {
+    background: linear-gradient(145deg, rgba(30,41,59,0.8), rgba(15,23,42,0.9));
+    border: 1px solid rgba(251,191,36,0.3);
+    border-radius: 1.5rem;
+    padding: 2.5rem 2rem;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(251,191,36,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .pricing-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, #f97316, #fbbf24);
+  }
+
+  .pro-badge {
+    display: inline-block; background: linear-gradient(135deg, #f97316, #fbbf24);
+    color: #000; font-weight: 900; font-size: 0.8rem; padding: 0.2rem 0.6rem;
+    border-radius: 5px; margin-bottom: 1rem;
+  }
+
+  .price-title { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; }
+  .price-amount { font-size: 3rem; font-weight: 900; color: #fbbf24; margin: 1rem 0; display: flex; align-items: flex-end; justify-content: center; gap: 0.5rem; }
+  .price-amount .currency { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .price-amount .period { font-size: 1rem; color: #94a3b8; font-weight: 500; margin-bottom: 0.5rem; }
+  .price-old { font-size: 1.2rem; color: #64748b; text-decoration: line-through; font-weight: 600; margin-bottom: -1rem; text-align: center; }
+
+  .features-list { list-style: none; padding: 0; margin: 2rem 0; text-align: left; }
+  .features-list li {
+    display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 1rem;
+    color: #cbd5e1; font-size: 1rem; line-height: 1.4;
+  }
+  .features-list li i { color: #34d399; font-size: 1.2rem; margin-top: 0.1rem; }
+
+  .pay-btn {
+    width: 100%; background: linear-gradient(135deg, #f97316, #fbbf24);
+    color: #000; font-weight: 800; font-size: 1.1rem; border: none;
+    padding: 1rem; border-radius: 0.75rem; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex; justify-content: center; align-items: center; gap: 0.5rem;
+  }
+  .pay-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(249,115,22,0.2); }
+
+  .trust-badges {
+    margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;
+    text-align: center; font-size: 0.8rem; color: #64748b;
+  }
+  .trust-badges i { color: #94a3b8; }
+</style>
+
+<div class="upgrade-page text-center">
+  <div class="pricing-card animate__animated animate__fadeInUp">
+    <div class="pro-badge">BUDGETBITES PRO</div>
+    <h2 class="price-title">Unlock Everything</h2>
+    
+    <div class="price-old">₹99</div>
+    <div class="price-amount">
+      <span class="currency">₹</span>69<span class="period">/month</span>
+    </div>
+    
+    <p style="color: #94a3b8; font-size: 0.9rem;">Launch discount! Cancel anytime.</p>
+
+    <ul class="features-list">
+      <li><i class="fas fa-check-circle"></i> <span><strong>Unlimited</strong> AI Recipe Generations</span></li>
+      <li><i class="fas fa-check-circle"></i> <span><strong>Daily Macro Tracker</strong> for fitness goals</span></li>
+      <li><i class="fas fa-check-circle"></i> <span><strong>Weekly Meal Planner</strong> & Grocery lists</span></li>
+      <li><i class="fas fa-check-circle"></i> <span><strong>Cravings Mode</strong> (Reverse Recipe tool)</span></li>
+      <li><i class="fas fa-check-circle"></i> <span><strong>One-Click Regenerate</strong> past recipes</span></li>
+      <li><i class="fas fa-check-circle"></i> <span>Ad-Free & Priority generation speed</span></li>
+    </ul>
+
+    <button onclick="startPayment()" class="pay-btn" id="payBtn">
+      <i class="fas fa-bolt"></i> Upgrade Now - ₹69/mo
+    </button>
+    
+    <div class="trust-badges">
+      <span><i class="fas fa-lock me-1"></i> Secure payment via Razorpay</span>
+      <span><i class="fas fa-undo me-1"></i> Cancel anytime. No commitments.</span>
+    </div>
+  </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function startPayment() {
+    const btn = document.getElementById('payBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    btn.disabled = true;
+
+    fetch('{% url "create_order" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+    })
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+        }
+
+        var options = {
+            key: '{{ razorpay_key_id }}', // Pass from view or use direct key
+            amount: data.amount,
+            currency: 'INR',
+            name: 'BudgetBites Pro',
+            description: 'Monthly Subscription (Launch Offer)',
+            order_id: data.order_id,
+            handler: function(response) {
+                btn.innerHTML = '<i class="fas fa-check"></i> Verifying...';
+                fetch('{% url "payment_success" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature
+                    })
+                })
+                .then(res => res.json())
+                .then(result => {
+                    if(result.success) {
+                        window.location.href = result.redirect_url || '/macros/';
+                    } else {
+                        alert('Payment verification failed.');
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }
+                })
+                .catch(err => {
+                    alert('Error verifying payment.');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+            },
+            prefill: {
+                name: '{{ request.user.username }}',
+                email: '{{ request.user.email }}'
+            },
+            theme: {
+                color: '#10b981'
+            },
+            modal: {
+                ondismiss: function() {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            }
+        };
+        var rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (response){
+            alert(response.error.description);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+        rzp.open();
+    })
+    .catch(err => {
+        alert('Could not initiate payment. Please try again.');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+</script>
+{% endblock %}

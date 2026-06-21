@@ -948,9 +948,18 @@
             </a>
             {% endif %}
 
+            {% if request.user.profile.is_premium or request.user.is_superuser %}
+            <a class="nav-link nav-user-badge ms-2" href="{% url 'profile' %}">
+              <i class="fas fa-user-circle me-1"></i> {{ user.username }} <span class="badge rounded-pill bg-warning text-dark ms-1" style="font-size: 0.6rem;">PRO</span>
+            </a>
+            {% else %}
+            <a class="nav-link ms-2" href="{% url 'upgrade_premium' %}" style="background: linear-gradient(135deg, #f97316, #fbbf24); color: #000 !important; border-radius: 8px; font-weight: bold; padding: 8px 12px; font-size: 0.9rem;">
+              <i class="fas fa-bolt me-1"></i> Upgrade to Pro ₹69/mo
+            </a>
             <a class="nav-link nav-user-badge ms-2" href="{% url 'profile' %}">
               <i class="fas fa-user-circle me-1"></i> {{ user.username }}
             </a>
+            {% endif %}
             <a class="nav-link nav-btn-white ms-2" href="{% url 'logout' %}">
               <i class="fas fa-sign-out-alt me-1"></i> Logout
             </a>

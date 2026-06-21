@@ -8,6 +8,10 @@ from .models import SavedRecipe, MealPlan, DailyRequestLog, UserProfile, MacroLo
 def is_user_premium(user):
     if user.is_superuser:
         return True
+    
+    # Use the new check_premium_status to revoke expired premium
+    check_premium_status(user)
+    
     try:
         if hasattr(user, 'profile') and user.profile.is_premium:
             return True
@@ -1854,3 +1858,140 @@ def delete_history_view(request, history_id):
     entry = get_object_or_404(RecipeHistory, id=history_id, user=request.user)
     entry.delete()
     return redirect('recipe_history')
+
+# ─── Razorpay Premium Checkout ───────────────────────────────────────────────
+
+import json
+from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
+from django.views.decorators.csrf import csrf_exempt
+
+try:
+    from .payment import client as razorpay_client
+except ImportError:
+    razorpay_client = None
+
+def check_premium_status(user):
+    """Check if premium has expired and revoke if needed."""
+    if not user.is_authenticated:
+        return
+    try:
+        profile = user.profile
+        if profile.is_premium and profile.premium_end_date:
+            if timezone.now() > profile.premium_end_date:
+                profile.is_premium = False
+                profile.save()
+    except Exception:
+        pass
+
+@login_required(login_url='/login/')
+def upgrade_premium_view(request):
+    """Render the pricing page."""
+    # Check expiry first
+    check_premium_status(request.user)
+    
+    # Pass razorpay key to frontend
+    key_id = getattr(settings, 'RAZORPAY_KEY_ID', '')
+    return render(request, 'recipes/upgrade_premium.html', {
+        'razorpay_key_id': key_id
+    })
+
+@login_required(login_url='/login/')
+@require_POST
+def create_order_view(request):
+    """Create a Razorpay order for Rs 69."""
+    if not razorpay_client:
+        return JsonResponse({'error': 'Razorpay not configured'}, status=500)
+        
+    try:
+        amount = 6900 # 69 INR in paise
+        currency = 'INR'
+        
+        # Create order
+        order_receipt = f'order_rcptid_{request.user.id}_{timezone.now().timestamp()}'
+        notes = {'user_id': request.user.id, 'username': request.user.username}
+        
+        razorpay_order = razorpay_client.order.create(dict(
+            amount=amount,
+            currency=currency,
+            receipt=order_receipt,
+            notes=notes,
+            payment_capture='1' # Auto-capture
+        ))
+        
+        return JsonResponse({
+            'order_id': razorpay_order['id'],
+            'amount': amount,
+            'currency': currency
+        })
+    except Exception as e:
+        print("Razorpay order error:", str(e))
+        return JsonResponse({'error': str(e)}, status=400)
+
+@login_required(login_url='/login/')
+@require_POST
+def payment_success_view(request):
+    """Verify signature and upgrade user."""
+    if not razorpay_client:
+        return JsonResponse({'error': 'Razorpay not configured', 'success': False}, status=500)
+        
+    try:
+        data = json.loads(request.body)
+        payment_id = data.get('razorpay_payment_id', '')
+        order_id = data.get('razorpay_order_id', '')
+        signature = data.get('razorpay_signature', '')
+        
+        # Verify signature
+        params_dict = {
+            'razorpay_order_id': order_id,
+            'razorpay_payment_id': payment_id,
+            'razorpay_signature': signature
+        }
+        
+        # This will raise a SignatureVerificationError if invalid
+        razorpay_client.utility.verify_payment_signature(params_dict)
+        
+        # Update user profile
+        profile = request.user.profile
+        profile.is_premium = True
+        profile.premium_start_date = timezone.now()
+        profile.premium_end_date = timezone.now() + timedelta(days=30)
+        profile.razorpay_subscription_id = payment_id # Or order_id
+        profile.save()
+        
+        # Also log the successful payment as a session variable to show success page
+        request.session['payment_success_expiry'] = profile.premium_end_date.isoformat()
+        
+        return JsonResponse({'success': True, 'redirect_url': '/payment-success/'})
+        
+    except Exception as e:
+        print("Razorpay verification error:", str(e))
+        return JsonResponse({'error': str(e), 'success': False}, status=400)
+
+@login_required(login_url='/login/')
+def payment_success_page_view(request):
+    """Render the success page after payment."""
+    expiry_str = request.session.pop('payment_success_expiry', None)
+    
+    if not expiry_str:
+        # Check if they are actually premium
+        check_premium_status(request.user)
+        if not request.user.profile.is_premium:
+            return redirect('upgrade_premium')
+        expiry_date = request.user.profile.premium_end_date
+    else:
+        from dateutil.parser import isoparse
+        expiry_date = isoparse(expiry_str)
+        
+    return render(request, 'recipes/payment_success.html', {
+        'expiry_date': expiry_date
+    })
+
+@login_required(login_url='/login/')
+def payment_failed_view(request):
+    """Handle payment failure."""
+    return render(request, 'recipes/upgrade_premium.html', {
+        'error_message': 'Payment failed or was cancelled. Please try again.',
+        'razorpay_key_id': getattr(settings, 'RAZORPAY_KEY_ID', '')
+    })

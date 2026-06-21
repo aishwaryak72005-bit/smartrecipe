@@ -6,3 +6,4 @@ whitenoise
 gunicorn
 dj-database-url
 psycopg2-binary
+razorpay==1.4.2

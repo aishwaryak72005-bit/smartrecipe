@@ -299,17 +299,10 @@
 
       <!-- Actions -->
       <div class="card-actions">
-        {% if premium %}
         <a href="{% url 'generate' %}?ingredients={{ item.ingredients_used|urlencode }}&budget={{ item.budget|urlencode }}&cuisine={{ item.cuisine|urlencode }}&auto=1"
            class="btn-use-again">
           <i class="fas fa-redo"></i> Use Again
         </a>
-        {% else %}
-        <button class="btn-use-again locked" title="Upgrade to Premium to use this feature"
-                onclick="alert('🔒 One-Click Regenerate is a Premium feature! Upgrade to reuse your past recipes instantly.')">
-          <i class="fas fa-lock"></i> Use Again (PRO)
-        </button>
-        {% endif %}
 
         <a href="{% url 'delete_history' item.id %}"
            class="btn-delete"

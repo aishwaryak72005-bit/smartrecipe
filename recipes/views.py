@@ -1212,7 +1212,7 @@ You must return the response strictly in the following format:
         log.save()
     
     quota_count = 0 if is_user_premium(request.user) else log.request_count
-    quota_limit = "∞" if is_user_premium(request.user) else 50
+    quota_limit = "∞" if is_user_premium(request.user) else 5
     
     return render(request, 'recipes/generate.html', {
         'quick_ingredients': quick_ingredients,

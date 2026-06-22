@@ -1891,6 +1891,12 @@ def upgrade_premium_view(request):
     # Check expiry first
     check_premium_status(request.user)
     
+    # If user is already PRO or Admin, redirect them away
+    if request.user.is_superuser or (hasattr(request.user, 'profile') and request.user.profile.is_premium):
+        from django.contrib import messages
+        messages.info(request, "You are already a PRO member! Thank you for your support.")
+        return redirect('home')
+    
     # Pass razorpay key to frontend
     key_id = getattr(settings, 'RAZORPAY_KEY_ID', '')
     return render(request, 'recipes/upgrade_premium.html', {

@@ -37,6 +37,10 @@ RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'G8p6QNCYW541mTxD3xf
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['*'] # In a real production environment, change this to your Render domain
+CSRF_TRUSTED_ORIGINS = [
+    'https://bugetbites.onrender.com',
+    'https://*.onrender.com',
+]
 
 
 # Application definition

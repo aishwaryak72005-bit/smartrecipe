@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Mistake Fixer - BudgetBites{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold"><i class="fas fa-tools text-orange-500"></i> Cooking Mistake Fixer</h2>
+                <p class="text-muted">Did you add too much salt? Burn the rice? Tell Chef AI and get instant fixes!</p>
+            </div>
+            
+            <div class="card shadow-sm border-0 mb-4 rounded-4" style="background: #ffffff;">
+                <div class="card-body p-4">
+                    <form method="POST" id="mistakeForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Dish Type</label>
+                            <select class="form-select form-select-lg" name="dish_type" required>
+                                <option value="" disabled {% if not dish_type %}selected{% endif %}>Select what you were cooking...</option>
+                                <option value="Curry" {% if dish_type == "Curry" %}selected{% endif %}>Curry / Gravy</option>
+                                <option value="Rice" {% if dish_type == "Rice" %}selected{% endif %}>Rice / Biryani</option>
+                                <option value="Dal" {% if dish_type == "Dal" %}selected{% endif %}>Dal / Lentils</option>
+                                <option value="Bread" {% if dish_type == "Bread" %}selected{% endif %}>Roti / Paratha / Bread</option>
+                                <option value="Dessert" {% if dish_type == "Dessert" %}selected{% endif %}>Dessert / Sweet</option>
+                                <option value="Other" {% if dish_type == "Other" %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">What went wrong?</label>
+                            <textarea class="form-control" name="mistake" rows="3" placeholder="e.g. I added way too much salt and it's too spicy..." required>{{ mistake }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary-brand w-100 py-3 fw-bold fs-5 rounded-3" id="fixBtn">
+                            <i class="fas fa-magic"></i> Fix My Mistake!
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {% if response %}
+            <div class="card shadow-sm border-0 rounded-4 mt-4" style="background-color: #f0fdf4; border-left: 5px solid #22c55e !important;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-success mb-3"><i class="fas fa-check-circle"></i> Chef AI's Solution:</h5>
+                    <div style="white-space: pre-line; color: #1f2937; line-height: 1.6;">{{ response }}</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if error %}
+            <div class="alert alert-danger rounded-4 mt-4 shadow-sm">
+                <i class="fas fa-exclamation-triangle"></i> {{ error }}
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('mistakeForm').addEventListener('submit', function() {
+    const btn = document.getElementById('fixBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chef AI is thinking...';
+    btn.disabled = true;
+});
+</script>
+{% endblock %}

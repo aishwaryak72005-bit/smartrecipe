@@ -8,6 +8,7 @@ urlpatterns = [
     path('suggest/', views.suggest_view, name='suggest'),
     path('save-recipe/', views.save_recipe_view, name='save_recipe'),
     path('saved-recipes/', views.saved_recipes_view, name='saved_recipes'),
+    path('mistake-fixer/', views.mistake_fixer_view, name='mistake_fixer'),
     
     # Policies for Razorpay
     path('terms/', TemplateView.as_view(template_name='policies/terms.html'), name='terms'),

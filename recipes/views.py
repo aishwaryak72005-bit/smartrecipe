@@ -2016,3 +2016,35 @@ def payment_failed_view(request):
         'error_message': 'Payment failed or was cancelled. Please try again.',
         'razorpay_key_id': getattr(settings, 'RAZORPAY_KEY_ID', '')
     })
+
+@login_required(login_url='/login/')
+def mistake_fixer_view(request):
+    """View to handle cooking mistake fixer feature using Groq API."""
+    context = {}
+    if request.method == 'POST':
+        dish_type = request.POST.get('dish_type', '')
+        mistake = request.POST.get('mistake', '')
+        
+        if dish_type and mistake:
+            try:
+                prompt = f"You are an expert Indian chef. A home cook made this mistake while cooking {dish_type}: {mistake}. Give 3 practical, simple fixes using common Indian kitchen ingredients. Be warm and encouraging."
+                
+                completion = client.chat.completions.create(
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": prompt,
+                        }
+                    ],
+                    model="llama3-8b-8192",
+                    temperature=0.7,
+                    max_tokens=600,
+                )
+                
+                context['response'] = completion.choices[0].message.content
+                context['dish_type'] = dish_type
+                context['mistake'] = mistake
+            except Exception as e:
+                context['error'] = f"Chef AI is currently taking a break. Please try again later. (Error: {str(e)})"
+                
+    return render(request, 'recipes/mistake_fixer.html', context)

@@ -195,7 +195,7 @@ function startPayment() {
         rzp.open();
     })
     .catch(err => {
-        alert('Could not initiate payment. Please try again.');
+        alert('Could not initiate payment. Server error: ' + err.message);
         btn.innerHTML = originalText;
         btn.disabled = false;
     });

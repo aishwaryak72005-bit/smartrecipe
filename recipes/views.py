@@ -1908,16 +1908,15 @@ def create_order_view(request):
         amount = 6900 # 69 INR in paise
         currency = 'INR'
         
-        # Create order
-        order_receipt = f'order_rcptid_{request.user.id}_{timezone.now().timestamp()}'
+        # Create order (ensure receipt length is safe and no deprecated params)
+        order_receipt = f'rcpt_{request.user.id}_{int(timezone.now().timestamp())}'
         notes = {'user_id': request.user.id, 'username': request.user.username}
         
         razorpay_order = razorpay_client.order.create(dict(
             amount=amount,
             currency=currency,
             receipt=order_receipt,
-            notes=notes,
-            payment_capture='1' # Auto-capture
+            notes=notes
         ))
         
         return JsonResponse({

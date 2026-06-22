@@ -1903,12 +1903,15 @@ def upgrade_premium_view(request):
         'razorpay_key_id': key_id
     })
 
-@login_required(login_url='/login/')
+@csrf_exempt
 @require_POST
 def create_order_view(request):
     """Create a Razorpay order for Rs 49 via direct API."""
     import requests
     from requests.auth import HTTPBasicAuth
+    
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Your session has expired. Please refresh the page and log in again.'}, status=401)
     
     key_id = getattr(settings, 'RAZORPAY_KEY_ID', '')
     key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', '')
@@ -1951,12 +1954,15 @@ def create_order_view(request):
         print("Razorpay order error:", str(e))
         return JsonResponse({'error': str(e)}, status=400)
 
-@login_required(login_url='/login/')
+@csrf_exempt
 @require_POST
 def payment_success_view(request):
     """Verify signature and upgrade user."""
     import hmac
     import hashlib
+    
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Your session has expired. Please log in again.'}, status=401)
     
     key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', '')
     if not key_secret:

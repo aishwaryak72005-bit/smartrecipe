@@ -2020,6 +2020,11 @@ def payment_failed_view(request):
 @login_required(login_url='/login/')
 def mistake_fixer_view(request):
     """View to handle cooking mistake fixer feature using Groq API."""
+    # Premium Check
+    check_premium_status(request.user)
+    if not request.user.profile.is_premium:
+        return redirect('upgrade_premium')
+
     context = {}
     if request.method == 'POST':
         dish_type = request.POST.get('dish_type', '')
@@ -2036,7 +2041,7 @@ def mistake_fixer_view(request):
                             "content": prompt,
                         }
                     ],
-                    model="llama3-8b-8192",
+                    model="llama-3.1-8b-instant",
                     temperature=0.7,
                     max_tokens=600,
                 )

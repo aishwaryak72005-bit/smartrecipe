@@ -1,53 +1,256 @@
 {% extends 'base.html' %}
 {% block title %}Mistake Fixer - BudgetBites{% endblock %}
 {% block content %}
-<div class="container py-5">
+<style>
+    /* Premium UI Styles */
+    .fixer-header {
+        position: relative;
+        padding: 4rem 2rem;
+        text-align: center;
+        overflow: hidden;
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        margin-bottom: -3rem;
+        z-index: 0;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    
+    .fixer-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at 50% 0%, rgba(244, 63, 94, 0.15), transparent 70%);
+        z-index: 1;
+    }
+    
+    .fixer-header h2 {
+        color: #fff;
+        font-weight: 800;
+        font-size: 2.5rem;
+        position: relative;
+        z-index: 2;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    .fixer-header p {
+        color: #cbd5e1;
+        font-size: 1.1rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 24px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        position: relative;
+        z-index: 10;
+        padding: 2.5rem;
+    }
+    
+    .dark-mode .glass-card {
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-floating > label {
+        color: #64748b;
+    }
+    .dark-mode .form-floating > label {
+        color: #94a3b8;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 16px;
+        border: 2px solid #e2e8f0;
+        padding: 1rem 1.25rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+        font-size: 1.05rem;
+    }
+    
+    .dark-mode .form-control, .dark-mode .form-select {
+        background: #0f172a;
+        border-color: #334155;
+        color: #f1f5f9;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #f43f5e;
+        box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.1);
+        background: #fff;
+    }
+    
+    .dark-mode .form-control:focus, .dark-mode .form-select:focus {
+        background: #1e293b;
+    }
+    
+    .magic-btn {
+        background: linear-gradient(135deg, #f43f5e, #fb923c);
+        color: white;
+        border: none;
+        border-radius: 16px;
+        padding: 1.2rem;
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .magic-btn::after {
+        content: '';
+        position: absolute;
+        top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        background: linear-gradient(transparent, rgba(255,255,255,0.2), transparent);
+        transform: rotate(45deg) translateY(-100%);
+        transition: 0.6s ease;
+    }
+    
+    .magic-btn:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 35px -5px rgba(244, 63, 94, 0.5);
+        color: white;
+    }
+    
+    .magic-btn:hover::after {
+        transform: rotate(45deg) translateY(100%);
+    }
+
+    .response-card {
+        border-radius: 20px;
+        background: linear-gradient(to bottom right, #f0fdf4, #ffffff);
+        border: 2px solid #bbf7d0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dark-mode .response-card {
+        background: linear-gradient(to bottom right, #064e3b, #022c22);
+        border: 2px solid #059669;
+    }
+    
+    .response-card::before {
+        content: '\f058';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        font-size: 8rem;
+        color: #22c55e;
+        opacity: 0.05;
+        z-index: 0;
+    }
+    
+    .response-content {
+        position: relative;
+        z-index: 1;
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+    
+    /* Loading Animation */
+    .loader-overlay {
+        display: none;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(8px);
+        z-index: 20;
+        border-radius: 24px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+    .dark-mode .loader-overlay {
+        background: rgba(15,23,42,0.85);
+    }
+    
+    .cooking-loader {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 4px solid #f43f5e;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+        margin-bottom: 1.5rem;
+    }
+    
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+</style>
+
+<div class="container py-4 mb-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="text-center mb-4">
-                <h2 class="fw-bold"><i class="fas fa-tools text-orange-500"></i> Cooking Mistake Fixer</h2>
-                <p class="text-muted">Did you add too much salt? Burn the rice? Tell Chef AI and get instant fixes!</p>
+            
+            <div class="fixer-header animate__animated animate__fadeInDown">
+                <h2><i class="fas fa-fire-extinguisher text-rose-500 me-2" style="color: #f43f5e;"></i> Cooking Rescue</h2>
+                <p>Don't panic. Tell Chef AI what went wrong and we'll save your dish!</p>
             </div>
             
-            <div class="card shadow-sm border-0 mb-4 rounded-4" style="background: #ffffff;">
-                <div class="card-body p-4">
-                    <form method="POST" id="mistakeForm">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Dish Type</label>
-                            <select class="form-select form-select-lg" name="dish_type" required>
-                                <option value="" disabled {% if not dish_type %}selected{% endif %}>Select what you were cooking...</option>
-                                <option value="Curry" {% if dish_type == "Curry" %}selected{% endif %}>Curry / Gravy</option>
-                                <option value="Rice" {% if dish_type == "Rice" %}selected{% endif %}>Rice / Biryani</option>
-                                <option value="Dal" {% if dish_type == "Dal" %}selected{% endif %}>Dal / Lentils</option>
-                                <option value="Bread" {% if dish_type == "Bread" %}selected{% endif %}>Roti / Paratha / Bread</option>
-                                <option value="Dessert" {% if dish_type == "Dessert" %}selected{% endif %}>Dessert / Sweet</option>
-                                <option value="Other" {% if dish_type == "Other" %}selected{% endif %}>Other</option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">What went wrong?</label>
-                            <textarea class="form-control" name="mistake" rows="3" placeholder="e.g. I added way too much salt and it's too spicy..." required>{{ mistake }}</textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary-brand w-100 py-3 fw-bold fs-5 rounded-3" id="fixBtn">
-                            <i class="fas fa-magic"></i> Fix My Mistake!
-                        </button>
-                    </form>
+            <div class="glass-card animate__animated animate__fadeInUp animate__delay-1s" style="margin-top: 2rem;">
+                
+                <div class="loader-overlay" id="loaderOverlay">
+                    <div class="cooking-loader"></div>
+                    <h3 class="fw-bold" style="color: #f43f5e;">Chef AI is analyzing...</h3>
+                    <p class="text-muted fs-5">Formulating the perfect rescue plan.</p>
                 </div>
+                
+                <form method="POST" id="mistakeForm">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold ms-1 mb-2 fs-5" style="color: #64748b;"><i class="fas fa-utensils me-2"></i>What were you cooking?</label>
+                        <select class="form-select" name="dish_type" required>
+                            <option value="" disabled {% if not dish_type %}selected{% endif %}>Select your dish...</option>
+                            <option value="Curry" {% if dish_type == "Curry" %}selected{% endif %}>🍲 Curry / Gravy</option>
+                            <option value="Rice" {% if dish_type == "Rice" %}selected{% endif %}>🍚 Rice / Biryani</option>
+                            <option value="Dal" {% if dish_type == "Dal" %}selected{% endif %}>🥣 Dal / Lentils</option>
+                            <option value="Bread" {% if dish_type == "Bread" %}selected{% endif %}>🥖 Roti / Paratha / Bread</option>
+                            <option value="Dessert" {% if dish_type == "Dessert" %}selected{% endif %}>🍰 Dessert / Sweet</option>
+                            <option value="Other" {% if dish_type == "Other" %}selected{% endif %}>🍳 Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-5">
+                        <label class="form-label fw-bold ms-1 mb-2 fs-5" style="color: #64748b;"><i class="fas fa-exclamation-circle me-2"></i>What went wrong?</label>
+                        <textarea class="form-control" name="mistake" rows="4" placeholder="e.g. I added way too much salt and it's too spicy..." required style="resize: none;">{{ mistake }}</textarea>
+                    </div>
+                    
+                    <button type="submit" class="magic-btn w-100" id="fixBtn">
+                        <i class="fas fa-magic me-2"></i> RESCUE MY DISH
+                    </button>
+                </form>
             </div>
 
             {% if response %}
-            <div class="card shadow-sm border-0 rounded-4 mt-4" style="background-color: #f0fdf4; border-left: 5px solid #22c55e !important;">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold text-success mb-3"><i class="fas fa-check-circle"></i> Chef AI's Solution:</h5>
-                    <div style="white-space: pre-line; line-height: 1.6;">{{ response }}</div>
+            <div class="response-card p-4 p-md-5 mt-5 shadow-lg animate__animated animate__zoomIn">
+                <div class="d-flex align-items-center mb-4">
+                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 56px; height: 56px; font-size: 1.8rem; flex-shrink: 0; box-shadow: 0 10px 20px rgba(34,197,94,0.3);">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h2 class="fw-bold mb-0" style="color: #059669;">Rescue Solution</h2>
+                </div>
+                <div class="response-content">
+                    {{ response }}
                 </div>
             </div>
             {% endif %}
             
             {% if error %}
-            <div class="alert alert-danger rounded-4 mt-4 shadow-sm">
-                <i class="fas fa-exclamation-triangle"></i> {{ error }}
+            <div class="alert alert-danger rounded-4 mt-4 shadow-sm border-0 d-flex align-items-center p-4">
+                <i class="fas fa-exclamation-triangle fs-3 me-3 text-danger"></i> 
+                <div>
+                    <h5 class="fw-bold mb-1">Rescue Failed</h5>
+                    <p class="mb-0">{{ error }}</p>
+                </div>
             </div>
             {% endif %}
             
@@ -57,9 +260,8 @@
 
 <script>
 document.getElementById('mistakeForm').addEventListener('submit', function() {
-    const btn = document.getElementById('fixBtn');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chef AI is thinking...';
-    btn.disabled = true;
+    // Show the beautiful glassmorphism loading overlay
+    document.getElementById('loaderOverlay').style.display = 'flex';
 });
 </script>
 {% endblock %}

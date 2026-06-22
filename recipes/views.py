@@ -1900,7 +1900,7 @@ def upgrade_premium_view(request):
 @login_required(login_url='/login/')
 @require_POST
 def create_order_view(request):
-    """Create a Razorpay order for Rs 69 via direct API."""
+    """Create a Razorpay order for Rs 49 via direct API."""
     import requests
     from requests.auth import HTTPBasicAuth
     
@@ -1911,7 +1911,7 @@ def create_order_view(request):
         return JsonResponse({'error': 'Razorpay keys not configured on server'}, status=500)
         
     try:
-        amount = 6900 # 69 INR in paise
+        amount = 4900 # 49 INR in paise
         currency = 'INR'
         
         # Create order via REST API directly to avoid SDK incompatibility
